@@ -1,12 +1,17 @@
 #include "../../apps.h"
+#include "../../hardware/uart/grf_hw_uart.h"
 
 static void button0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-	// switch (event) {
-	// 	case GRF_EVENT_CLICKED:
-	// 		break;
-	// }
+    switch (event) {
+        case GRF_EVENT_SHORT_CLICKED:
+            hmi_send("hi\n");
+            break;
+        default: break;
+    }
 }
+
+
 
 
 

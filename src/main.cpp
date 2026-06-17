@@ -4,7 +4,7 @@
 #define HMI_BAUD    115200
 
 String rxLine;
-enum { IDLE, WAIT_HELLO } state = IDLE;
+enum RpState { ST_IDLE, ST_WAIT_HELLO } state = ST_IDLE;
 uint32_t t0 = 0;
 
 void setup() {
@@ -22,7 +22,7 @@ void loop() {
       if (rxLine == "hi") {
         HMI_SERIAL.print("Hi from RP\n");
         Serial.println("got 'hi' -> sent 'Hi from RP'");
-        state = WAIT_HELLO; t0 = millis();
+        state = ST_WAIT_HELLO; t0 = millis();
       }
       rxLine = "";
     } else {
@@ -31,9 +31,9 @@ void loop() {
     }
   }
 
-  if (state == WAIT_HELLO && millis() - t0 >= 1000) {
+  if (state == ST_WAIT_HELLO && millis() - t0 >= 1000) {
     HMI_SERIAL.print("hello\n");
     Serial.println("sent 'hello'");
-    state = IDLE;
+    state = ST_IDLE;
   }
 }

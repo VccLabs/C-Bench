@@ -13,7 +13,8 @@ s32 grf_reg_set(u16 addr,u16 data);
 s32 grf_reg_get(u16 addr);
 s32 grf_reg_com_send(u16 addr,u16 len);
 
-
+void hmi_send(const char *s);
+int  hmi_take_rx(char *out, int maxlen);
 
 
 #endif

@@ -4,6 +4,22 @@
 
 static grf_drv_t *drv_uart = NULL;
 
+#include <string.h>
+static volatile char g_rx_msg[64] = {0};
+static volatile u8   g_rx_ready  = 0;
+
+void hmi_send(const char *s) {
+    if (drv_uart) grf_drv_uart_send(drv_uart, (char*)s, strlen(s));
+}
+int hmi_take_rx(char *out, int maxlen) {
+    if (!g_rx_ready) return 0;
+    g_rx_ready = 0;
+    int i = 0;
+    while (i < maxlen - 1 && g_rx_msg[i]) { out[i] = g_rx_msg[i]; i++; }
+    out[i] = 0;
+    return 1;
+}
+
 void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
 {
     //user code 
@@ -105,58 +121,14 @@ static s32 grf_comm_handle(u8* data)
 #define RX_BUF_LEN   1024
 static u8 RX_HAND_BUF[RX_BUF_LEN];
 #endif
-static void recive_data_handle(u8* databuf,u32 datalen)
-{
-	u16 i = 0;
-	static u16 last_data_num=0;
-#if UART_LASTBUFF
-	if(last_data_num + datalen > RX_BUF_LEN){
-		datalen = RX_BUF_LEN - last_data_num;
-	}
-	if(last_data_num){ 
-		memcpy(RX_HAND_BUF+last_data_num,databuf,datalen);
-		databuf=RX_HAND_BUF;
-		datalen+=last_data_num;
-		last_data_num = 0;
-	}
-#endif
-#if 0
-    u16 j;
-    grf_printf("uart rx[%d]:",datalen);
-	for(j = 0;j < datalen; j++){
-		grf_printf(" %02X",databuf[j]);
-	}
-	grf_printf("\n",datalen);
-#endif
-	if(datalen >= 6){//最短的指令为6个
-		for(i = 0;i <= datalen-6; i++)
-        {
-			if((databuf[i]==HEAD_FH) && (databuf[i+1]==HEAD_FL))
-			{
-    			if(databuf[i+2] <= (datalen-i-3)){
-                    if(grf_comm_handle(databuf+i)==GRF_OK){
-                        i += (databuf[i+2]+3)-1;
-                    }
-    			}
-			}	
-		}
-	}
-    if(i < datalen){
-        last_data_num = datalen-i;
-    }
 
-#if UART_LASTBUFF	
-	if(last_data_num <= 256 && last_data_num != 0)
-	{
-		u8  last_data_buf[256] = {0};
-		memcpy(last_data_buf,databuf+i,last_data_num);
-		memcpy(RX_HAND_BUF,last_data_buf,last_data_num);
-	}else{
-		last_data_num=0;			
-	}
-#else
-	last_data_num = 0;
-#endif
+static void recive_data_handle(u8* databuf, u32 datalen)
+{
+    u32 n = (datalen < sizeof(g_rx_msg) - 1) ? datalen : sizeof(g_rx_msg) - 1;
+    memcpy((void*)g_rx_msg, databuf, n);
+    while (n > 0 && (g_rx_msg[n-1] == '\n' || g_rx_msg[n-1] == '\r')) g_rx_msg[--n] = 0;
+    g_rx_msg[n] = 0;
+    g_rx_ready = 1;
 }
 
 
