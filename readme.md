@@ -180,9 +180,12 @@ lets the MCU both **bias** the STAT node and **read** it safely.
 
 ```
 C-Bench/
-├── README.md        ← this file
-├── Code/            ← PlatformIO project (VS Code) — RP2354A firmware
-└── ...              ← hardware (schematic, PCB), docs, etc.
+├── readme.md         ← this file
+├── platformio.ini    ← PlatformIO project config (RP2354A firmware)
+├── src/              ← firmware source (main.cpp)
+├── include/  lib/  test/
+├── GiraffeIDE/       ← TDO HMI project (Giraffe IDE)
+└── LICENSE
 ```
 
 ## Toolchain
