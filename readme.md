@@ -1,0 +1,207 @@
+# C-Bench
+
+**A mini bench power supply powered by USB-C Power Delivery.**
+
+C-Bench turns any USB-C PD source (phone charger, laptop charger, or even a
+phone) into an adjustable bench supply with live power monitoring and a 4"
+touch UI. Open-source hardware and software, planned for launch on Crowd Supply.
+
+- **Output:** up to **28 V @ 5 A (140 W)** — actual range depends on what the
+  connected source can negotiate.
+- **Host controller:** Raspberry Pi **RP2354A**.
+- **PD sink:** **AP33772S** USB-C PD sink controller (supports fixed PDO, PPS, AVS).
+- **Monitoring:** INA260 (V/I/P/energy), TMP102 (temperature), MAX17048 (battery
+  fuel gauge) + MCP73831 Li-ion charger.
+- **UI:** 4" 720×720 capacitive TDO HMI over UART (Giraffe IDE).
+
+> Status: hardware defined, firmware in early bring-up. This README is the
+> single source of truth for the system architecture — keep it current.
+
+---
+
+## System overview
+
+```
+USB-C source ──► AP33772S (PD sink) ──► back-to-back MOSFET load switch ──► OUTPUT (28V/5A max)
+                     │  I2C (5V, level-shifted)                                 │
+USB-C debug  ──────► RP2354A (host) ◄── I2C ── INA260 (main output bus monitor) ┘
+                     │  UART
+                     └──► TDO 4" 720×720 HMI
+```
+
+The RP2354A is the master controller. The AP33772S negotiates power with the
+source and switches the output; the RP supervises it over I2C and drives the
+HMI. INA260 monitors the main output bus.
+
+---
+
+## Power architecture
+
+### Input / rails
+- **Source port (USB-C):** input from the PD source, **3.3 V – 28 V** depending
+  on negotiation. Feeds **TI TPS552872RYQR** buck-boost → stable **5 V** (`Vout`).
+- **Debug port (USB-C):** provides **5 V_USB**.
+- Both `Vout` and `5V_USB` pass through a **510 mΩ / 1 W** impedance-matching
+  resistor, then each through its own **ideal diode** to prevent back-feed if
+  both ports are connected.
+- Diode outputs join into the main **+5 V** rail.
+- **AMS1117** LDO derives **+3.3 V** (RP2354A and 3.3 V logic) from +5 V.
+
+Result: the user can connect either port, or both, safely. Power output
+requires the **source port** connected to a real USB-C source.
+
+### Output
+Max **28 V / 5 A / 140 W** (source-dependent), exposed on multiple connectors:
+- DC 2 mm barrel jack (+ / −)
+- 2×2 right-angle 2.54 mm header (+ pair / − pair)
+- 4 mm banana jacks (red = +, black = −)
+
+---
+
+## USB-C ports
+
+| Port | Connected to | Purpose |
+|------|--------------|---------|
+| Source | AP33772S | PD negotiation with an external source; power input + output path |
+| Debug  | RP2354A  | Programming / debugging; also supplies 5V_USB |
+
+---
+
+## RP2354A pin map
+
+| GPIO | Dir | Net | Notes |
+|------|-----|-----|-------|
+| IO2  | in  | INA260 `ALERT` | pulled up to 3.3 V |
+| IO3  | out | MAX17048 `QSTRT` | quick-start; pulled down to GND |
+| IO6  | in  | `CHG_STATE` | charger STAT read-back (right-side level shift); pulled up to 3.3 V |
+| IO7  | out | `CTL` | charger STAT pull-direction control (left-side level shift) |
+| IO8  | out | HMI `RX` | RP **TX** → HMI RX (UART) |
+| IO9  | in  | HMI `TX` | RP **RX** ← HMI TX (UART) |
+| IO22 | in  | AP33772S `FLIP` | via resistor divider (5 V → 3.3 V) |
+| IO25 | in  | AP33772S `INT`  | via resistor divider (5 V → 3.3 V) |
+| SDA/SCL | — | I2C bus | **pins TBD** — assign in firmware |
+
+> **Open:** MAX17048 `ALRT` is pulled up to **5 V**; if routed to a GPIO it needs
+> a level shifter (RP is 3.3 V-tolerant only). GPIO assignment TBD.
+
+All RP GPIO (including the ones above) are broken out to the board edge on a
+**2×20 right-angle 2.54 mm male header**.
+
+---
+
+## I2C devices
+
+Single bus (5 V devices sit behind level shifters and appear as 3.3 V to the RP).
+All addresses are distinct, so one bus is fine.
+
+| Device | Addr | Role | Logic | Level shift |
+|--------|------|------|-------|-------------|
+| INA260AIPWR | `0x40` | Voltage / current / power / energy on output bus | 3.3 V | No |
+| MAX17048G+T10 | `0x36` | Li-ion fuel gauge | — | Yes |
+| TMP102AIDRLR | `0x4B` | Temperature | 3.3 V | No |
+| AP33772S | `0x52` | USB-C PD sink controller | 5 V | Yes |
+
+---
+
+## AP33772S (PD sink)
+
+- Negotiates with the source and exposes available **PDO / PPS / AVS** profiles.
+- Controls **two back-to-back MOSFETs** as the output load switch.
+- `FLIP` → IO22, `INT` → IO25 (both via dividers).
+- `LED` pin → 0805 LED through 1 kΩ resistor.
+
+---
+
+## Battery / charging subsystem
+
+- **MCP73831T-2ACI/OT** Li-ion charge controller. `PROG` pulled to GND via 2 kΩ.
+- **MAX17048G+T10** fuel gauge (I2C `0x36`, level-shifted). `ALRT` pulled to 5 V;
+  `QSTRT` → IO3 (pulled down).
+
+### Charger STAT level-shift / read circuit
+
+The MCP73831 `STAT` pin is tri-state (driven LOW, driven HIGH ≈4.6 V, or High-Z).
+Because the RP is 3.3 V-only, the 4.6 V HIGH is the hazard. A 3-MOSFET network
+lets the MCU both **bias** the STAT node and **read** it safely.
+
+**Left side — software-controlled pull on the 5 V domain (driven by `CTL`/IO7):**
+- R42 (10 k) pulls STAT toward +5 V through Q5 (DMG230, P-ch) — pull-up enable.
+- R46 (10 k) pulls STAT to GND through Q6 (BSS138, N-ch) — pull-down.
+- `CTL` HIGH → Q6 ON (pull-down active), Q5 OFF (pull-up disconnected); and
+  vice-versa.
+
+**Right side — level-shifted read to 3.3 V (`CHG_STATE`/IO6):**
+- Q7 (BSS138, N-ch), gate on the STAT node, R47 (10 k) pulls `CHG_STATE` to 3.3 V.
+- STAT above Q7 Vgs(th) (~1.5–2 V) → Q7 ON → `CHG_STATE` = 0 V.
+- STAT below threshold → Q7 OFF → `CHG_STATE` = 3.3 V.
+
+**Truth table (node behavior):**
+
+| STAT state | CTL | Left node | Q7 | CHG_STATE |
+|------------|-----|-----------|----|-----------|
+| High-Z | LOW (pull-up) | ~5 V | ON  | 0 V |
+| High-Z | HIGH (pull-down) | ~0 V | OFF | 3.3 V |
+| LOW (0 V) | LOW  | 0 V | OFF | 3.3 V |
+| LOW (0 V) | HIGH | 0 V | OFF | 3.3 V |
+| HIGH (5 V) | LOW  | 5 V | ON  | 0 V |
+| HIGH (5 V) | HIGH | 5 V | ON  | 0 V |
+
+**Charge-state decode — read `CHG_STATE` at both CTL polarities:**
+
+| STAT | CTL=LOW read | CTL=HIGH read | Pattern | Meaning |
+|------|--------------|---------------|---------|---------|
+| High-Z | 0 | 1 | `01` | High-Z (no battery / done) |
+| LOW    | 1 | 1 | `11` | Charging |
+| HIGH   | 0 | 0 | `00` | Charge complete |
+
+---
+
+## Display / HMI
+
+- **TDO 4" 720×720 capacitive touch**, developed in **Giraffe IDE**.
+- Connected via FPC/FFC flex providing **GND + 5 V + UART** (RP RX=IO9, TX=IO8).
+- **XH-4A** connector exposes the same UART (+5 V, GND, TX, RX) so an alternative
+  display (e.g. Nextion) can be used instead of the TDO panel.
+- HMI role: scan and list source-advertised **PDO / PPS / AVS** profiles, let the
+  user select one, then set target output voltage and limit max output current;
+  live monitoring of V / I / P / energy / temperature / battery.
+
+---
+
+## Other
+
+- **APS6404L-3SQR-SN** QSPI PSRAM footprint (unpopulated by default) to extend
+  RP2354A RAM if needed.
+- 4× **M3** mounting holes, one at each corner.
+
+---
+
+## Repository layout
+
+```
+C-Bench/
+├── README.md        ← this file
+├── Code/            ← PlatformIO project (VS Code) — RP2354A firmware
+└── ...              ← hardware (schematic, PCB), docs, etc.
+```
+
+## Toolchain
+
+- Firmware: **PlatformIO** + **VS Code**, RP2354A target.
+- HMI: **Giraffe IDE** (TDO panel).
+- Repo: `github.com/VccLabs/C-Bench`.
+
+## License
+
+Open-source hardware **and** software. Specific licenses TBD (e.g. CERN-OHL for
+hardware, MIT/Apache-2.0 for firmware).
+
+---
+
+## TODO / open questions
+
+- [ ] Assign I2C `SDA`/`SCL` GPIOs.
+- [ ] Decide whether/how to route MAX17048 `ALRT` (5 V) to a GPIO (needs shifter).
+- [ ] HMI UART baud rate.
+- [ ] Confirm PD profile-selection UX (PDO/PPS/AVS → voltage + current-limit).
+- [ ] Choose final HW/SW licenses before Crowd Supply.
