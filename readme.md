@@ -60,29 +60,29 @@ Max **28 V / 5 A / 140 W** (source-dependent), exposed on multiple connectors:
 
 ## USB-C ports
 
-| Port | Connected to | Purpose |
-|------|--------------|---------|
-| Source | AP33772S | PD negotiation with an external source; power input + output path |
-| Debug  | RP2354A  | Programming / debugging; also supplies 5V_USB |
+| Port   | Connected to | Purpose                                                           |
+| ------ | ------------ | ----------------------------------------------------------------- |
+| Source | AP33772S     | PD negotiation with an external source; power input + output path |
+| Debug  | RP2354A      | Programming / debugging; also supplies 5V_USB                     |
 
 ---
 
 ## RP2354A pin map
 
-| GPIO | Dir | Net | Notes |
-|------|-----|-----|-------|
-| IO2  | in  | INA260 `ALERT` | pulled up to 3.3 V |
-| IO3  | out | MAX17048 `QSTRT` | quick-start; pulled down to GND |
-| IO6  | in  | `CHG_STATE` | charger STAT read-back (right-side level shift); pulled up to 3.3 V |
-| IO7  | out | `CTL` | charger STAT pull-direction control (left-side level shift) |
-| IO8  | out | HMI `RX` | RP **TX** → HMI RX (UART) |
-| IO9  | in  | HMI `TX` | RP **RX** ← HMI TX (UART) |
-| IO22 | in  | AP33772S `FLIP` | via resistor divider (5 V → 3.3 V) |
-| IO25 | in  | AP33772S `INT`  | via resistor divider (5 V → 3.3 V) |
-| SDA/SCL | — | I2C bus | **pins TBD** — assign in firmware |
+| GPIO | Dir | Net              | Notes                                                               |
+| ---- | --- | ---------------- | ------------------------------------------------------------------- |
+| IO2  | in  | INA260 `ALERT`   | pulled up to 3.3 V                                                  |
+| IO3  | out | MAX17048 `QSTRT` | quick-start; pulled down to GND                                     |
+| IO6  | in  | `CHG_STATE`      | charger STAT read-back (right-side level shift); pulled up to 3.3 V |
+| IO7  | out | `CTL`            | charger STAT pull-direction control (left-side level shift)         |
+| IO8  | out | HMI `RX`         | RP **TX** → HMI RX (UART)                                           |
+| IO9  | in  | HMI `TX`         | RP **RX** ← HMI TX (UART)                                           |
+| IO22 | in  | AP33772S `FLIP`  | via resistor divider (5 V → 3.3 V)                                  |
+| IO25 | in  | AP33772S `INT`   | via resistor divider (5 V → 3.3 V)                                  |
+| IO20 | —   | I2C `SDA`        | shared bus                                                          |
+| IO21 | —   | I2C `SCL`        | shared bus                                                          |
 
-> **Open:** MAX17048 `ALRT` is pulled up to **5 V**; if routed to a GPIO it needs
-> a level shifter (RP is 3.3 V-tolerant only). GPIO assignment TBD.
+> **Note:** MAX17048 `ALRT` is **not connected to the RP** — only pulled up to 5 V.
 
 All RP GPIO (including the ones above) are broken out to the board edge on a
 **2×20 right-angle 2.54 mm male header**.
@@ -94,12 +94,12 @@ All RP GPIO (including the ones above) are broken out to the board edge on a
 Single bus (5 V devices sit behind level shifters and appear as 3.3 V to the RP).
 All addresses are distinct, so one bus is fine.
 
-| Device | Addr | Role | Logic | Level shift |
-|--------|------|------|-------|-------------|
-| INA260AIPWR | `0x40` | Voltage / current / power / energy on output bus | 3.3 V | No |
-| MAX17048G+T10 | `0x36` | Li-ion fuel gauge | — | Yes |
-| TMP102AIDRLR | `0x4B` | Temperature | 3.3 V | No |
-| AP33772S | `0x52` | USB-C PD sink controller | 5 V | Yes |
+| Device        | Addr   | Role                                             | Logic | Level shift |
+| ------------- | ------ | ------------------------------------------------ | ----- | ----------- |
+| INA260AIPWR   | `0x40` | Voltage / current / power / energy on output bus | 3.3 V | No          |
+| MAX17048G+T10 | `0x36` | Li-ion fuel gauge                                | —     | Yes         |
+| TMP102AIDRLR  | `0x4B` | Temperature                                      | 3.3 V | No          |
+| AP33772S      | `0x52` | USB-C PD sink controller                         | 5 V   | Yes         |
 
 ---
 
@@ -115,8 +115,8 @@ All addresses are distinct, so one bus is fine.
 ## Battery / charging subsystem
 
 - **MCP73831T-2ACI/OT** Li-ion charge controller. `PROG` pulled to GND via 2 kΩ.
-- **MAX17048G+T10** fuel gauge (I2C `0x36`, level-shifted). `ALRT` pulled to 5 V;
-  `QSTRT` → IO3 (pulled down).
+- **MAX17048G+T10** fuel gauge (I2C `0x36`, level-shifted). `ALRT` pulled up to 5 V,
+  not connected to the RP. `QSTRT` → IO3 (pulled down).
 
 ### Charger STAT level-shift / read circuit
 
@@ -137,29 +137,29 @@ lets the MCU both **bias** the STAT node and **read** it safely.
 
 **Truth table (node behavior):**
 
-| STAT state | CTL | Left node | Q7 | CHG_STATE |
-|------------|-----|-----------|----|-----------|
-| High-Z | LOW (pull-up) | ~5 V | ON  | 0 V |
-| High-Z | HIGH (pull-down) | ~0 V | OFF | 3.3 V |
-| LOW (0 V) | LOW  | 0 V | OFF | 3.3 V |
-| LOW (0 V) | HIGH | 0 V | OFF | 3.3 V |
-| HIGH (5 V) | LOW  | 5 V | ON  | 0 V |
-| HIGH (5 V) | HIGH | 5 V | ON  | 0 V |
+| STAT state | CTL              | Left node | Q7  | CHG_STATE |
+| ---------- | ---------------- | --------- | --- | --------- |
+| High-Z     | LOW (pull-up)    | ~5 V      | ON  | 0 V       |
+| High-Z     | HIGH (pull-down) | ~0 V      | OFF | 3.3 V     |
+| LOW (0 V)  | LOW              | 0 V       | OFF | 3.3 V     |
+| LOW (0 V)  | HIGH             | 0 V       | OFF | 3.3 V     |
+| HIGH (5 V) | LOW              | 5 V       | ON  | 0 V       |
+| HIGH (5 V) | HIGH             | 5 V       | ON  | 0 V       |
 
 **Charge-state decode — read `CHG_STATE` at both CTL polarities:**
 
-| STAT | CTL=LOW read | CTL=HIGH read | Pattern | Meaning |
-|------|--------------|---------------|---------|---------|
-| High-Z | 0 | 1 | `01` | High-Z (no battery / done) |
-| LOW    | 1 | 1 | `11` | Charging |
-| HIGH   | 0 | 0 | `00` | Charge complete |
+| STAT   | CTL=LOW read | CTL=HIGH read | Pattern | Meaning                    |
+| ------ | ------------ | ------------- | ------- | -------------------------- |
+| High-Z | 0            | 1             | `01`    | High-Z (no battery / done) |
+| LOW    | 1            | 1             | `11`    | Charging                   |
+| HIGH   | 0            | 0             | `00`    | Charge complete            |
 
 ---
 
 ## Display / HMI
 
 - **TDO 4" 720×720 capacitive touch**, developed in **Giraffe IDE**.
-- Connected via FPC/FFC flex providing **GND + 5 V + UART** (RP RX=IO9, TX=IO8).
+- Connected via FPC/FFC flex providing **GND + 5 V + UART** (RP RX=IO9, TX=IO8) at **115200 baud**.
 - **XH-4A** connector exposes the same UART (+5 V, GND, TX, RX) so an alternative
   display (e.g. Nextion) can be used instead of the TDO panel.
 - HMI role: scan and list source-advertised **PDO / PPS / AVS** profiles, let the
@@ -188,20 +188,16 @@ C-Bench/
 ## Toolchain
 
 - Firmware: **PlatformIO** + **VS Code**, RP2354A target.
-- HMI: **Giraffe IDE** (TDO panel).
+  - Board `rpipico2`, Arduino framework, **earlephilhower** core, monitor @115200.
+- HMI: **Giraffe IDE** (TDO panel), UART @115200.
 - Repo: `github.com/VccLabs/C-Bench`.
 
 ## License
 
-Open-source hardware **and** software. Specific licenses TBD (e.g. CERN-OHL for
-hardware, MIT/Apache-2.0 for firmware).
+Open-source hardware **and** software under the **MIT License**.
 
 ---
 
 ## TODO / open questions
 
-- [ ] Assign I2C `SDA`/`SCL` GPIOs.
-- [ ] Decide whether/how to route MAX17048 `ALRT` (5 V) to a GPIO (needs shifter).
-- [ ] HMI UART baud rate.
-- [ ] Confirm PD profile-selection UX (PDO/PPS/AVS → voltage + current-limit).
-- [ ] Choose final HW/SW licenses before Crowd Supply.
+- [ ] Define PD profile-selection UX (PDO/PPS/AVS → voltage + current-limit) — details TBD.
