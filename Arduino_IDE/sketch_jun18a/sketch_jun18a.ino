@@ -1,9 +1,15 @@
 void setup() {
-  // put your setup code here, to run once:
-
+  Serial.begin(115200);
+  Serial2.begin(115200);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  Serial2.write(0x02);
 
+  if (Serial2.available()) {
+    Serial.print("Got a message: ");
+      Serial.println(Serial2.read());
+  }
+
+  delay(1000);
 }
