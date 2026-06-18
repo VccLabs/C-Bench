@@ -75,17 +75,6 @@ s32 grf_reg_com_send(u16 addr,u16 len)
     grf_drv_uart_send(drv_uart,txdata,i);
 }
 
-s32 grf_hmi_send_reg(u16 addr, u16 val)
-{
-    u8 f[8];
-    f[0] = HEAD_FH; f[1] = HEAD_FL;
-    f[2] = 0x05;                       // len = cmd(1)+addr(2)+data(2)
-    f[3] = 0x82;                       // write-reg
-    f[4] = addr >> 8; f[5] = addr & 0xFF;
-    f[6] = val  >> 8; f[7] = val  & 0xFF;
-    return grf_drv_uart_send(drv_uart, (char*)f, 8);
-}
-
 static s32 grf_comm_handle(u8* data)
 {
 	u8 cmd = data[3];
