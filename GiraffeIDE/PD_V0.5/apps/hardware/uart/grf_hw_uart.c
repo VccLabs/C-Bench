@@ -4,11 +4,26 @@
 
 static grf_drv_t *drv_uart = NULL;
 
+#define LBL_VOLT   1   /* <- Control IDs from Giraffe IDE */
+#define LBL_CURR   3
+#define LBL_POWER  5
+
 void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
 {
-    if(addr == 0x0001){
-    	grf_ctrl_t* lbl = GCL(GRF_VIEW1_ID, 1);   // <- your label's Control ID
-        if(lbl) grf_label_set_txt(lbl, data[0] ? "hello" : "hi");
+    char buf[16];
+    switch(addr){
+        case 0x0010:  /* voltage mV */
+            snprintf(buf,sizeof(buf),"%u.%02u V", data[0]/1000, (data[0]%1000)/10);
+            grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
+            break;
+        case 0x0011:  /* current mA */
+            snprintf(buf,sizeof(buf),"%u.%03u A", data[0]/1000, data[0]%1000);
+            grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
+            break;
+        case 0x0012:  /* power dW (0.1W) */
+            snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
+            grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
+            break;
     }
 }
 
