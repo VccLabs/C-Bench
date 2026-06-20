@@ -2,7 +2,8 @@
 #define __VIEW1_H_
 
 typedef enum {
-	VIEW1_NULL
+	VIEW1_NULL,
+	VIEW1_LABEL0_ID = 1
 } view1_ctrls_id_e;
 
 void view1_init(void);
