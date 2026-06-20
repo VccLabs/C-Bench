@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
-    <page pageId="1" pageName="view1" />
+
+<project> 
+  <page pageId="1" pageName="view1"/>  
+  <ICType selectedICType="TR660-Linux"/> 
 </project>

@@ -163,8 +163,8 @@ static void recive_data_handle(u8* databuf,u32 datalen)
 void grf_uart_init(void)
 {
     grf_uart_cfg_t cfg_t = {0};
-    cfg_t.port = 3;
-    cfg_t.win_port = 2;
+    cfg_t.port = 6;
+    cfg_t.win_port = -1;
     cfg_t.speed_e = UART_SPEED_115200;
     cfg_t.bit_e = UART_BIT_8;
     cfg_t.parity_e = UART_PARITY_NONE;
