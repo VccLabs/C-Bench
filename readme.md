@@ -14,8 +14,10 @@ touch UI. Open-source hardware and software, planned for launch on Crowd Supply.
   fuel gauge) + MCP73831 Li-ion charger.
 - **UI:** 4" 720×720 capacitive TDO HMI over UART (Giraffe IDE).
 
-> Status: hardware defined, firmware in early bring-up. This README is the
-> single source of truth for the system architecture — keep it current.
+> Status: hardware defined; firmware bring-up in progress. Validated so far:
+> PD profile read, PPS request + output arm, INA260 readback, and live V/I/P
+> telemetry to the HMI. This README is the single source of truth for the
+> system architecture — keep it current.
 
 ---
 
@@ -168,6 +170,47 @@ lets the MCU both **bias** the STAT node and **read** it safely.
 
 ---
 
+## HMI serial protocol
+
+The RP↔HMI link uses the Giraffe register protocol (handled in
+`GiraffeIDE/PD_V0.5/apps/hardware/uart/grf_hw_uart.c`). Frame format:
+
+```
+5A A5  LEN  CMD  ADDR_H ADDR_L  [DATA...]
+
+│    │
+
+│    └ 0x82 = write register(s), 0x83 = read register(s)
+
+└ byte count of CMD + ADDR + DATA
+```
+Single 16-bit write example (voltage register 0x0010 = 9000 mV):
+`5A A5 05 82 00 10 23 28`
+
+On the panel, `grf_reg_set_user()` decodes incoming registers, formats the
+value, and updates the matching label via `grf_label_set_txt()`.
+`grf_reg_com_send()` provides the reverse path (panel → RP).
+
+### Register map
+
+**RP → HMI** (telemetry, pushed each loop):
+
+| Reg      | Value          | Units | HMI label (Control ID) |
+| -------- | -------------- | ----- | ---------------------- |
+| `0x0010` | Output voltage | mV    | Voltage (1)            |
+| `0x0011` | Output current | mA    | Current (3)            |
+| `0x0012` | Output power   | 0.1 W | Power (5)              |
+
+**HMI → RP** (control, planned):
+
+| Reg      | Value             | Units |
+| -------- | ----------------- | ----- |
+| `0x0020` | Requested voltage | mV    |
+| `0x0021` | Current limit     | mA    |
+| `0x0022` | Output enable     | 0/1   |
+
+---
+
 ## Other
 
 - **APS6404L-3SQR-SN** QSPI PSRAM footprint (unpopulated by default) to extend
@@ -192,7 +235,13 @@ C-Bench/
 
 - Firmware: **PlatformIO** + **VS Code**, RP2354A target.
   - Board `rpipico2`, Arduino framework, **earlephilhower** core, monitor @115200.
+  - Libraries (`lib_deps`): `CentyLab/AP33772S-CentyLab` (PD sink),
+    `adafruit/Adafruit INA260 Library` (output-bus monitor).
 - HMI: **Giraffe IDE** (TDO panel), UART @115200.
+- **Optional SWD debug:** an RP2040 (e.g. Pico) flashed with `debugprobe` acts as a
+  CMSIS-DAP probe (SWCLK→GP2, SWDIO→GP3, common GND; target powered separately).
+  Set `upload_protocol = cmsis-dap` to flash over SWD and bypass USB-CDC upload
+  hangs. Default flashing is over the USB debug port.
 - Repo: `github.com/VccLabs/C-Bench`.
 
 ## License
@@ -203,4 +252,8 @@ Open-source hardware **and** software under the **MIT License**.
 
 ## TODO / open questions
 
-- [ ] Define PD profile-selection UX (PDO/PPS/AVS → voltage + current-limit) — details TBD.
+- [x] Read & list source PDO/PPS/AVS profiles (AP33772S over I2C).
+- [x] Request PPS voltage, arm output, read back on INA260 (closed loop validated).
+- [x] Push live V/I/P telemetry to HMI labels (regs 0x0010–0x0012).
+- [ ] Reverse control path: HMI touch → RP (regs 0x0020–0x0022) for setpoint + output enable.
+- [ ] Profile-selection UI on the panel (scan → select → activate), with PPS/AVS fine adjust.
