@@ -6,7 +6,10 @@ static grf_drv_t *drv_uart = NULL;
 
 void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
 {
-    //user code 
+    if(addr == 0x0001){
+    	grf_ctrl_t* lbl = GCL(GRF_VIEW1_ID, 1);   // <- your label's Control ID
+        if(lbl) grf_label_set_txt(lbl, data[0] ? "hello" : "hi");
+    }
 }
 
 
