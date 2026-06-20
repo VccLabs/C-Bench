@@ -1,21 +1,27 @@
 #include <Arduino.h>
-#define HMI       Serial2
-#define HMI_BAUD  115200
+#include <Wire.h>
+#include <AP33772S.h>
 
-static void writeReg(uint16_t addr, uint16_t val) {
-  uint8_t f[8] = { 0x5A, 0xA5, 0x05, 0x82,
-                   (uint8_t)(addr >> 8), (uint8_t)addr,
-                   (uint8_t)(val >> 8),  (uint8_t)val };
-  HMI.write(f, 8);
-}
+AP33772S usbpd;   // defaults to Wire (I2C0)
 
 void setup() {
-  HMI.begin(HMI_BAUD);
+  Serial.begin(115200);
+  while (!Serial && millis() < 4000) {}   // wait for USB-CDC
+
+  Wire.setSDA(20);   // IO20
+  Wire.setSCL(21);   // IO21
+  Wire.begin();
+
+  delay(1000);       // let charger negotiation settle (lib recommends >500ms)
+  usbpd.begin();     // reads source PDOs over I2C
+
+  Serial.println("\nC-Bench: charger PDOs");
+  usbpd.displayProfiles();
 }
 
 void loop() {
-  writeReg(0x0001, 0);   // -> "hi"
-  delay(1000);
-  writeReg(0x0001, 1);   // -> "hello"
-  delay(1000);
+  usbpd.begin();     // reads source PDOs over I2C
+    Serial.println("\nC-Bench: charger PDOs");
+  usbpd.displayProfiles();
+  delay(5000);
 }
