@@ -69,6 +69,16 @@ static void label2_event(grf_ctrl_t *ctrl, grf_event_e event)
 //	}
 }
 
+
+static void sw0_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+    if (event == GRF_EVENT_VALUE_CHANGED) {
+        u16 on = grf_sw_get_state(ctrl) ? 1 : 0;
+        grf_reg_set(0x0022, on);   // store value in ctrlreg[]
+        grf_reg_com_send(0x0022, 1); // emit 5A A5 06 83 00 22 01 00 0X
+    }
+}
+
 #include "../../../libs/appscc/view1_cc.h"
 void view1_init(void)
 {

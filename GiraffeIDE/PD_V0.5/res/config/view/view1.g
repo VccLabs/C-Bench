@@ -93,6 +93,30 @@
       } ]
     }
   }, {
+    "CLASSNAME" : "sw",
+    "theme" : "youth",
+    "type" : 8,
+    "property" : {
+      "pub_t" : {
+        "name" : "sw0",
+        "id" : 7,
+        "ctrl_type" : 8,
+        "pt" : {
+          "x" : 315,
+          "y" : 445
+        },
+        "size" : {
+          "width" : 241,
+          "height" : 121
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "anim_time" : 1000
+    }
+  }, {
     "CLASSNAME" : "label",
     "theme" : "youth",
     "property" : {
