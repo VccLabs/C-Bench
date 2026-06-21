@@ -79,6 +79,16 @@ static void sw0_event(grf_ctrl_t *ctrl, grf_event_e event)
     }
 }
 
+
+static void image_button0_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view1_cc.h"
 void view1_init(void)
 {

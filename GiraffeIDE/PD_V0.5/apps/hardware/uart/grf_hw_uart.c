@@ -13,7 +13,7 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
     char buf[16];
     switch(addr){
         case 0x0010:  /* voltage mV */
-            snprintf(buf,sizeof(buf),"%u.%02u V", data[0]/1000, (data[0]%1000)/10);
+            snprintf(buf,sizeof(buf),"%u.%02u", data[0]/1000, (data[0]%1000)/10);
             grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
             break;
         case 0x0011:  /* current mA */
