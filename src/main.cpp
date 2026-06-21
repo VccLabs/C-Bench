@@ -140,25 +140,35 @@ void setup()
 
 void loop()
 {
-  pollHMI(); // parse incoming control frames from the panel
+  pollHMI(); // parse incoming control frames every pass
+  uint32_t now = millis();
 
-  if (ppsIdx > 0)
+  // PD keep-alive: re-request PPS occasionally (PPS only needs a refresh ~every <10s)
+  static uint32_t tPPS = 0;
+  if (ppsIdx > 0 && now - tPPS >= 2000)
   {
-    usbpd.setPPSPDO(ppsIdx, PPS_TARGET_MV, PPS_LIMIT_MA); // re-request keeps PPS alive
-    usbpd.setOutput(outputOn ? 1 : 0);                    // load switch driven by HMI (reg 0x0022)
+    tPPS = now;
+    usbpd.setPPSPDO(ppsIdx, PPS_TARGET_MV, PPS_LIMIT_MA);
   }
 
-  delay(300); // let the rail settle before measuring
+  // Output switch: act only when the HMI changes it
+  static int lastOut = -1;
+  if (ppsIdx > 0 && (int)outputOn != lastOut)
+  {
+    lastOut = outputOn;
+    usbpd.setOutput(outputOn ? 1 : 0);
+  }
 
-  uint16_t mV = (uint16_t)ina260.readBusVoltage();    // mV
-  uint16_t mA = (uint16_t)ina260.readCurrent();       // mA
-  uint16_t dW = (uint16_t)(ina260.readPower() / 100); // mW -> 0.1W
-
-  writeReg(0x0010, mV); // -> voltage label
-  writeReg(0x0011, mA); // -> current label
-  writeReg(0x0012, dW); // -> power label
-
-  Serial.printf("Bus: %u mV  %u mA  %u dW\n", mV, mA, dW);
-
-  delay(300); // total cycle <750ms keeps the PPS request fresh
+  // Telemetry: fast, smooth refresh
+  static uint32_t tTel = 0;
+  if (now - tTel >= 120) // ~12.5 Hz
+  {
+    tTel = now;
+    uint16_t mV = (uint16_t)ina260.readBusVoltage();
+    uint16_t mA = (uint16_t)ina260.readCurrent();
+    uint16_t dW = (uint16_t)(ina260.readPower() / 100);
+    writeReg(0x0010, mV);
+    writeReg(0x0011, mA);
+    writeReg(0x0012, dW);
+  }
 }
