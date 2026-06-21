@@ -4,9 +4,12 @@
 
 static grf_drv_t *drv_uart = NULL;
 
-#define LBL_VOLT   1   /* <- Control IDs from Giraffe IDE */
+#define LBL_VOLT   1
+#define ARC_VOLT   7   /* <- your arc's Control ID from view1.h */
+
 #define LBL_CURR   3
 #define LBL_POWER  5
+
 
 void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
 {
@@ -15,6 +18,7 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
         case 0x0010:  /* voltage mV */
             snprintf(buf,sizeof(buf),"%u.%02u", data[0]/1000, (data[0]%1000)/10);
             grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
+            grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), data[0]/100); /* 0..280 = 0..28.0V */
             break;
         case 0x0011:  /* current mA */
             snprintf(buf,sizeof(buf),"%u.%03u A", data[0]/1000, data[0]%1000);

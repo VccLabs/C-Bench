@@ -5,38 +5,6 @@
     "theme" : "youth",
     "property" : {
       "pub_t" : {
-        "name" : "label0",
-        "id" : 1,
-        "pt" : {
-          "x" : 207,
-          "y" : 165
-        },
-        "size" : {
-          "width" : 306,
-          "height" : 118
-        },
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true
-      },
-      "animspeed" : 50,
-      "align_e" : 34,
-      "txt" : "88.88",
-      "styles" : [ {
-        "name" : "style",
-        "txt_t" : {
-          "color" : 16777215,
-          "font_lib" : "Inter_24pt-ExtraBold.ttf",
-          "font_size" : 76
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
         "name" : "label2",
         "id" : 3,
         "pt" : {
@@ -99,30 +67,6 @@
       } ]
     }
   }, {
-    "CLASSNAME" : "sw",
-    "theme" : "youth",
-    "type" : 8,
-    "property" : {
-      "pub_t" : {
-        "name" : "sw0",
-        "id" : 7,
-        "ctrl_type" : 8,
-        "pt" : {
-          "x" : 515,
-          "y" : 325
-        },
-        "size" : {
-          "width" : 156,
-          "height" : 66
-        },
-        "t_mode" : 1,
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true
-      },
-      "anim_time" : 100
-    }
-  }, {
     "CLASSNAME" : "image_button",
     "theme" : "youth",
     "type" : 3,
@@ -145,37 +89,82 @@
       },
       "mode" : 1,
       "img_rel" : "turn_on.png",
-      "img_pr" : "0",
       "img_tgl_rel" : "turn_off.png"
+    }
+  }, {
+    "CLASSNAME" : "arc",
+    "theme" : "youth",
+    "type" : 5,
+    "property" : {
+      "pub_t" : {
+        "name" : "arc0",
+        "id" : 7,
+        "ctrl_type" : 5,
+        "pt" : {
+          "x" : 213,
+          "y" : 101
+        },
+        "size" : {
+          "width" : 292,
+          "height" : 292
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : {
+          "mode_e" : 1,
+          "dir_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "angle_t" : {
+        "start_angle" : 270,
+        "end_angle" : 1080
+      },
+      "arc_value" : 180,
+      "range_t" : {
+        "maxvalue" : 280
+      },
+      "arc_t_main" : {
+        "color" : 4281084974,
+        "width" : 27,
+        "opa" : 255,
+        "rounded" : 12
+      },
+      "arc_t_inc" : {
+        "color" : 4294942474,
+        "width" : 27,
+        "opa" : 255,
+        "rounded" : 12
+      }
     }
   }, {
     "CLASSNAME" : "label",
     "theme" : "youth",
     "property" : {
       "pub_t" : {
-        "name" : "label1",
-        "id" : 2,
-        "parent_id" : 1,
+        "name" : "label0",
+        "id" : 1,
         "pt" : {
-          "x" : 205,
-          "y" : 205
+          "x" : 207,
+          "y" : 165
         },
         "size" : {
-          "width" : 316,
-          "height" : 42
+          "width" : 306,
+          "height" : 113
         },
         "scrollbar_t" : { },
         "alpha" : 255,
-        "pub" : true,
-        "controlIDEnum" : "VIEW1_LABEL1_ID"
+        "pub" : true
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "Label",
+      "txt" : "88.88",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
-          "font_size" : 26
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 73
         },
         "img_t" : { }
       } ]
@@ -232,6 +221,38 @@
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW1_LABEL5_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "Label",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "font_size" : 26
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label1",
+        "id" : 2,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 205,
+          "y" : 205
+        },
+        "size" : {
+          "width" : 316,
+          "height" : 42
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW1_LABEL1_ID"
       },
       "animspeed" : 50,
       "align_e" : 34,
