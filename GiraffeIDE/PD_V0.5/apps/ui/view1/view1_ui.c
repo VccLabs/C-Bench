@@ -89,6 +89,58 @@ static void arc0_event(grf_ctrl_t *ctrl, grf_event_e event)
 //	}
 }
 
+
+static void mbox0_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void image_button1_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void txtbox0_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label6_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+	switch (event) {
+	    case GRF_EVENT_PRESSED:                                   /* held down */
+	        grf_label_set_txt_color(ctrl, GRF_COLOR_GET(0xFF, 0xE6, 0x80)); /* light yellow */
+	        break;
+
+	    case GRF_EVENT_PRESS_LOST:                                /* dragged off, cancel */
+	        grf_label_set_txt_color(ctrl, GRF_COLOR_GET(0xFF, 0x9F, 0x0A)); /* orange */
+	        break;
+
+	    case GRF_EVENT_CLICKED:                                   /* released on label -> act */
+	        grf_label_set_txt_color(ctrl, GRF_COLOR_GET(0xFF, 0x9F, 0x0A)); /* orange */
+	        grf_view_set_dis_view_anim(GRF_VIEW2_ID,
+	            GRF_SCR_LOAD_ANIM_MOVE_LEFT, 250, 0, GRF_ANIM_PATH_END_SLOW);
+	        break;
+
+	    default: break;
+	    }
+}
+
 #include "../../../libs/appscc/view1_cc.h"
 void view1_init(void)
 {

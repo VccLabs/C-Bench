@@ -108,7 +108,6 @@
           "width" : 292,
           "height" : 292
         },
-        "t_mode" : 1,
         "scrollbar_t" : {
           "mode_e" : 1,
           "dir_e" : 2
@@ -165,6 +164,39 @@
           "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 73
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label6",
+        "id" : 9,
+        "pt" : {
+          "x" : 423,
+          "y" : 531
+        },
+        "size" : {
+          "width" : 230,
+          "height" : 84
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 35,
+      "txt" : "Change",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16752394,
+          "font_size" : 15
         },
         "img_t" : { }
       } ]

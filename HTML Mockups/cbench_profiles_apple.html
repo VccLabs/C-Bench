@@ -1,0 +1,199 @@
+<!--
+  C-Bench — Profiles (view2) — APPLE-STYLE, sibling to Monitor (view1)
+  720x720. Same Inter type + iOS system colors. Back button -> view1 (hub-and-spoke).
+  Build map (Giraffe):
+    - background art (Illustrator): nav bar chrome, "Profiles" title, card/badge shapes,
+      colour dots, slider tracks. Static.
+    - native widgets on top: the ROW LIST (Giraffe list / dynamically created rows fed by
+      the scanned PDOs over UART), the Scan button, sliders, the Use button, Back button.
+    - selection highlight = recolor/show a selected-row image or a native style swap.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C-Bench — Profiles (Apple style)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --orange:#FF9F0A; --cyan:#64D2FF; --purple:#BF5AF2; --green:#30D158; --red:#FF453A; }
+  [data-theme="dark"]{
+    --bg:#000000; --screenbg:#000000; --card:#1C1C1E; --card2:#2C2C2E;
+    --txt:#FFFFFF; --txt2:rgba(235,235,245,.60); --txt3:rgba(235,235,245,.30);
+    --track:#2C2C2E; --sep:rgba(255,255,255,.07);
+    --bezel-a:#26262A; --bezel-b:#0A0A0C; --selbg:rgba(255,159,10,.12);
+  }
+  [data-theme="light"]{
+    --bg:#F2F2F7; --screenbg:#F2F2F7; --card:#FFFFFF; --card2:#EFEFF4;
+    --txt:#000000; --txt2:rgba(60,60,67,.60); --txt3:rgba(60,60,67,.30);
+    --track:#E5E5EA; --sep:rgba(60,60,67,.12);
+    --bezel-a:#D7DEE6; --bezel-b:#B7C2CE; --selbg:rgba(255,149,0,.10);
+    --orange:#FF9500; --cyan:#32ADE6; --purple:#AF52DE; --green:#34C759; --red:#FF3B30;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ background:#050507; font-family:'Inter',-apple-system,system-ui,sans-serif;
+        display:flex; flex-direction:column; align-items:center; gap:14px; padding:24px 12px 40px; overflow-x:hidden; }
+  .cap{ color:#5a6571; font-size:12px; letter-spacing:.04em; text-align:center; }
+  .cap b{ color:#9aa6b2; }
+  .stage{ width:100%; display:flex; justify-content:center; }
+  .fit{ width:720px; height:720px; transform-origin:top center; }
+
+  .device{ width:720px; height:720px; background:linear-gradient(160deg,var(--bezel-a),var(--bezel-b));
+           border-radius:40px; padding:18px; box-shadow:0 40px 90px -24px #000, inset 0 1px 0 rgba(255,255,255,.18); transition:background .35s; }
+  .screen{ width:100%; height:100%; background:var(--screenbg); border-radius:22px; overflow:hidden;
+           position:relative; display:flex; flex-direction:column; transition:background .35s; }
+
+  /* nav bar */
+  .nav{ display:flex; align-items:center; justify-content:space-between; padding:18px 22px 2px; }
+  .back{ display:flex; align-items:center; gap:3px; border:none; background:transparent; cursor:pointer;
+         color:var(--orange); font-family:inherit; font-size:17px; font-weight:500; padding:6px 6px 6px 0; }
+  .back svg{ display:block; }
+  .tbtn{ width:38px; height:38px; border-radius:50%; border:none; background:var(--card);
+         color:var(--txt); font-size:17px; cursor:pointer; display:grid; place-items:center; }
+  .tbtn:active{ transform:scale(.92); }
+
+  /* large title + scan */
+  .titlerow{ display:flex; align-items:flex-end; justify-content:space-between; padding:6px 26px 4px; }
+  .titlerow h1{ font-size:34px; font-weight:700; letter-spacing:-.02em; color:var(--txt); }
+  .titlerow .sub{ font-size:13px; color:var(--txt2); font-weight:500; margin-top:3px; }
+  .scan{ border:none; background:var(--orange); color:#231300; font-family:inherit; font-weight:600;
+         font-size:15px; border-radius:20px; padding:9px 20px; cursor:pointer; }
+  .scan:active{ transform:scale(.96); }
+
+  /* list */
+  .list{ flex:1; overflow-y:auto; padding:12px 22px 4px; min-height:0; }
+  .list::-webkit-scrollbar{ width:6px; } .list::-webkit-scrollbar-thumb{ background:var(--card2); border-radius:3px; }
+  .empty{ color:var(--txt3); font-size:15px; text-align:center; padding:60px 24px; line-height:1.7; font-weight:500; }
+
+  .row{ display:flex; align-items:center; gap:14px; background:var(--card); border-radius:18px;
+        padding:16px 18px; margin-bottom:10px; cursor:pointer; border:2px solid transparent; transition:.14s; }
+  .row:active{ transform:scale(.992); }
+  .row.sel{ border-color:var(--orange); background:var(--selbg); }
+  .badge{ font-weight:700; font-size:13px; letter-spacing:.02em; padding:6px 10px; border-radius:9px;
+          min-width:58px; text-align:center; }
+  .badge.fix{ color:var(--txt2); background:var(--card2); }
+  .badge.pps{ color:#062a30; background:var(--cyan); }
+  .badge.avs{ color:#2a1800; background:var(--orange); }
+  .badge.epr{ color:#1e0c33; background:var(--purple); }
+  .rinfo{ flex:1; }
+  .rinfo .v{ font-size:19px; font-weight:600; color:var(--txt); }
+  .rinfo .v small{ font-size:14px; font-weight:500; color:var(--txt2); margin-left:2px; }
+  .rinfo .meta{ font-size:13px; color:var(--txt2); font-weight:500; margin-top:2px; }
+  .amp{ font-size:15px; font-weight:600; color:var(--cyan); }
+  .check{ width:24px; height:24px; flex:0 0 auto; opacity:0; transition:.14s; color:var(--orange); }
+  .row.sel .check{ opacity:1; }
+
+  /* adjust panel (PPS/AVS) */
+  .adjust{ margin:0 22px; background:var(--card); border-radius:18px; padding:18px 20px;
+           max-height:0; opacity:0; overflow:hidden; transition:.25s; }
+  .adjust.show{ max-height:230px; opacity:1; margin-bottom:12px; }
+  .arow{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .arow .k{ font-size:13px; color:var(--txt2); font-weight:600; letter-spacing:.02em; }
+  .arow .val{ font-size:26px; font-weight:700; letter-spacing:-.02em; }
+  .arow .val.v{ color:var(--orange); } .arow .val.c{ color:var(--cyan); }
+  input[type=range]{ width:100%; height:30px; accent-color:var(--orange); margin-bottom:16px; }
+  input[type=range].cur{ accent-color:var(--cyan); margin-bottom:0; }
+
+  /* use button */
+  .foot{ padding:8px 22px 22px; }
+  .use{ width:100%; height:60px; border:none; border-radius:30px; cursor:pointer; font-family:inherit;
+        font-weight:600; font-size:19px; letter-spacing:-.01em; color:var(--txt2); background:var(--card); transition:.18s; }
+  .use.able{ color:#231300; background:var(--orange); }
+  .use:active{ transform:scale(.985); }
+</style>
+
+<div class="cap"><b>Profiles / view2</b> · Apple-style · tap Scan → pick a rail → Use</div>
+
+<div class="stage"><div class="fit" id="fit">
+<div class="device"><div class="screen" id="screen" data-theme="dark">
+
+  <div class="nav">
+    <button class="back" id="back">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+      Monitor
+    </button>
+    <button class="tbtn" id="theme">☾</button>
+  </div>
+
+  <div class="titlerow">
+    <div>
+      <h1>Profiles</h1>
+      <div class="sub" id="sub">Plug in a source, then Scan</div>
+    </div>
+    <button class="scan" id="scan">Scan</button>
+  </div>
+
+  <div class="list" id="list">
+    <div class="empty">No profiles yet.<br>Tap Scan to read the source.</div>
+  </div>
+
+  <div class="adjust" id="adjust">
+    <div class="arow"><span class="k">SET VOLTAGE</span><span class="val v" id="adjv">9.00 V</span></div>
+    <input type="range" id="sv" min="3300" max="11000" step="20" value="9000">
+    <div class="arow"><span class="k">CURRENT LIMIT</span><span class="val c" id="adjc">5.0 A</span></div>
+    <input type="range" class="cur" id="sc" min="500" max="5000" step="100" value="5000">
+  </div>
+
+  <div class="foot">
+    <button class="use" id="use" disabled>Select a rail</button>
+  </div>
+
+</div></div>
+</div></div>
+
+<div class="cap">iOS system colours · list rows fed by scanned PDOs over UART</div>
+
+<script>
+  const PDOS = [
+    {t:'fix', v:'5.00',  set:5.00,  a:'3.0 A'},
+    {t:'fix', v:'9.00',  set:9.00,  a:'3.0 A'},
+    {t:'fix', v:'12.00', set:12.00, a:'3.0 A'},
+    {t:'fix', v:'15.00', set:15.00, a:'3.0 A'},
+    {t:'fix', v:'20.00', set:20.00, a:'5.0 A'},
+    {t:'pps', v:'3.3–11', set:9.00,  a:'5.0 A', range:true, lo:3300, hi:11000},
+    {t:'pps', v:'3.3–21', set:12.00, a:'5.0 A', range:true, lo:3300, hi:21000},
+    {t:'epr', v:'28.00', set:28.00, a:'5.0 A'},
+    {t:'avs', v:'15–28', set:24.00, a:'5.0 A', range:true, lo:15000, hi:28000},
+  ];
+  const CHECK = '<svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const $=id=>document.getElementById(id);
+  let sel=null;
+
+  $('scan').onclick=()=>{
+    const list=$('list'); list.innerHTML='';
+    PDOS.forEach((p,i)=>{
+      const row=document.createElement('div'); row.className='row';
+      row.innerHTML=`<span class="badge ${p.t}">${p.t.toUpperCase()}</span>
+        <div class="rinfo"><div class="v">${p.v}<small>V</small></div>
+        <div class="meta">${p.range?'Adjustable rail':'Fixed rail'}</div></div>
+        <span class="amp">${p.a}</span>${CHECK}`;
+      row.onclick=()=>pick(i,row);
+      list.appendChild(row);
+    });
+    $('sub').textContent='140 W USB-C · 9 profiles';
+  };
+
+  function pick(i,row){
+    document.querySelectorAll('.row').forEach(r=>r.classList.remove('sel'));
+    row.classList.add('sel'); sel=PDOS[i];
+    const adj=$('adjust');
+    if(sel.range){
+      adj.classList.add('show');
+      const sv=$('sv'); sv.min=sel.lo; sv.max=sel.hi; sv.value=sel.set*1000;
+      $('adjv').textContent=sel.set.toFixed(2)+' V';
+      sv.oninput=e=>$('adjv').textContent=(e.target.value/1000).toFixed(2)+' V';
+      $('sc').oninput=e=>$('adjc').textContent=(e.target.value/1000).toFixed(1)+' A';
+    } else adj.classList.remove('show');
+    const u=$('use'); u.disabled=false; u.classList.add('able');
+    u.textContent=`Use ${sel.v} V`;
+  }
+
+  $('use').onclick=()=>{ if(sel) $('use').textContent='✓ Applied — back to Monitor'; };
+  $('back').onclick=()=>{ $('back').style.opacity=.5; setTimeout(()=>$('back').style.opacity=1,150); };
+  $('theme').onclick=()=>{ const s=$('screen'),d=s.dataset.theme==='dark';
+    s.dataset.theme=d?'light':'dark'; $('theme').textContent=d?'☀':'☾'; };
+
+  function fit(){ const avail=Math.min(window.innerWidth-24,760), s=Math.min(1,avail/720);
+    const f=$('fit'); f.style.transform=`scale(${s})`; f.parentElement.style.height=(720*s)+'px'; }
+  addEventListener('resize',fit); fit();
+</script>

@@ -161,7 +161,7 @@ void loop()
 
   // Telemetry: fast, smooth refresh
   static uint32_t tTel = 0;
-  if (now - tTel >= 120) // ~12.5 Hz
+  if (now - tTel >= 500) // 2 Hz
   {
     tTel = now;
     uint16_t mV = (uint16_t)ina260.readBusVoltage();
