@@ -165,8 +165,6 @@ void setup()
   Serial.print("PPS index: ");
   Serial.println(ppsIdx);
 
-  delay(300);        // let the HMI come up
-  sendProfileList(); // Phase 2 test: populate row 0
 }
 
 void loop()
@@ -190,6 +188,9 @@ void loop()
     usbpd.setOutput(outputOn ? 1 : 0);
   }
 
+  static uint32_t tProf = 0;
+  if (now - tProf >= 2000) { tProf = now; sendProfileList(); }
+  
   // Telemetry: fast, smooth refresh
   static uint32_t tTel = 0;
   if (now - tTel >= 500) // 2 Hz

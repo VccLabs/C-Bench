@@ -6,8 +6,8 @@ typedef enum {
 	VIEW2_LABEL0_ID = 2,
 	VIEW2_LABEL2_ID = 4,
 	VIEW2_LABEL1_ID = 3,
-	VIEW2_IMAGE_BUTTON0_ID = 1,
-	VIEW2_IMAGE_BUTTON1_ID = 5
+	VIEW2_LABEL3_ID = 6,
+	VIEW2_LABEL4_ID = 5
 } view2_ctrls_id_e;
 
 void view2_init(void);

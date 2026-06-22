@@ -69,9 +69,19 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
         case 0x0100:  /* profile count */
                     g_prof_n = (data[0]>MAX_PROF)?MAX_PROF:(u8)data[0];
                     break;
-                case 0x0101:  /* list ready -> render */
-                    if(g_prof_n>0) fill_row(0, &g_prof[0]);  /* Phase 2: row 0 only */
+        case 0x0101: {            /* list ready -> render */
+                    g_prof_n = grf_reg_get(0x0100);
+                    if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
+                    for(u8 i=0; i<g_prof_n; i++){
+                        prof_t p;
+                        p.type = grf_reg_get(0x0110 + i*4 + 0);
+                        p.vmin = grf_reg_get(0x0110 + i*4 + 1);
+                        p.vmax = grf_reg_get(0x0110 + i*4 + 2);
+                        p.imax = grf_reg_get(0x0110 + i*4 + 3);
+                        fill_row(i, &p);   /* fill_row gains real multi-row support in Phase 3 */
+                    }
                     break;
+                }
     }
 }
 
