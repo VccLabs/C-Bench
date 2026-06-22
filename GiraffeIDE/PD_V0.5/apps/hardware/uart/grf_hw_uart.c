@@ -10,28 +10,46 @@ static grf_drv_t *drv_uart = NULL;
 #define LBL_CURR   3
 #define LBL_POWER  5
 
-/* --- view2 row 0 widgets --- */
-#define R0_BADGE   6   /* LABEL3 - type chip (FIX/PPS/AVS/EPR) */
-#define R0_VOLT    2   /* LABEL0 - voltage */
-#define R0_META    3   /* LABEL1 - meta (Fixed/Adjustable) */
-#define R0_CURR    4   /* LABEL2 - current */
-#define R0_CHECK   5   /* LABEL4 - "✓" select mark (hidden until selected) */
-
 #define MAX_PROF 13
 typedef struct { u16 type, vmin, vmax, imax; } prof_t;
 static prof_t g_prof[MAX_PROF];
 static u8 g_prof_n = 0;
 
+/* per-row Control IDs: {badge, volt, meta, curr, check} */
+enum { COL_BADGE, COL_VOLT, COL_META, COL_CURR, COL_CHECK };
+static const u16 ROW_ID[MAX_PROF][5] = {
+  /* {badge, volt, meta, curr, check} */
+  {  6,  2,  3,  4,  5 },  /* row 0  */
+  { 10,  9,  8,  7,  1 },  /* row 1  */
+  { 12, 11, 13, 14, 15 },  /* row 2  */
+  { 26, 27, 28, 29, 30 },  /* row 3  */
+  { 25, 24, 23, 22, 21 },  /* row 4  */
+  { 16, 17, 18, 19, 20 },  /* row 5  */
+  { 55, 54, 43, 42, 31 },  /* row 6  */
+  { 56, 53, 44, 41, 32 },  /* row 7  */
+  { 57, 52, 45, 40, 33 },  /* row 8  */
+  { 58, 51, 46, 39, 34 },  /* row 9  */
+  { 59, 50, 47, 38, 35 },  /* row 10 */
+  { 60, 49, 48, 37, 36 },  /* row 11 */
+  { 65, 64, 63, 62, 61 },  /* row 12 */
+};
+
+static void show_row(u8 i, u8 vis)
+{
+    for(u8 k=0;k<5;k++)
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][k]), vis?0:1);
+}
+
 static void fill_row(u8 i, prof_t *p)
 {
     char v[20], c[16];
     const char *badge; grf_color_t bbg, btx;
-        switch(p->type){
-          case 1: badge="PPS"; bbg=GRF_COLOR_GET(0x64,0xD2,0xFF); btx=GRF_COLOR_GET(0x06,0x2A,0x30); break;
-          case 2: badge="AVS"; bbg=GRF_COLOR_GET(0xFF,0x9F,0x0A); btx=GRF_COLOR_GET(0x2A,0x18,0x00); break;
-          case 3: badge="EPR"; bbg=GRF_COLOR_GET(0xBF,0x5A,0xF2); btx=GRF_COLOR_GET(0x1E,0x0C,0x33); break;
-          default:badge="FIX"; bbg=GRF_COLOR_GET(0x2C,0x2C,0x2E); btx=GRF_COLOR_GET(0x8E,0x8E,0x93); break;
-        }
+    switch(p->type){
+      case 1: badge="PPS"; bbg=GRF_COLOR_GET(0x64,0xD2,0xFF); btx=GRF_COLOR_GET(0x06,0x2A,0x30); break;
+      case 2: badge="AVS"; bbg=GRF_COLOR_GET(0xFF,0x9F,0x0A); btx=GRF_COLOR_GET(0x2A,0x18,0x00); break;
+      case 3: badge="EPR"; bbg=GRF_COLOR_GET(0xBF,0x5A,0xF2); btx=GRF_COLOR_GET(0x1E,0x0C,0x33); break;
+      default:badge="FIX"; bbg=GRF_COLOR_GET(0x2C,0x2C,0x2E); btx=GRF_COLOR_GET(0x8E,0x8E,0x93); break;
+    }
     u8 range = (p->vmin != p->vmax);
 
     if(!range) snprintf(v,sizeof(v),"%u.%02u V", p->vmin/1000, (p->vmin%1000)/10);
@@ -39,13 +57,13 @@ static void fill_row(u8 i, prof_t *p)
                                                      p->vmax/1000,(p->vmax%1000)/100);
     snprintf(c,sizeof(c),"%u.%u A", p->imax/1000, (p->imax%1000)/100);
 
-    /* Phase 2: only row 0 */
-        grf_label_set_txt          (GCL(GRF_VIEW2_ID, R0_BADGE), badge);
-        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, R0_BADGE), bbg, 0);
-        grf_label_set_txt_color    (GCL(GRF_VIEW2_ID, R0_BADGE), btx);
-        grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_VOLT), v);
-        grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_META), range?"Adjustable rail":"Fixed rail");
-        grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_CURR), c);
+    grf_label_set_txt          (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]), badge);
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]), bbg, 0);
+    grf_label_set_txt_color    (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]), btx);
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_VOLT]), v);
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_META]), range?"Adjustable rail":"Fixed rail");
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CURR]), c);
+    show_row(i, 1);
 }
 
 void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
@@ -74,22 +92,20 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
             snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
             grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
             break;
-        case 0x0100:  /* profile count */
-                    g_prof_n = (data[0]>MAX_PROF)?MAX_PROF:(u8)data[0];
-                    break;
         case 0x0101: {            /* list ready -> render */
-                    g_prof_n = grf_reg_get(0x0100);
-                    if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
-                    for(u8 i=0; i<g_prof_n; i++){
-                        prof_t p;
-                        p.type = grf_reg_get(0x0110 + i*4 + 0);
-                        p.vmin = grf_reg_get(0x0110 + i*4 + 1);
-                        p.vmax = grf_reg_get(0x0110 + i*4 + 2);
-                        p.imax = grf_reg_get(0x0110 + i*4 + 3);
-                        fill_row(i, &p);   /* fill_row gains real multi-row support in Phase 3 */
-                    }
-                    break;
-                }
+                            g_prof_n = grf_reg_get(0x0100);
+                            if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
+                            for(u8 i=0; i<g_prof_n; i++){
+                                prof_t p;
+                                p.type = grf_reg_get(0x0110 + i*4 + 0);
+                                p.vmin = grf_reg_get(0x0110 + i*4 + 1);
+                                p.vmax = grf_reg_get(0x0110 + i*4 + 2);
+                                p.imax = grf_reg_get(0x0110 + i*4 + 3);
+                                fill_row(i, &p);
+                            }
+                            for(u8 i=g_prof_n; i<MAX_PROF; i++) show_row(i, 0);  /* hide unused rows */
+                            break;
+                        }
     }
 }
 
