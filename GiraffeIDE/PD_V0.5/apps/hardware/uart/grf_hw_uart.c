@@ -11,11 +11,11 @@ static grf_drv_t *drv_uart = NULL;
 #define LBL_POWER  5
 
 /* --- view2 row 0 widgets --- */
-#define R0_BADGE   1   /* IMAGE_BUTTON0 */
-#define R0_VOLT    2   /* <- the LABEL showing voltage  (2,3,or 4) */
-#define R0_META    3   /* <- the LABEL showing "Fixed rail" */
-#define R0_CURR    4   /* <- the LABEL showing current */
-#define R0_CHECK   5   /* IMAGE_BUTTON1 */
+#define R0_BADGE   6   /* LABEL3 - type chip (FIX/PPS/AVS/EPR) */
+#define R0_VOLT    2   /* LABEL0 - voltage */
+#define R0_META    3   /* LABEL1 - meta (Fixed/Adjustable) */
+#define R0_CURR    4   /* LABEL2 - current */
+#define R0_CHECK   5   /* LABEL4 - "✓" select mark (hidden until selected) */
 
 #define MAX_PROF 13
 typedef struct { u16 type, vmin, vmax, imax; } prof_t;
@@ -25,7 +25,13 @@ static u8 g_prof_n = 0;
 static void fill_row(u8 i, prof_t *p)
 {
     char v[20], c[16];
-    const char *badge = (p->type==1)?"PPS":(p->type==2)?"AVS":(p->type==3)?"EPR":"FIX";
+    const char *badge; grf_color_t bbg, btx;
+        switch(p->type){
+          case 1: badge="PPS"; bbg=GRF_COLOR_GET(0x64,0xD2,0xFF); btx=GRF_COLOR_GET(0x06,0x2A,0x30); break;
+          case 2: badge="AVS"; bbg=GRF_COLOR_GET(0xFF,0x9F,0x0A); btx=GRF_COLOR_GET(0x2A,0x18,0x00); break;
+          case 3: badge="EPR"; bbg=GRF_COLOR_GET(0xBF,0x5A,0xF2); btx=GRF_COLOR_GET(0x1E,0x0C,0x33); break;
+          default:badge="FIX"; bbg=GRF_COLOR_GET(0x2C,0x2C,0x2E); btx=GRF_COLOR_GET(0x8E,0x8E,0x93); break;
+        }
     u8 range = (p->vmin != p->vmax);
 
     if(!range) snprintf(v,sizeof(v),"%u.%02u V", p->vmin/1000, (p->vmin%1000)/10);
@@ -34,10 +40,12 @@ static void fill_row(u8 i, prof_t *p)
     snprintf(c,sizeof(c),"%u.%u A", p->imax/1000, (p->imax%1000)/100);
 
     /* Phase 2: only row 0 */
-    grf_imgbtn_set_txt(GCL(GRF_VIEW2_ID, R0_BADGE), badge);
-    grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_VOLT), v);
-    grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_META), range?"Adjustable rail":"Fixed rail");
-    grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_CURR), c);
+        grf_label_set_txt          (GCL(GRF_VIEW2_ID, R0_BADGE), badge);
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, R0_BADGE), bbg, 0);
+        grf_label_set_txt_color    (GCL(GRF_VIEW2_ID, R0_BADGE), btx);
+        grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_VOLT), v);
+        grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_META), range?"Adjustable rail":"Fixed rail");
+        grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_CURR), c);
 }
 
 void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
