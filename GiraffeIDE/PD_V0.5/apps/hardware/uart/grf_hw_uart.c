@@ -10,10 +10,48 @@ static grf_drv_t *drv_uart = NULL;
 #define LBL_CURR   3
 #define LBL_POWER  5
 
+/* --- view2 row 0 widgets --- */
+#define R0_BADGE   1   /* IMAGE_BUTTON0 */
+#define R0_VOLT    2   /* <- the LABEL showing voltage  (2,3,or 4) */
+#define R0_META    3   /* <- the LABEL showing "Fixed rail" */
+#define R0_CURR    4   /* <- the LABEL showing current */
+#define R0_CHECK   5   /* IMAGE_BUTTON1 */
+
+#define MAX_PROF 13
+typedef struct { u16 type, vmin, vmax, imax; } prof_t;
+static prof_t g_prof[MAX_PROF];
+static u8 g_prof_n = 0;
+
+static void fill_row(u8 i, prof_t *p)
+{
+    char v[20], c[16];
+    const char *badge = (p->type==1)?"PPS":(p->type==2)?"AVS":(p->type==3)?"EPR":"FIX";
+    u8 range = (p->vmin != p->vmax);
+
+    if(!range) snprintf(v,sizeof(v),"%u.%02u V", p->vmin/1000, (p->vmin%1000)/10);
+    else       snprintf(v,sizeof(v),"%u.%u-%u.%u V", p->vmin/1000,(p->vmin%1000)/100,
+                                                     p->vmax/1000,(p->vmax%1000)/100);
+    snprintf(c,sizeof(c),"%u.%u A", p->imax/1000, (p->imax%1000)/100);
+
+    /* Phase 2: only row 0 */
+    grf_imgbtn_set_txt(GCL(GRF_VIEW2_ID, R0_BADGE), badge);
+    grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_VOLT), v);
+    grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_META), range?"Adjustable rail":"Fixed rail");
+    grf_label_set_txt (GCL(GRF_VIEW2_ID, R0_CURR), c);
+}
 
 void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
 {
     char buf[16];
+
+    /* profile rows: 0x0110 + i*4 = [type, vmin, vmax, imax] */
+    if(addr>=0x0110 && addr<0x0110+MAX_PROF*4 && datalen>=4){
+        u8 i=(addr-0x0110)/4;
+        g_prof[i].type=data[0]; g_prof[i].vmin=data[1];
+        g_prof[i].vmax=data[2]; g_prof[i].imax=data[3];
+        return;
+    }
+
     switch(addr){
         case 0x0010:  /* voltage mV */
             snprintf(buf,sizeof(buf),"%u.%02u", data[0]/1000, (data[0]%1000)/10);
@@ -28,6 +66,12 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
             snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
             grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
             break;
+        case 0x0100:  /* profile count */
+                    g_prof_n = (data[0]>MAX_PROF)?MAX_PROF:(u8)data[0];
+                    break;
+                case 0x0101:  /* list ready -> render */
+                    if(g_prof_n>0) fill_row(0, &g_prof[0]);  /* Phase 2: row 0 only */
+                    break;
     }
 }
 

@@ -25,6 +25,34 @@ static void writeReg(uint16_t addr, uint16_t val)
   HMI.write(f, 8);
 }
 
+static void writeRegs(uint16_t addr, const uint16_t *vals, uint8_t n)
+{
+  uint8_t f[64];
+  f[0] = 0x5A;
+  f[1] = 0xA5;
+  f[2] = (uint8_t)(n * 2 + 3);
+  f[3] = 0x82;
+  f[4] = (uint8_t)(addr >> 8);
+  f[5] = (uint8_t)addr;
+  for (uint8_t i = 0; i < n; i++)
+  {
+    f[6 + i * 2] = (uint8_t)(vals[i] >> 8);
+    f[7 + i * 2] = (uint8_t)vals[i];
+  }
+  HMI.write(f, 6 + n * 2);
+}
+
+// Phase 2 test: send one fixed 9V / 3A profile
+static void sendProfileList()
+{
+  uint16_t n = 1;
+  writeRegs(0x0100, &n, 1);                         // count
+  uint16_t row0[4] = {0 /*FIX*/, 9000, 9000, 3000}; // type,vmin,vmax,imax
+  writeRegs(0x0110, row0, 4);                       // row 0
+  uint16_t rdy = 1;
+  writeRegs(0x0101, &rdy, 1); // ready -> render
+}
+
 // Apply one decoded control register from the panel
 static void applyControl(uint16_t addr, uint16_t val)
 {
@@ -136,6 +164,9 @@ void setup()
   ppsIdx = usbpd.getPPSIndex();
   Serial.print("PPS index: ");
   Serial.println(ppsIdx);
+
+  delay(300);        // let the HMI come up
+  sendProfileList(); // Phase 2 test: populate row 0
 }
 
 void loop()

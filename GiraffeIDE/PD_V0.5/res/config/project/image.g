@@ -14,4 +14,8 @@
   "imageId" : 4,
   "imagePath" : "turn_on.png",
   "child" : [ ]
+}, {
+  "imageId" : 5,
+  "imagePath" : "view2.png",
+  "child" : [ ]
 } ]
