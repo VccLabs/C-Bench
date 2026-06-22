@@ -104,6 +104,8 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
                                 fill_row(i, &p);
                             }
                             for(u8 i=g_prof_n; i<MAX_PROF; i++) show_row(i, 0);  /* hide unused rows */
+                            for(u8 i=0; i<g_prof_n; i++)
+                                            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
                             break;
                         }
     }

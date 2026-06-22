@@ -196,6 +196,7 @@
         "name" : "style",
         "txt_t" : {
           "color" : 16752394,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 15
         },
         "img_t" : { }
