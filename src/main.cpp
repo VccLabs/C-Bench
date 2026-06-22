@@ -46,16 +46,18 @@ static void writeRegs(uint16_t addr, const uint16_t *vals, uint8_t n)
 static void sendProfileList()
 {
   uint16_t n = 13;
-  writeRegs(0x0100, &n, 1);                          // count
-  for (uint16_t i = 0; i < n; i++) {
-    uint16_t row[4] = { (uint16_t)(i % 4),            // type cycles FIX/PPS/AVS/EPR
-                        (uint16_t)((i+1)*1000),        // vmin = 1V,2V,... encodes row index
-                        (uint16_t)((i+1)*1000),        // vmax = vmin (fixed for the test)
-                        (uint16_t)((i+1)*100) };        // imax = 0.1A,0.2A,...
-    writeRegs(0x0110 + i*4, row, 4);                  // row i
+  writeRegs(0x0100, &n, 1); // count
+  for (uint16_t i = 0; i < n; i++)
+  {
+    uint16_t row[4] = {(uint16_t)(i % 4),          // type cycles FIX/PPS/AVS/EPR
+                       (uint16_t)((i + 1) * 1000), // vmin = 1V,2V,... encodes row index
+                       (uint16_t)((i + 1) * 1000), // vmax = vmin (fixed for the test)
+                       (uint16_t)((i + 1) * 100)}; // imax = 0.1A,0.2A,...
+    writeRegs(0x0110 + i * 4, row, 4);             // row i
+    delay(5);                                      // let the HMI RX drain
   }
   uint16_t rdy = 1;
-  writeRegs(0x0101, &rdy, 1);                         // ready -> render
+  writeRegs(0x0101, &rdy, 1); // ready -> render
 }
 
 // Apply one decoded control register from the panel
@@ -169,7 +171,6 @@ void setup()
   ppsIdx = usbpd.getPPSIndex();
   Serial.print("PPS index: ");
   Serial.println(ppsIdx);
-
 }
 
 void loop()
@@ -194,7 +195,11 @@ void loop()
   }
 
   static uint32_t tProf = 0;
-  if (now - tProf >= 2000) { tProf = now; sendProfileList(); }
+  if (now - tProf >= 2000)
+  {
+    tProf = now;
+    sendProfileList();
+  }
 
   // Telemetry: fast, smooth refresh
   static uint32_t tTel = 0;
