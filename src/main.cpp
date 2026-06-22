@@ -42,22 +42,49 @@ static void writeRegs(uint16_t addr, const uint16_t *vals, uint8_t n)
   HMI.write(f, 6 + n * 2);
 }
 
-// Phase 2 test: send one fixed 9V / 3A profile
+// Read source PDOs over I2C and push the real list to the HMI
 static void sendProfileList()
 {
-  uint16_t n = 13;
-  writeRegs(0x0100, &n, 1); // count
-  for (uint16_t i = 0; i < n; i++)
-  {
-    uint16_t row[4] = {(uint16_t)(i % 4),          // type cycles FIX/PPS/AVS/EPR
-                       (uint16_t)((i + 1) * 1000), // vmin = 1V,2V,... encodes row index
-                       (uint16_t)((i + 1) * 1000), // vmax = vmin (fixed for the test)
-                       (uint16_t)((i + 1) * 100)}; // imax = 0.1A,0.2A,...
-    writeRegs(0x0110 + i * 4, row, 4);             // row i
-    delay(5);                                      // let the HMI RX drain
+  uint8_t raw[26];
+  Wire.beginTransmission(0x52);             // AP33772S
+  Wire.write(0x20);                         // CMD_SRCPDO
+  if (Wire.endTransmission(false) != 0) return;       // bus error: keep last list
+  if (Wire.requestFrom(0x52, 26) < 26) return;
+  for (uint8_t i = 0; i < 26; i++) raw[i] = Wire.read();
+
+  uint16_t rows[13][4];
+  uint16_t n = 0;
+
+  for (uint8_t idx = 0; idx < 13; idx++) {
+    uint8_t b0 = raw[idx*2], b1 = raw[idx*2 + 1];
+    if (b0 == 0 && b1 == 0) continue;       // empty slot
+
+    uint16_t pdo     = b0 | (b1 << 8);
+    uint16_t vField  = pdo & 0xFF;          // voltage_max field
+    uint8_t  cField  = (pdo >> 10) & 0xF;   // current_max field
+    uint8_t  typeBit = (pdo >> 14) & 1;     // 0=fixed, 1=PPS/AVS
+    bool     isEPR   = (idx >= 7);          // PDO 8..13 are EPR
+
+    uint16_t type, vmin, vmax;
+    if (!isEPR) {                                   // SPR PDO 1..7 (100 mV units)
+      if (typeBit == 0) { type = 0; vmin = vmax = vField * 100; }        // FIX
+      else              { type = 1; vmin = 3300;  vmax = vField * 100; } // PPS
+    } else {                                        // EPR PDO 8..13 (200 mV units)
+      if (typeBit == 0) { type = 3; vmin = vmax = vField * 200; }        // EPR fixed
+      else              { type = 2; vmin = 15000; vmax = vField * 200; } // AVS
+    }
+    uint16_t imax = (cField == 15) ? 5000
+                  : (cField == 0)  ? 1240
+                  : (uint16_t)(1000 + cField * 250);
+
+    rows[n][0] = type; rows[n][1] = vmin; rows[n][2] = vmax; rows[n][3] = imax;
+    n++;
   }
+
+  writeRegs(0x0100, &n, 1);
+  for (uint16_t i = 0; i < n; i++) { writeRegs(0x0110 + i*4, rows[i], 4); delay(5); }
   uint16_t rdy = 1;
-  writeRegs(0x0101, &rdy, 1); // ready -> render
+  writeRegs(0x0101, &rdy, 1);
 }
 
 // Apply one decoded control register from the panel
