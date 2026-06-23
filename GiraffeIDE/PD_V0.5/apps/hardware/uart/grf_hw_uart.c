@@ -15,6 +15,9 @@ typedef struct { u16 type, vmin, vmax, imax; } prof_t;
 static prof_t g_prof[MAX_PROF];
 static u8 g_prof_n = 0;
 
+#define LBL_EMPTY1  80   /* label78 - "No profiles..." view2*/
+#define LBL_EMPTY2  81   /* label79 - subtitle view2*/
+
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
 enum { COL_BADGE, COL_VOLT, COL_META, COL_CURR, COL_CHECK, COL_BG };
 static const u16 ROW_ID[MAX_PROF][6] = {
@@ -92,8 +95,10 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
             grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
             break;
         case 0x0101: {            /* list ready -> render */
-                            g_prof_n = grf_reg_get(0x0100);
-                            if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
+        	g_prof_n = grf_reg_get(0x0100);
+        	            if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
+        	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY1), g_prof_n ? 1 : 0);
+        	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY2), g_prof_n ? 1 : 0);
                             for(u8 i=0; i<g_prof_n; i++){
                                 prof_t p;
                                 p.type = grf_reg_get(0x0110 + i*4 + 0);

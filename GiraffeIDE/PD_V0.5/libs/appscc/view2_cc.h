@@ -1,6 +1,8 @@
 static grf_ctrl_fun_t view_ctrls_fun_t[] =
 {
 	{VIEW2_CONTAINER0_ID,container0_event},
+	{VIEW2_LABEL78_ID,label78_event},
+	{VIEW2_LABEL79_ID,label79_event},
 	{VIEW2_LABEL72_ID,label72_event},
 	{VIEW2_LABEL73_ID,label73_event},
 	{VIEW2_LABEL71_ID,label71_event},

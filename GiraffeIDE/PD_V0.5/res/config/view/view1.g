@@ -176,19 +176,19 @@
         "name" : "label6",
         "id" : 9,
         "pt" : {
-          "x" : 423,
-          "y" : 531
+          "x" : 505,
+          "y" : 562
         },
         "size" : {
-          "width" : 230,
-          "height" : 84
+          "width" : 145,
+          "height" : 32
         },
         "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
-        "pub" : true
+        "pub" : true,
+        "click_area" : 30
       },
-      "auto_hight" : 1,
       "animspeed" : 50,
       "align_e" : 35,
       "txt" : "Change",

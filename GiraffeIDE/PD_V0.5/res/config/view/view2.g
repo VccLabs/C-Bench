@@ -10,8 +10,8 @@
         "id" : 66,
         "ctrl_type" : 2,
         "pt" : {
-          "x" : 30,
-          "y" : 160
+          "x" : 185,
+          "y" : 595
         },
         "size" : {
           "width" : 656,
@@ -32,6 +32,67 @@
         "body_t" : {
           "main_color" : 8421504,
           "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label78",
+        "id" : 80,
+        "pt" : {
+          "x" : 275,
+          "y" : 216
+        },
+        "size" : {
+          "width" : 171,
+          "height" : 30
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "No profiles detected.",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 4671303
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label79",
+        "id" : 81,
+        "pt" : {
+          "x" : 105,
+          "y" : 245
+        },
+        "size" : {
+          "width" : 501,
+          "height" : 30
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW2_LABEL79_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "Connect a USB-C PD source, or this source may not support PD.",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 4671303
         },
         "img_t" : { }
       } ]
