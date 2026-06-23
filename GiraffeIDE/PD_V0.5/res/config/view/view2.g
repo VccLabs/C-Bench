@@ -113,6 +113,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -146,6 +147,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -179,6 +181,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -212,6 +215,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -245,6 +249,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -278,6 +283,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -311,6 +317,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -344,6 +351,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -377,6 +385,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -410,6 +419,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -443,6 +453,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -476,6 +487,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -509,6 +521,7 @@
           "width" : 635,
           "height" : 78
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true

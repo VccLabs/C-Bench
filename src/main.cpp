@@ -42,6 +42,8 @@ static void writeRegs(uint16_t addr, const uint16_t *vals, uint8_t n)
   HMI.write(f, 6 + n * 2);
 }
 
+static uint32_t lastSig = 0xFFFFFFFF;
+
 // Read source PDOs over I2C and push the real list to the HMI
 static void sendProfileList()
 {
@@ -51,14 +53,22 @@ static void sendProfileList()
   uint16_t zero = 0, rdyz = 1;
   if (Wire.endTransmission(false) != 0)
   { // no source / bus error -> clear list
-    writeRegs(0x0100, &zero, 1);
-    writeRegs(0x0101, &rdyz, 1);
+    if (lastSig != 0)
+    {
+      writeRegs(0x0100, &zero, 1);
+      writeRegs(0x0101, &rdyz, 1);
+      lastSig = 0;
+    }
     return;
   }
   if (Wire.requestFrom(0x52, 26) < 26)
   {
-    writeRegs(0x0100, &zero, 1);
-    writeRegs(0x0101, &rdyz, 1);
+    if (lastSig != 0)
+    {
+      writeRegs(0x0100, &zero, 1);
+      writeRegs(0x0101, &rdyz, 1);
+      lastSig = 0;
+    }
     return;
   }
   for (uint8_t i = 0; i < 26; i++)
@@ -118,6 +128,15 @@ static void sendProfileList()
     rows[n][3] = imax;
     n++;
   }
+
+  // signature of the list; skip resend (and HMI re-render) if unchanged
+  uint32_t sig = n * 2654435761u;
+  for (uint16_t i = 0; i < n; i++)
+    for (uint8_t k = 0; k < 4; k++)
+      sig = sig * 31u + rows[i][k];
+  if (sig == lastSig)
+    return;
+  lastSig = sig;
 
   writeRegs(0x0100, &n, 1);
   for (uint16_t i = 0; i < n; i++)
@@ -267,7 +286,7 @@ void loop()
   if (now - tProf >= 2000)
   {
     tProf = now;
-    sendProfileList();
+    sendProfileList(); // sends only if the PDO set changed (see below)
   }
 
   // Telemetry: fast, smooth refresh

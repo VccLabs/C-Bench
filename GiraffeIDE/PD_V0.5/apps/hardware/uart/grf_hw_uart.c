@@ -42,6 +42,29 @@ static void show_row(u8 i, u8 vis)
         grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][k]), vis?0:1);
 }
 
+static u8 g_sel = 0xFF;   /* selected row, 0xFF = none */
+
+static void highlight_row(u8 i, u8 on)
+{
+    /* check mark */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), on ? 0 : 1);
+    /* background chip: orange tint when selected, default card when not */
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]),
+        on ? GRF_COLOR_GET(0x3A,0x2A,0x10) : GRF_COLOR_GET(0x1C,0x1C,0x1E), 0);
+}
+
+void select_row_by_bg(grf_ctrl_t *ctrl)
+{
+    for (u8 i = 0; i < MAX_PROF; i++) {
+        if (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]) == ctrl) {
+            if (g_sel != 0xFF) highlight_row(g_sel, 0);   /* clear previous */
+            g_sel = i;
+            highlight_row(i, 1);                          /* highlight new */
+            return;
+        }
+    }
+}
+
 static void fill_row(u8 i, prof_t *p)
 {
     char v[20], c[16];
