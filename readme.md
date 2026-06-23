@@ -16,9 +16,8 @@ touch UI. Open-source hardware and software, planned for launch on Crowd Supply.
 
 > Status: hardware defined; firmware bring-up in progress. Validated so far:
 > PD profile read, PPS request + output arm, INA260 readback, live V/I/P
-> telemetry to the HMI, HMI→RP output control, and full source-profile list
-> transfer to the panel. This README is the single source of truth for the
-> system architecture — keep it current.
+> telemetry, HMI→RP output control, full source-profile list transfer with
+> live 13-row Profiles UI (auto-clears on unplug), and row selection on the panel. This README is the single source of truth — keep it current.
 
 ---
 
@@ -193,6 +192,11 @@ value, and updates the matching label via `grf_label_set_txt()`.
 `grf_reg_com_send()` provides the reverse path (panel → RP).
 
 Note: the panel's `grf_reg_s_set` calls `grf_reg_set_user` **once per register**
+(`datalen=1`, base addr each time). Multi-register payloads are read back from
+`ctrlreg[]` via `grf_reg_get()` on a "ready" trigger (`0x0101`), not from the
+callback's `data` pointer.
+
+Note: the panel's `grf_reg_s_set` calls `grf_reg_set_user` **once per register**
 (`datalen=1`, base addr each time). Multi-register payloads are therefore read
 back from `ctrlreg[]` via `grf_reg_get()` on a "ready" trigger, not from the
 callback's `data` pointer.
@@ -207,17 +211,18 @@ callback's `data` pointer.
 | `0x0011` | Output current | mA    |
 | `0x0012` | Output power   | 0.1 W |
 
-**RP → HMI — profile list** (pushed periodically; re-reads source PDOs):
+**RP → HMI — profile list** (resent only on change; empty pushed while no source):
 
-| Reg              | Value                                            | Units |
-| ---------------- | ------------------------------------------------ | ----- |
-| `0x0100`         | Profile count N (0 ⇒ no source; list cleared)    | —     |
-| `0x0110 + i*4`   | Row i: `+0` type, `+1` vmin, `+2` vmax, `+3` imax | mV/mA |
-| `0x0101`         | "List ready" trigger — panel renders on receipt  | —     |
+| Reg            | Value                                              | Units |
+| -------------- | -------------------------------------------------- | ----- |
+| `0x0100`       | Profile count N (0 ⇒ no source; panel clears list) | —     |
+| `0x0110 + i*4` | Row i: `+0` type, `+1` vmin, `+2` vmax, `+3` imax  | mV/mA |
+| `0x0101`       | "List ready" trigger — panel renders on receipt    | —     |
 
 Type codes: `0` FIX, `1` PPS, `2` AVS, `3` EPR. Voltage = `voltage_max ×
-(EPR ? 200 : 100)` mV; vmin = vmax for fixed. Panel maps a selected **list
-position** back to the real PDO (charger-agnostic — no reliance on PDO index).
+(EPR ? 200 : 100)` mV; vmin = vmax for fixed. The RP reads source PDOs directly
+over I2C (`CMD_SRCPDO 0x20`) and normalizes them; the panel renders by **list
+position** and never relies on PDO index — so any charger works.
 
 **HMI → RP — control:**
 
@@ -246,6 +251,26 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
   N = 0. Per-view control limit raised above the default 64.
 - view3 — Battery, view4 — Settings: planned.
 
+---
+
+## HMI UI (Giraffe)
+
+Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
+`grf_view_set_dis_view_anim()`. Per-view control limit raised from 64 to 80.
+
+- **view1 — Monitor (boot):** voltage ring (`arc`, reg `0x0010`), V/I/P labels,
+  output toggle (`imgbtn`, toggle → reg `0x0022`, alpha-crossfade animation),
+  touchable "Change" label → view2.
+- **view2 — Profiles:** scrolling `container` holding a fixed pool of **13 rows**;
+  each row = 6 labels (badge / voltage / meta / current / check / background chip).
+  Rows are filled from the profile-list registers and shown/hidden by count.
+  Badge label is a colored chip (bg color + text per type). Empty-state labels
+  show when N = 0. Tap a row's background chip to select it (✓ + chip tint);
+  selection is tracked on the panel (`g_sel`).
+- view3 — Battery, view4 — Settings: planned.
+
+Row data lives in a `ROW_ID[13][6]` table in `grf_hw_uart.c` mapping each row's
+six Control IDs; `fill_row()` / `show_row()` / selection all index through it.
 
 ## Other
 

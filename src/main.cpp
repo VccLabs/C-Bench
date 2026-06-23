@@ -14,6 +14,7 @@ int ppsIdx = -1;
 volatile uint16_t reqMV = PPS_TARGET_MV; // reg 0x0020 (next milestone)
 volatile uint16_t limMA = PPS_LIMIT_MA;  // reg 0x0021 (next milestone)
 volatile bool outputOn = false;          // reg 0x0022 - default OFF for safety
+volatile int pendingSel = -1;            // reg 0x0023 list position, applied in loop()
 
 #define HMI Serial2 // UART1: IO8=TX, IO9=RX -> TR660
 
@@ -44,6 +45,17 @@ static void writeRegs(uint16_t addr, const uint16_t *vals, uint8_t n)
 
 static uint32_t lastSig = 1; /* not 0: forces a clear on first unplugged cycle */
 
+// list position -> real PDO (charger-agnostic; rebuilt every sendProfileList)
+struct Slot
+{
+  uint8_t pdoIndex, type;
+  uint16_t vmin, vmax, imax;
+};
+static Slot g_slots[13];
+static uint8_t g_slotN = 0;
+static int activePdoIdx = -1;  // applied PDO (1-based), -1 = none
+static uint8_t activeType = 0; // 0 FIX, 1 PPS, 2 AVS, 3 EPR
+
 // Read source PDOs over I2C and push the real list to the HMI
 static void sendProfileList()
 {
@@ -54,17 +66,24 @@ static void sendProfileList()
   if (Wire.endTransmission(false) != 0)
   { // no source / bus error -> clear list
     static uint8_t clrTries = 0;
-    if (lastSig != 0) { clrTries = 0; }
-writeRegs(0x0100, &zero, 1);
+    if (lastSig != 0)
+    {
+      clrTries = 0;
+    }
+    writeRegs(0x0100, &zero, 1);
     writeRegs(0x0101, &rdyz, 1);
     lastSig = 0;
+    g_slotN = 0;
     return;
   }
   if (Wire.requestFrom(0x52, 26) < 26)
   {
     static uint8_t clrTries = 0;
-    if (lastSig != 0) { clrTries = 0; }
-writeRegs(0x0100, &zero, 1);
+    if (lastSig != 0)
+    {
+      clrTries = 0;
+    }
+    writeRegs(0x0100, &zero, 1);
     writeRegs(0x0101, &rdyz, 1);
     lastSig = 0;
     return;
@@ -124,9 +143,10 @@ writeRegs(0x0100, &zero, 1);
     rows[n][1] = vmin;
     rows[n][2] = vmax;
     rows[n][3] = imax;
+    g_slots[n] = {(uint8_t)(idx + 1), (uint8_t)type, vmin, vmax, imax}; // idx+1 = real 1-based PDO
     n++;
   }
-
+  g_slotN = n;
   // signature of the list; skip resend (and HMI re-render) if unchanged
   uint32_t sig = n * 2654435761u;
   for (uint16_t i = 0; i < n; i++)
@@ -160,6 +180,10 @@ static void applyControl(uint16_t addr, uint16_t val)
   case 0x0022:
     outputOn = (val != 0);
     break; // output enable
+  case 0x0023:
+    if (val < g_slotN)
+      pendingSel = (int)val; // selected position, applied in loop()
+    break;
   }
 }
 
@@ -268,17 +292,47 @@ void loop()
   pollHMI(); // parse incoming control frames every pass
   uint32_t now = millis();
 
-  // PD keep-alive: re-request PPS occasionally (PPS only needs a refresh ~every <10s)
+  // Apply a profile selected on the panel (reg 0x0023; 0x0020/0x0021 already latched)
+  if (pendingSel >= 0)
+  {
+    int sel = pendingSel;
+    pendingSel = -1;
+    if (sel < g_slotN)
+    {
+      Slot &s = g_slots[sel];
+      switch (s.type)
+      {
+      case 1:
+        usbpd.setPPSPDO(s.pdoIndex, reqMV, limMA);
+        break; // PPS
+      case 2:
+        usbpd.setAVSPDO(s.pdoIndex, reqMV, limMA);
+        break; // AVS
+      default:
+        usbpd.setFixPDO(s.pdoIndex, s.imax);
+        break; // FIX / EPR-fixed
+      }
+      activePdoIdx = s.pdoIndex;
+      activeType = s.type;
+      usbpd.setOutput(1);
+      outputOn = true;
+    }
+  }
+
+  // PD keep-alive: refresh the *applied* PPS/AVS rail (fixed PDOs don't need it)
   static uint32_t tPPS = 0;
-  if (ppsIdx > 0 && now - tPPS >= 2000)
+  if ((activeType == 1 || activeType == 2) && now - tPPS >= 2000)
   {
     tPPS = now;
-    usbpd.setPPSPDO(ppsIdx, PPS_TARGET_MV, PPS_LIMIT_MA);
+    if (activeType == 1)
+      usbpd.setPPSPDO(activePdoIdx, reqMV, limMA);
+    else
+      usbpd.setAVSPDO(activePdoIdx, reqMV, limMA);
   }
 
   // Output switch: act only when the HMI changes it
   static int lastOut = -1;
-  if (ppsIdx > 0 && (int)outputOn != lastOut)
+  if (activePdoIdx > 0 && (int)outputOn != lastOut)
   {
     lastOut = outputOn;
     usbpd.setOutput(outputOn ? 1 : 0);
