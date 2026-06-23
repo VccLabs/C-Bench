@@ -53,22 +53,20 @@ static void sendProfileList()
   uint16_t zero = 0, rdyz = 1;
   if (Wire.endTransmission(false) != 0)
   { // no source / bus error -> clear list
-    if (lastSig != 0)
-    {
-      writeRegs(0x0100, &zero, 1);
-      writeRegs(0x0101, &rdyz, 1);
-      lastSig = 0;
-    }
+    static uint8_t clrTries = 0;
+    if (lastSig != 0) { clrTries = 0; }
+writeRegs(0x0100, &zero, 1);
+    writeRegs(0x0101, &rdyz, 1);
+    lastSig = 0;
     return;
   }
   if (Wire.requestFrom(0x52, 26) < 26)
   {
-    if (lastSig != 0)
-    {
-      writeRegs(0x0100, &zero, 1);
-      writeRegs(0x0101, &rdyz, 1);
-      lastSig = 0;
-    }
+    static uint8_t clrTries = 0;
+    if (lastSig != 0) { clrTries = 0; }
+writeRegs(0x0100, &zero, 1);
+    writeRegs(0x0101, &rdyz, 1);
+    lastSig = 0;
     return;
   }
   for (uint8_t i = 0; i < 26; i++)
@@ -260,8 +258,9 @@ void setup()
   Serial.print("PPS index: ");
   Serial.println(ppsIdx);
 
-  delay(300);        // let the HMI come up
-  sendProfileList(); // initial render (clears list if no source)
+  delay(300);           // let the HMI come up
+  lastSig = 0xFFFFFFFF; // force the first render regardless of prior RAM state
+  sendProfileList();    // initial render (clears list if no source)
 }
 
 void loop()
