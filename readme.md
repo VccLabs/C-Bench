@@ -15,8 +15,9 @@ touch UI. Open-source hardware and software, planned for launch on Crowd Supply.
 - **UI:** 4" 720×720 capacitive TDO HMI over UART (Giraffe IDE).
 
 > Status: hardware defined; firmware bring-up in progress. Validated so far:
-> PD profile read, PPS request + output arm, INA260 readback, and live V/I/P
-> telemetry to the HMI. This README is the single source of truth for the
+> PD profile read, PPS request + output arm, INA260 readback, live V/I/P
+> telemetry to the HMI, HMI→RP output control, and full source-profile list
+> transfer to the panel. This README is the single source of truth for the
 > system architecture — keep it current.
 
 ---
@@ -191,25 +192,60 @@ On the panel, `grf_reg_set_user()` decodes incoming registers, formats the
 value, and updates the matching label via `grf_label_set_txt()`.
 `grf_reg_com_send()` provides the reverse path (panel → RP).
 
+Note: the panel's `grf_reg_s_set` calls `grf_reg_set_user` **once per register**
+(`datalen=1`, base addr each time). Multi-register payloads are therefore read
+back from `ctrlreg[]` via `grf_reg_get()` on a "ready" trigger, not from the
+callback's `data` pointer.
+
 ### Register map
 
-**RP → HMI** (telemetry, pushed each loop):
+**RP → HMI — telemetry** (pushed at 2 Hz):
 
-| Reg      | Value          | Units | HMI label (Control ID) |
-| -------- | -------------- | ----- | ---------------------- |
-| `0x0010` | Output voltage | mV    | Voltage (1)            |
-| `0x0011` | Output current | mA    | Current (3)            |
-| `0x0012` | Output power   | 0.1 W | Power (5)              |
+| Reg      | Value          | Units |
+| -------- | -------------- | ----- |
+| `0x0010` | Output voltage | mV    |
+| `0x0011` | Output current | mA    |
+| `0x0012` | Output power   | 0.1 W |
 
-**HMI → RP** (control, planned):
+**RP → HMI — profile list** (pushed periodically; re-reads source PDOs):
 
-| Reg      | Value             | Units |
-| -------- | ----------------- | ----- |
-| `0x0020` | Requested voltage | mV    |
-| `0x0021` | Current limit     | mA    |
-| `0x0022` | Output enable     | 0/1   |
+| Reg              | Value                                            | Units |
+| ---------------- | ------------------------------------------------ | ----- |
+| `0x0100`         | Profile count N (0 ⇒ no source; list cleared)    | —     |
+| `0x0110 + i*4`   | Row i: `+0` type, `+1` vmin, `+2` vmax, `+3` imax | mV/mA |
+| `0x0101`         | "List ready" trigger — panel renders on receipt  | —     |
+
+Type codes: `0` FIX, `1` PPS, `2` AVS, `3` EPR. Voltage = `voltage_max ×
+(EPR ? 200 : 100)` mV; vmin = vmax for fixed. Panel maps a selected **list
+position** back to the real PDO (charger-agnostic — no reliance on PDO index).
+
+**HMI → RP — control:**
+
+| Reg      | Value                       | Units | Status  |
+| -------- | --------------------------- | ----- | ------- |
+| `0x0020` | Requested voltage (PPS/AVS) | mV    | planned |
+| `0x0021` | Current limit (PPS/AVS)     | mA    | planned |
+| `0x0022` | Output enable               | 0/1   | done    |
+| `0x0023` | Selected profile position   | index | planned |
 
 ---
+
+---
+
+## HMI UI (Giraffe)
+
+Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
+`grf_view_set_dis_view_anim()`.
+
+- **view1 — Monitor (boot):** hero voltage ring (`arc`, reg `0x0010`), V/I/P
+  labels, output toggle (`imgbtn` → reg `0x0022`, alpha-crossfade animation),
+  "Change" label → view2.
+- **view2 — Profiles:** scrolling `container` with a fixed pool of **13 rows**
+  (badge/voltage/meta/current/check/background labels each), filled from the
+  profile-list registers and shown/hidden by count. Empty-state labels show when
+  N = 0. Per-view control limit raised above the default 64.
+- view3 — Battery, view4 — Settings: planned.
+
 
 ## Other
 
@@ -255,5 +291,9 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] Read & list source PDO/PPS/AVS profiles (AP33772S over I2C).
 - [x] Request PPS voltage, arm output, read back on INA260 (closed loop validated).
 - [x] Push live V/I/P telemetry to HMI labels (regs 0x0010–0x0012).
-- [ ] Reverse control path: HMI touch → RP (regs 0x0020–0x0022) for setpoint + output enable.
-- [ ] Profile-selection UI on the panel (scan → select → activate), with PPS/AVS fine adjust.
+- [x] Reverse control path: HMI output enable → RP (reg 0x0022).
+- [x] Source-profile list transfer RP → HMI (regs 0x0100/0x0110+/0x0101); auto-clear on unplug.
+- [x] Profiles UI: 13-row scrolling pool, dynamic badges, real PDO data.
+- [ ] Row selection → reg 0x0023, PPS/AVS fine adjust → regs 0x0020/0x0021.
+- [ ] Apply selected profile on RP; return to Monitor armed.
+- [ ] Battery (view3) and Settings (view4) pages.
