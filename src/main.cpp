@@ -42,7 +42,7 @@ static void writeRegs(uint16_t addr, const uint16_t *vals, uint8_t n)
   HMI.write(f, 6 + n * 2);
 }
 
-static uint32_t lastSig = 0xFFFFFFFF;
+static uint32_t lastSig = 1; /* not 0: forces a clear on first unplugged cycle */
 
 // Read source PDOs over I2C and push the real list to the HMI
 static void sendProfileList()
@@ -259,6 +259,9 @@ void setup()
   ppsIdx = usbpd.getPPSIndex();
   Serial.print("PPS index: ");
   Serial.println(ppsIdx);
+
+  delay(300);        // let the HMI come up
+  sendProfileList(); // initial render (clears list if no source)
 }
 
 void loop()
