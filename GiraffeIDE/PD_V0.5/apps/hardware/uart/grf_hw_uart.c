@@ -16,27 +16,26 @@ static prof_t g_prof[MAX_PROF];
 static u8 g_prof_n = 0;
 
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
-enum { COL_BADGE, COL_VOLT, COL_META, COL_CURR, COL_CHECK };
-static const u16 ROW_ID[MAX_PROF][5] = {
-  /* {badge, volt, meta, curr, check} */
-  {  6,  2,  3,  4,  5 },  /* row 0  */
-  { 10,  9,  8,  7,  1 },  /* row 1  */
-  { 12, 11, 13, 14, 15 },  /* row 2  */
-  { 26, 27, 28, 29, 30 },  /* row 3  */
-  { 25, 24, 23, 22, 21 },  /* row 4  */
-  { 16, 17, 18, 19, 20 },  /* row 5  */
-  { 55, 54, 43, 42, 31 },  /* row 6  */
-  { 56, 53, 44, 41, 32 },  /* row 7  */
-  { 57, 52, 45, 40, 33 },  /* row 8  */
-  { 58, 51, 46, 39, 34 },  /* row 9  */
-  { 59, 50, 47, 38, 35 },  /* row 10 */
-  { 60, 49, 48, 37, 36 },  /* row 11 */
-  { 65, 64, 63, 62, 61 },  /* row 12 */
+enum { COL_BADGE, COL_VOLT, COL_META, COL_CURR, COL_CHECK, COL_BG };
+static const u16 ROW_ID[MAX_PROF][6] = {
+  /* {badge, volt, meta, curr, check, bg} */
+  {  6,  2,  3,  4,  5, 67 },  /* row 0  */
+  { 10,  9,  8,  7,  1, 68 },  /* row 1  */
+  { 12, 11, 13, 14, 15, 79 },  /* row 2  */
+  { 26, 27, 28, 29, 30, 78 },  /* row 3  */
+  { 25, 24, 18, 22, 21, 77 },  /* row 4  */
+  { 16, 17, 23, 19, 20, 76 },  /* row 5  */
+  { 55, 54, 43, 42, 31, 69 },  /* row 6  */
+  { 56, 53, 44, 41, 32, 70 },  /* row 7  */
+  { 57, 52, 45, 40, 33, 71 },  /* row 8  */
+  { 58, 51, 46, 39, 34, 72 },  /* row 9  */
+  { 59, 50, 47, 38, 35, 73 },  /* row 10 */
+  { 60, 49, 48, 37, 36, 75 },  /* row 11 */
+  { 65, 64, 63, 62, 61, 74 },  /* row 12 */
 };
-
 static void show_row(u8 i, u8 vis)
 {
-    for(u8 k=0;k<5;k++)
+	for(u8 k=0;k<6;k++)
         grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][k]), vis?0:1);
 }
 
