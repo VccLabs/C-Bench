@@ -113,6 +113,12 @@ static void update_adjust(u8 i)
 
 void select_row_by_bg(grf_ctrl_t *ctrl)
 {
+    if (g_panel_up) {                                 /* panel open: tap outside just dismisses it */
+        if (g_sel != 0xFF) { highlight_row(g_sel, 0); g_sel = 0xFF; }
+        adj_panel(0);
+        use_btn_set(0, "Select a rail");
+        return;                                       /* don't select the tapped card */
+    }
     for (u8 i = 0; i < MAX_PROF; i++) {
         if (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]) == ctrl) {
             if (g_sel != 0xFF) highlight_row(g_sel, 0);   /* clear previous */
