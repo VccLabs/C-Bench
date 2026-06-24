@@ -18,6 +18,14 @@ static u8 g_prof_n = 0;
 #define LBL_EMPTY1  80   /* label78 - "No profiles..." view2*/
 #define LBL_EMPTY2  81   /* label79 - subtitle view2*/
 
+/* view2 adjust panel + Use button (PPS/AVS fine-adjust) */
+#define ADJ_CONT 82   /* container1            */
+#define ADJ_SV   83   /* slider0 - set voltage  -> reg 0x0020 (mV) */
+#define ADJ_SC   87   /* slider1 - current limit-> reg 0x0021 (mA) */
+#define ADJ_LV   88   /* label82 - voltage value */
+#define ADJ_LC   89   /* label83 - current value */
+#define BTN_USE  90   /* label84 - Use/apply button */
+
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
 enum { COL_BADGE, COL_VOLT, COL_META, COL_CURR, COL_CHECK, COL_BG };
 static const u16 ROW_ID[MAX_PROF][6] = {
@@ -53,16 +61,84 @@ static void highlight_row(u8 i, u8 on)
         on ? GRF_COLOR_GET(0x3A,0x2A,0x10) : GRF_COLOR_GET(0x1C,0x1C,0x1E), 0);
 }
 
+static void use_btn_set(u8 enabled, const char *txt)
+{
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, BTN_USE), txt);
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, BTN_USE),
+        enabled ? GRF_COLOR_GET(0xFF,0x9F,0x0A) : GRF_COLOR_GET(0x2C,0x2C,0x2E), 0);
+    grf_label_set_txt_color(GCL(GRF_VIEW2_ID, BTN_USE),
+        enabled ? GRF_COLOR_GET(0x23,0x13,0x00) : GRF_COLOR_GET(0x8E,0x8E,0x93));
+}
+
+static void adj_labels(u16 mv, u16 ma)
+{
+    char b[16];
+    snprintf(b,sizeof(b),"%u.%02u V", mv/1000, (mv%1000)/10);
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), b);
+    snprintf(b,sizeof(b),"%u.%u A", ma/1000, (ma%1000)/100);
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), b);
+}
+
+static void update_adjust(u8 i)
+{
+    prof_t *p = &g_prof[i];
+    u8 range = (p->type==1 || p->type==2) && (p->vmin != p->vmax);
+    char b[20];
+    if (range) {
+        grf_slider_set_range(GCL(GRF_VIEW2_ID, ADJ_SV), p->vmin, p->vmax);
+        grf_slider_set_value(GCL(GRF_VIEW2_ID, ADJ_SV), p->vmax);
+        grf_slider_set_range(GCL(GRF_VIEW2_ID, ADJ_SC), 0, p->imax);
+        grf_slider_set_value(GCL(GRF_VIEW2_ID, ADJ_SC), p->imax);
+        adj_labels(p->vmax, p->imax);
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 0);   /* show panel */
+        snprintf(b,sizeof(b),"Use %u.%02u V", p->vmax/1000, (p->vmax%1000)/10);
+    } else {
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);   /* hide panel */
+        snprintf(b,sizeof(b),"Use %u.%02u V", p->vmin/1000, (p->vmin%1000)/10);
+    }
+    use_btn_set(1, b);
+}
+
 void select_row_by_bg(grf_ctrl_t *ctrl)
 {
     for (u8 i = 0; i < MAX_PROF; i++) {
         if (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]) == ctrl) {
             if (g_sel != 0xFF) highlight_row(g_sel, 0);   /* clear previous */
             g_sel = i;
-            highlight_row(i, 1);                          /* highlight new */
-            return;
+                        highlight_row(i, 1);                          /* highlight new */
+                        update_adjust(i);                             /* drive panel + Use btn */
+                        return;
         }
     }
+}
+
+void view2_slider_changed(u8 which)
+{
+    u16 mv = grf_slider_get_value(GCL(GRF_VIEW2_ID, ADJ_SV));
+    u16 ma = grf_slider_get_value(GCL(GRF_VIEW2_ID, ADJ_SC));
+    char b[20];
+    (void)which;
+    adj_labels(mv, ma);
+    snprintf(b,sizeof(b),"Use %u.%02u V", mv/1000, (mv%1000)/10);
+    use_btn_set(1, b);
+}
+
+void view2_use_apply(void)
+{
+    prof_t *p;
+    if (g_sel == 0xFF) return;                 /* nothing selected */
+    p = &g_prof[g_sel];
+    if ((p->type==1 || p->type==2) && (p->vmin != p->vmax)) {
+        grf_reg_set(0x0020, grf_slider_get_value(GCL(GRF_VIEW2_ID, ADJ_SV)));
+        grf_reg_com_send(0x0020, 1);           /* latch mV first */
+        grf_reg_set(0x0021, grf_slider_get_value(GCL(GRF_VIEW2_ID, ADJ_SC)));
+        grf_reg_com_send(0x0021, 1);           /* then mA */
+    }
+    grf_reg_set(0x0023, g_sel);
+    grf_reg_com_send(0x0023, 1);               /* apply: RP maps pos -> PDO, arms */
+    use_btn_set(1, "Applied");
+    grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT,
+                               250, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 static void fill_row(u8 i, prof_t *p)
@@ -119,7 +195,10 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
             break;
         case 0x0101: {            /* list ready -> render */
         	g_prof_n = grf_reg_get(0x0100);
-        	            if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
+        	        	            if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
+        	        	            g_sel = 0xFF;
+        	        	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
+        	        	            use_btn_set(0, "Select a rail");
         	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY1), g_prof_n ? 1 : 0);
         	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY2), g_prof_n ? 1 : 0);
                             for(u8 i=0; i<g_prof_n; i++){

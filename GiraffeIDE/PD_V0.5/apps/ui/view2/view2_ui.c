@@ -844,11 +844,7 @@ static void label85_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void label84_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view2_use_apply();
 }
 
 
@@ -942,11 +938,7 @@ static void container1_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void slider0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_VALUE_CHANGED) view2_slider_changed(0);
 }
 
 
@@ -962,11 +954,7 @@ static void image0_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void slider1_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_VALUE_CHANGED) view2_slider_changed(1);
 }
 
 #include "../../../libs/appscc/view2_cc.h"
