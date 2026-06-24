@@ -2877,7 +2877,7 @@
         "body_t" : {
           "main_color" : 16752394,
           "radius" : -1,
-          "opa" : 127,
+          "opa" : 255,
           "padding" : {
             "top" : 2147483647,
             "bottom" : 2147483647,
