@@ -211,14 +211,13 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
         	        	            use_btn_set(0, "Select a rail");
         	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY1), g_prof_n ? 1 : 0);
         	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY2), g_prof_n ? 1 : 0);
-                            for(u8 i=0; i<g_prof_n; i++){
-                                prof_t p;
-                                p.type = grf_reg_get(0x0110 + i*4 + 0);
-                                p.vmin = grf_reg_get(0x0110 + i*4 + 1);
-                                p.vmax = grf_reg_get(0x0110 + i*4 + 2);
-                                p.imax = grf_reg_get(0x0110 + i*4 + 3);
-                                fill_row(i, &p);
-                            }
+        	            for(u8 i=0; i<g_prof_n; i++){
+        	                                            g_prof[i].type = grf_reg_get(0x0110 + i*4 + 0);
+        	                                            g_prof[i].vmin = grf_reg_get(0x0110 + i*4 + 1);
+        	                                            g_prof[i].vmax = grf_reg_get(0x0110 + i*4 + 2);
+        	                                            g_prof[i].imax = grf_reg_get(0x0110 + i*4 + 3);
+        	                                            fill_row(i, &g_prof[i]);
+        	                                        }
                             for(u8 i=g_prof_n; i<MAX_PROF; i++) show_row(i, 0);  /* hide unused rows */
                             for(u8 i=0; i<g_prof_n; i++)
                                             grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
