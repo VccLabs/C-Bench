@@ -332,17 +332,20 @@ void loop()
 
   // Output switch: act only when the HMI changes it
   static int lastOut = -1;
-  if (activePdoIdx > 0 && (int)outputOn != lastOut)
+if ((int)outputOn != lastOut)
   {
     lastOut = outputOn;
     usbpd.setOutput(outputOn ? 1 : 0);
   }
 
-  static uint32_t tProf = 0;
-  if (now - tProf >= 2000)
+static uint32_t tProf = 0;
+  uint32_t profPeriod = (now < 5000) ? 1000 : 2000; // faster while the HMI boots
+  if (now - tProf >= profPeriod)
   {
     tProf = now;
-    sendProfileList(); // sends only if the PDO set changed (see below)
+    if (now < 5000)
+      lastSig = 0xFFFFFFFF; // boot window: force re-push until the panel is listening
+    sendProfileList();
   }
 
   // Telemetry: fast, smooth refresh
