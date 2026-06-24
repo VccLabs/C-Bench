@@ -182,8 +182,8 @@ static void applyControl(uint16_t addr, uint16_t val)
     reqMV = val;
     break; // requested voltage (mV)
   case 0x0021:
-    limMA = val;
-    break; // current limit (mA)
+    limMA = (val > 4999) ? 4999 : val; // 5000 maps to current code 16, which the sink rejects
+    break;                             // current limit (mA)
   case 0x0022:
     outputOn = (val != 0);
     break; // output enable
@@ -320,7 +320,7 @@ void loop()
         usbpd.setAVSPDO(s.pdoIndex, reqMV, limMA);
         break; // AVS
       default:
-        usbpd.setFixPDO(s.pdoIndex, s.imax);
+        usbpd.setFixPDO(s.pdoIndex, (s.imax > 4999) ? 4999 : s.imax);
         break; // FIX / EPR-fixed
       }
       activePdoIdx = s.pdoIndex;
