@@ -117,11 +117,10 @@
       },
       "angle_t" : {
         "start_angle" : 270,
-        "end_angle" : 1080
+        "end_angle" : 629
       },
-      "arc_value" : 180,
       "range_t" : {
-        "maxvalue" : 360
+        "maxvalue" : 280
       },
       "arc_t_main" : {
         "color" : 4281084974,

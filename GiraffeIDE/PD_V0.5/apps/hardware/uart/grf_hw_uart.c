@@ -167,7 +167,8 @@ void view2_use_apply(void)
     grf_reg_set(0x0023, g_sel);
     grf_reg_com_send(0x0023, 1);               /* apply: RP maps pos -> PDO, arms */
     use_btn_set(1, "Applied");
-        grf_ctrl_add_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED); /* output armed -> show red "turn off" */
+    grf_ctrl_add_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED);                  /* logical: armed */
+            grf_imgbtn_set_mode(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_IMGBTN_STATE_CHECKED_RELEASED); /* visual: red "turn off" */
         grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT,
                                250, 0, GRF_ANIM_PATH_END_SLOW);
 }
