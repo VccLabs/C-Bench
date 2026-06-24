@@ -195,14 +195,10 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
 
     switch(addr){
     case 0x0010:  /* voltage mV */
-            {
-                static u8 arc_init = 0;
-                if (!arc_init) { grf_arc_set_value_range(GCL(GRF_VIEW1_ID, ARC_VOLT), 0, 280); arc_init = 1; } /* full scale 28.0V */
                 snprintf(buf,sizeof(buf),"%u.%02u", data[0]/1000, (data[0]%1000)/10);
                 grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
-                grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), data[0]/100); /* value in 0.1V units */
+                grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), data[0]/100); /* 0..280 = 0..28.0V */
                 break;
-            }
         case 0x0011:  /* current mA */
             snprintf(buf,sizeof(buf),"%u.%03u A", data[0]/1000, data[0]%1000);
             grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
