@@ -86,14 +86,8 @@ static u8 g_panel_up = 0;
 
 static void adj_panel(u8 show)
 {
-    if (show == g_panel_up) return;                 /* already there -> no re-slide */
-    grf_anim_set_t a = {0};
-    a.time          = show ? 220 : 180;
-    a.value_start_a = show ? ADJ_Y_HIDDEN : ADJ_Y_SHOWN;
-    a.value_end_a   = show ? ADJ_Y_SHOWN  : ADJ_Y_HIDDEN;
-    a.anim_cb_a     = (void *)grf_ctrl_set_y;        /* tween the container's Y */
-    a.mode          = GRF_ANIM_PATH_END_SLOW;
-    grf_animation_set(GCL(GRF_VIEW2_ID, ADJ_CONT), &a);
+    if (show == g_panel_up) return;
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), show ? 0 : 1);
     g_panel_up = show;
 }
 
@@ -164,7 +158,7 @@ void view2_reset_panel(void)
 {
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), "0.0 A");
-    grf_ctrl_set_y(GCL(GRF_VIEW2_ID, ADJ_CONT), ADJ_Y_HIDDEN); /* park below screen, no anim on entry */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
         g_panel_up = 0;
         grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SV), 24); /* enlarge hit area, keep graphics */
         grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SC), 24);
