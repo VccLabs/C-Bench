@@ -80,6 +80,23 @@ static void adj_labels(u16 mv, u16 ma)
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), b);
 }
 
+#define ADJ_Y_SHOWN  405   /* must match container1's Y in the IDE */
+#define ADJ_Y_HIDDEN 720   /* parked just below the 720px screen */
+static u8 g_panel_up = 0;
+
+static void adj_panel(u8 show)
+{
+    if (show == g_panel_up) return;                 /* already there -> no re-slide */
+    grf_anim_set_t a = {0};
+    a.time          = show ? 220 : 180;
+    a.value_start_a = show ? ADJ_Y_HIDDEN : ADJ_Y_SHOWN;
+    a.value_end_a   = show ? ADJ_Y_SHOWN  : ADJ_Y_HIDDEN;
+    a.anim_cb_a     = (void *)grf_ctrl_set_y;        /* tween the container's Y */
+    a.mode          = GRF_ANIM_PATH_END_SLOW;
+    grf_animation_set(GCL(GRF_VIEW2_ID, ADJ_CONT), &a);
+    g_panel_up = show;
+}
+
 static void update_adjust(u8 i)
 {
     prof_t *p = &g_prof[i];
@@ -91,10 +108,10 @@ static void update_adjust(u8 i)
         grf_slider_set_range(GCL(GRF_VIEW2_ID, ADJ_SC), 0, p->imax);
         grf_slider_set_value(GCL(GRF_VIEW2_ID, ADJ_SC), p->imax);
         adj_labels(p->vmax, p->imax);
-        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 0);   /* show panel */
-        snprintf(b,sizeof(b),"Use %u.%02u V", p->vmax/1000, (p->vmax%1000)/10);
-    } else {
-        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);   /* hide panel */
+                adj_panel(1);                                          /* slide up */
+                snprintf(b,sizeof(b),"Use %u.%02u V", p->vmax/1000, (p->vmax%1000)/10);
+            } else {
+                adj_panel(0);                                          /* slide down */
         snprintf(b,sizeof(b),"Use %u.%02u V", p->vmin/1000, (p->vmin%1000)/10);
     }
     use_btn_set(1, b);
@@ -147,7 +164,8 @@ void view2_reset_panel(void)
 {
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), "0.0 A");
-    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
+    grf_ctrl_set_y(GCL(GRF_VIEW2_ID, ADJ_CONT), ADJ_Y_HIDDEN); /* park below screen, no anim on entry */
+        g_panel_up = 0;
         grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SV), 24); /* enlarge hit area, keep graphics */
         grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SC), 24);
         use_btn_set(0, "Select a rail");
