@@ -126,7 +126,7 @@
         "body_t" : {
           "main_color" : 16752394,
           "radius" : -1,
-          "opa" : 127,
+          "opa" : 255,
           "padding" : {
             "top" : 2147483647,
             "bottom" : 2147483647,
@@ -167,7 +167,12 @@
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "opa" : 2147483647
+          "main_color" : 1842206,
+          "radius" : 16,
+          "border" : {
+            "color" : 16752394,
+            "width" : 2
+          }
         },
         "img_t" : { }
       } ]

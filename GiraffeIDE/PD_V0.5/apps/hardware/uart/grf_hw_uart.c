@@ -9,6 +9,7 @@ static grf_drv_t *drv_uart = NULL;
 
 #define LBL_CURR   3
 #define LBL_POWER  5
+#define BTN_OUT    8   /* view1 output toggle imgbtn (VIEW1_IMAGE_BUTTON0_ID) */
 
 #define MAX_PROF 13
 typedef struct { u16 type, vmin, vmax, imax; } prof_t;
@@ -137,7 +138,8 @@ void view2_use_apply(void)
     grf_reg_set(0x0023, g_sel);
     grf_reg_com_send(0x0023, 1);               /* apply: RP maps pos -> PDO, arms */
     use_btn_set(1, "Applied");
-    grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT,
+        grf_ctrl_add_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED); /* output armed -> show red "turn off" */
+        grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT,
                                250, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
@@ -146,6 +148,8 @@ void view2_reset_panel(void)
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), "0.0 A");
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
+        grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SV), 24); /* enlarge hit area, keep graphics */
+        grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SC), 24);
         use_btn_set(0, "Select a rail");
         grf_reg_set(0x0024, 1);      /* ask the RP to (re)push the PDO list now */
         grf_reg_com_send(0x0024, 1);
@@ -190,11 +194,15 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
     }
 
     switch(addr){
-        case 0x0010:  /* voltage mV */
-            snprintf(buf,sizeof(buf),"%u.%02u", data[0]/1000, (data[0]%1000)/10);
-            grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
-            grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), data[0]/100); /* 0..280 = 0..28.0V */
-            break;
+    case 0x0010:  /* voltage mV */
+            {
+                static u8 arc_init = 0;
+                if (!arc_init) { grf_arc_set_value_range(GCL(GRF_VIEW1_ID, ARC_VOLT), 0, 280); arc_init = 1; } /* full scale 28.0V */
+                snprintf(buf,sizeof(buf),"%u.%02u", data[0]/1000, (data[0]%1000)/10);
+                grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
+                grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), data[0]/100); /* value in 0.1V units */
+                break;
+            }
         case 0x0011:  /* current mA */
             snprintf(buf,sizeof(buf),"%u.%03u A", data[0]/1000, data[0]%1000);
             grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
