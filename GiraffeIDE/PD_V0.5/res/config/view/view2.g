@@ -1,42 +1,6 @@
 {
   "CLASSNAME" : "view",
   "controls" : [ {
-    "CLASSNAME" : "container",
-    "theme" : "youth",
-    "type" : 2,
-    "property" : {
-      "pub_t" : {
-        "name" : "container0",
-        "id" : 66,
-        "ctrl_type" : 2,
-        "pt" : {
-          "x" : 30,
-          "y" : 180
-        },
-        "size" : {
-          "width" : 656,
-          "height" : 396
-        },
-        "t_mode" : 1,
-        "scrollbar_t" : {
-          "mode_e" : 1,
-          "dir_e" : 12,
-          "momentum" : true,
-          "elastic" : true
-        },
-        "alpha" : 255,
-        "pub" : true
-      },
-      "styles" : [ {
-        "name" : "style",
-        "body_t" : {
-          "main_color" : 8421504,
-          "opa" : 2147483647
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
     "CLASSNAME" : "label",
     "theme" : "youth",
     "property" : {
@@ -148,11 +112,47 @@
     "type" : 2,
     "property" : {
       "pub_t" : {
+        "name" : "container0",
+        "id" : 66,
+        "ctrl_type" : 2,
+        "pt" : {
+          "x" : 30,
+          "y" : 180
+        },
+        "size" : {
+          "width" : 656,
+          "height" : 386
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : {
+          "mode_e" : 1,
+          "dir_e" : 12,
+          "momentum" : true,
+          "elastic" : true
+        },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 8421504,
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "container",
+    "theme" : "youth",
+    "type" : 2,
+    "property" : {
+      "pub_t" : {
         "name" : "container1",
         "id" : 82,
         "ctrl_type" : 2,
         "pt" : {
-          "x" : 40,
+          "x" : 38,
           "y" : 405
         },
         "size" : {
@@ -208,7 +208,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -247,7 +250,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -286,7 +292,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -325,7 +334,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -364,7 +376,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -403,7 +418,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -442,7 +460,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -481,7 +502,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -520,7 +544,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -559,7 +586,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -598,7 +628,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -637,7 +670,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -676,7 +712,10 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 16,
-          "opa" : 255
+          "opa" : 255,
+          "border" : {
+            "color" : 16752394
+          }
         },
         "txt_t" : {
           "color" : 1842206
@@ -2898,6 +2937,43 @@
         "name" : "style",
         "txt_t" : {
           "color" : 16777215
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "container",
+    "theme" : "youth",
+    "type" : 2,
+    "property" : {
+      "pub_t" : {
+        "name" : "selbox",
+        "id" : 84,
+        "parent_id" : 66,
+        "ctrl_type" : 2,
+        "pt" : {
+          "x" : 9,
+          "y" : 7
+        },
+        "size" : {
+          "width" : 316,
+          "height" : 61
+        },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "radius" : 16,
+          "opa" : 2147483647,
+          "border" : {
+            "color" : 16752394,
+            "width" : 2
+          }
         },
         "img_t" : { }
       } ]

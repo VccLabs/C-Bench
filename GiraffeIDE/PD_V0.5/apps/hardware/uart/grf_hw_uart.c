@@ -26,6 +26,7 @@ static u8 g_prof_n = 0;
 #define ADJ_LV   88   /* label82 - voltage value */
 #define ADJ_LC   89   /* label83 - current value */
 #define BTN_USE  90   /* label84 - Use/apply button */
+#define SEL_BOX  84   /* <- set to the selbox outline control's ID */
 
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
 enum { COL_BADGE, COL_VOLT, COL_META, COL_CURR, COL_CHECK, COL_BG };
@@ -55,11 +56,22 @@ static u8 g_sel = 0xFF;   /* selected row, 0xFF = none */
 
 static void highlight_row(u8 i, u8 on)
 {
+    grf_ctrl_t *bg  = GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]);
+    grf_ctrl_t *box = GCL(GRF_VIEW2_ID, SEL_BOX);
     /* check mark */
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), on ? 0 : 1);
     /* background chip: orange tint when selected, default card when not */
-    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]),
+    grf_ctrl_style_set_bg_color(bg,
         on ? GRF_COLOR_GET(0x3A,0x2A,0x10) : GRF_COLOR_GET(0x1C,0x1C,0x1E), 0);
+    /* #ff9f0a border: move the single outline box over the selected row */
+    if (on) {
+        grf_ctrl_set_pos (box, grf_ctrl_get_x(bg),     grf_ctrl_get_y(bg));
+        grf_ctrl_set_size(box, grf_ctrl_get_width(bg), grf_ctrl_get_height(bg));
+        grf_ctrl_move_forground(box);
+        grf_ctrl_set_hidden(box, 0);
+    } else {
+        grf_ctrl_set_hidden(box, 1);
+    }
 }
 
 static void use_btn_set(u8 enabled, const char *txt)
@@ -165,7 +177,8 @@ void view2_reset_panel(void)
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), "0.0 A");
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
-        g_panel_up = 0;
+            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, SEL_BOX), 1);   /* hide selection border until a row is picked */
+            g_panel_up = 0;
         grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SV), 24); /* enlarge hit area, keep graphics */
         grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SC), 24);
         use_btn_set(0, "Select a rail");

@@ -957,6 +957,16 @@ static void slider1_event(grf_ctrl_t *ctrl, grf_event_e event)
 	if (event == GRF_EVENT_VALUE_CHANGED) view2_slider_changed(1);
 }
 
+
+static void selbox_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view2_cc.h"
 void view2_init(void)
 {
