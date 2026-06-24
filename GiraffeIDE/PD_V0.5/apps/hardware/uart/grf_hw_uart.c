@@ -146,8 +146,10 @@ void view2_reset_panel(void)
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), "0.0 A");
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
-    use_btn_set(0, "Select a rail");
-}
+        use_btn_set(0, "Select a rail");
+        grf_reg_set(0x0024, 1);      /* ask the RP to (re)push the PDO list now */
+        grf_reg_com_send(0x0024, 1);
+    }
 
 static void fill_row(u8 i, prof_t *p)
 {

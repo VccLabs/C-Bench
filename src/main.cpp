@@ -191,6 +191,10 @@ static void applyControl(uint16_t addr, uint16_t val)
     if (val < g_slotN)
       pendingSel = (int)val; // selected position, applied in loop()
     break;
+  case 0x0024:
+    lastSig = 0xFFFFFFFF; // panel opened view2 -> force a fresh list push now
+    sendProfileList();
+    break;
   }
 }
 
@@ -371,5 +375,18 @@ void loop()
     writeReg(0x0010, mV);
     writeReg(0x0011, mA);
     writeReg(0x0012, dW);
+  }
+  // Fast source-attach watch: kill VOUT ASAP after a contract appears
+  static uint32_t tAtt = 0;
+  if (now - tAtt >= 150)
+  {
+    tAtt = now;
+    Wire.beginTransmission(0x52);
+    bool present = (Wire.endTransmission() == 0);
+    if (present && !g_prevSource)
+    {
+      g_outAttach = true;   // re-assert output (default OFF) immediately
+      lastSig = 0xFFFFFFFF; // and refresh the PDO list now
+    }
   }
 }
