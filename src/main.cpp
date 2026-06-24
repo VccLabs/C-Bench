@@ -53,8 +53,10 @@ struct Slot
 };
 static Slot g_slots[13];
 static uint8_t g_slotN = 0;
-static int activePdoIdx = -1;  // applied PDO (1-based), -1 = none
-static uint8_t activeType = 0; // 0 FIX, 1 PPS, 2 AVS, 3 EPR
+static int activePdoIdx = -1;             // applied PDO (1-based), -1 = none
+static uint8_t activeType = 0;            // 0 FIX, 1 PPS, 2 AVS, 3 EPR
+static bool g_prevSource = false;         // source-present edge detect
+static volatile bool g_outAttach = false; // re-assert output after a (re)attach
 
 // Read source PDOs over I2C and push the real list to the HMI
 static void sendProfileList()
@@ -74,6 +76,7 @@ static void sendProfileList()
     writeRegs(0x0101, &rdyz, 1);
     lastSig = 0;
     g_slotN = 0;
+    g_prevSource = false;
     return;
   }
   if (Wire.requestFrom(0x52, 26) < 26)
@@ -86,6 +89,7 @@ static void sendProfileList()
     writeRegs(0x0100, &zero, 1);
     writeRegs(0x0101, &rdyz, 1);
     lastSig = 0;
+    g_prevSource = false;
     return;
   }
   for (uint8_t i = 0; i < 26; i++)
@@ -147,6 +151,9 @@ static void sendProfileList()
     n++;
   }
   g_slotN = n;
+  if (n > 0 && !g_prevSource)
+    g_outAttach = true; // source just (re)appeared -> re-assert output state
+  g_prevSource = (n > 0);
   // signature of the list; skip resend (and HMI re-render) if unchanged
   uint32_t sig = n * 2654435761u;
   for (uint16_t i = 0; i < n; i++)
@@ -330,15 +337,20 @@ void loop()
       usbpd.setAVSPDO(activePdoIdx, reqMV, limMA);
   }
 
-  // Output switch: act only when the HMI changes it
+  // Output switch: act when the HMI changes it, or re-assert after a source attach
   static int lastOut = -1;
-if ((int)outputOn != lastOut)
+  if (g_outAttach)
+  {
+    g_outAttach = false;
+    lastOut = -1; // force re-apply of outputOn (default OFF) on the next check
+  }
+  if ((int)outputOn != lastOut)
   {
     lastOut = outputOn;
     usbpd.setOutput(outputOn ? 1 : 0);
   }
 
-static uint32_t tProf = 0;
+  static uint32_t tProf = 0;
   uint32_t profPeriod = (now < 5000) ? 1000 : 2000; // faster while the HMI boots
   if (now - tProf >= profPeriod)
   {
