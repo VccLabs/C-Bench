@@ -15,7 +15,7 @@
         },
         "size" : {
           "width" : 656,
-          "height" : 406
+          "height" : 396
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -98,25 +98,49 @@
       } ]
     }
   }, {
-    "CLASSNAME" : "image",
+    "CLASSNAME" : "label",
     "theme" : "youth",
-    "type" : 19,
     "property" : {
       "pub_t" : {
-        "name" : "image0",
-        "id" : 84,
-        "ctrl_type" : 19,
-        "pt" : { },
-        "size" : {
-          "width" : 720,
-          "height" : 720
+        "name" : "label84",
+        "id" : 90,
+        "pt" : {
+          "x" : 40,
+          "y" : 620
         },
+        "size" : {
+          "width" : 641,
+          "height" : 61
+        },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
       },
-      "init_img" : "Artboard1.png",
-      "rotate_pt" : { }
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "✓ Applied - back to Monitor",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 16752394,
+          "radius" : -1,
+          "opa" : 127,
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 2298624,
+          "font_size" : 20
+        },
+        "img_t" : { }
+      } ]
     }
   }, {
     "CLASSNAME" : "container",
@@ -165,7 +189,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -202,7 +228,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -239,7 +267,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -276,7 +306,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -313,7 +345,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -350,7 +384,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -387,7 +423,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -424,7 +462,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -461,7 +501,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -498,7 +540,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -535,7 +579,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -572,7 +618,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -609,7 +657,9 @@
           "height" : 78
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -2843,52 +2893,6 @@
         "name" : "style",
         "txt_t" : {
           "color" : 16777215
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
-        "name" : "label84",
-        "id" : 90,
-        "parent_id" : 84,
-        "pt" : {
-          "x" : 40,
-          "y" : 620
-        },
-        "size" : {
-          "width" : 641,
-          "height" : 61
-        },
-        "t_mode" : 1,
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true
-      },
-      "auto_hight" : 1,
-      "animspeed" : 50,
-      "align_e" : 34,
-      "txt" : "✓ Applied - back to Monitor",
-      "styles" : [ {
-        "name" : "style",
-        "body_t" : {
-          "main_color" : 16752394,
-          "radius" : -1,
-          "opa" : 255,
-          "padding" : {
-            "top" : 2147483647,
-            "bottom" : 2147483647,
-            "left" : 2147483647,
-            "right" : 2147483647,
-            "inner" : 2147483647
-          }
-        },
-        "txt_t" : {
-          "color" : 2298624,
-          "font_size" : 20
         },
         "img_t" : { }
       } ]

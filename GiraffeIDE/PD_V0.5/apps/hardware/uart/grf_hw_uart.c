@@ -141,6 +141,14 @@ void view2_use_apply(void)
                                250, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
+void view2_reset_panel(void)
+{
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), "0.0 A");
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
+    use_btn_set(0, "Select a rail");
+}
+
 static void fill_row(u8 i, prof_t *p)
 {
     char v[20], c[16];

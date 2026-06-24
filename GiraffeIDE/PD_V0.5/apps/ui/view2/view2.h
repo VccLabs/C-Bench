@@ -91,8 +91,7 @@ typedef enum {
 	VIEW2_SLIDER0_ID = 83,
 	VIEW2_LABEL55_ID = 56,
 	VIEW2_LABEL45_ID = 46,
-	VIEW2_LABEL20_ID = 21,
-	VIEW2_IMAGE0_ID = 84
+	VIEW2_LABEL20_ID = 21
 } view2_ctrls_id_e;
 
 void view2_init(void);

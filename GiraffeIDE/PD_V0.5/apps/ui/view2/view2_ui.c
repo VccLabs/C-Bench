@@ -965,7 +965,7 @@ void view2_init(void)
 
 void view2_entry(void)
 {
-
+	view2_reset_panel();   /* clear "." placeholders, hide panel, reset Use btn */
 }
 
 void view2_exit(void)
