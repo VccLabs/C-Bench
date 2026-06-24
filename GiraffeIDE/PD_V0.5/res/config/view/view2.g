@@ -98,6 +98,57 @@
       } ]
     }
   }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image0",
+        "id" : 84,
+        "ctrl_type" : 19,
+        "pt" : { },
+        "size" : {
+          "width" : 720,
+          "height" : 720
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "init_img" : "Artboard1.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "container",
+    "theme" : "youth",
+    "type" : 2,
+    "property" : {
+      "pub_t" : {
+        "name" : "container1",
+        "id" : 82,
+        "ctrl_type" : 2,
+        "pt" : {
+          "x" : 40,
+          "y" : 405
+        },
+        "size" : {
+          "width" : 640,
+          "height" : 196
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
     "CLASSNAME" : "label",
     "theme" : "youth",
     "property" : {
@@ -2792,6 +2843,318 @@
         "name" : "style",
         "txt_t" : {
           "color" : 16777215
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label84",
+        "id" : 90,
+        "parent_id" : 84,
+        "pt" : {
+          "x" : 40,
+          "y" : 620
+        },
+        "size" : {
+          "width" : 641,
+          "height" : 61
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "✓ Applied - back to Monitor",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 16752394,
+          "radius" : -1,
+          "opa" : 127,
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 2298624,
+          "font_size" : 20
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "slider",
+    "theme" : "youth",
+    "type" : 7,
+    "property" : {
+      "pub_t" : {
+        "name" : "slider0",
+        "id" : 83,
+        "parent_id" : 82,
+        "ctrl_type" : 7,
+        "pt" : {
+          "x" : 17,
+          "y" : 66
+        },
+        "size" : {
+          "width" : 597,
+          "height" : 8
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "maxValue" : 1000,
+      "anim_time" : 100,
+      "styles" : [ {
+        "name" : "bg_style_t",
+        "body_t" : {
+          "main_color" : 3881787,
+          "border" : {
+            "color" : 1842206
+          },
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "img_t" : { }
+      }, {
+        "style_part" : 131072,
+        "name" : "bar_style_t",
+        "body_t" : {
+          "main_color" : 16752394,
+          "border" : {
+            "color" : 16752394,
+            "width" : 2
+          }
+        },
+        "img_t" : { }
+      }, {
+        "style_part" : 196608,
+        "name" : "slider_style_t",
+        "body_t" : {
+          "main_color" : 16752394,
+          "grad_color" : 16758082,
+          "border" : {
+            "color" : 16752394
+          }
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label80",
+        "id" : 85,
+        "parent_id" : 82,
+        "pt" : {
+          "x" : 5,
+          "y" : 18
+        },
+        "size" : {
+          "width" : 116,
+          "height" : 26
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "SET VOLTAGE",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 8750469,
+          "font_size" : 14
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label81",
+        "id" : 86,
+        "parent_id" : 82,
+        "pt" : {
+          "x" : 9,
+          "y" : 105
+        },
+        "size" : {
+          "width" : 126,
+          "height" : 26
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "CURRENT LIMIT",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 8750469,
+          "font_size" : 14
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "slider",
+    "theme" : "youth",
+    "type" : 7,
+    "property" : {
+      "pub_t" : {
+        "name" : "slider1",
+        "id" : 87,
+        "parent_id" : 82,
+        "ctrl_type" : 7,
+        "pt" : {
+          "x" : 17,
+          "y" : 153
+        },
+        "size" : {
+          "width" : 597,
+          "height" : 8
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "maxValue" : 1000,
+      "anim_time" : 100,
+      "styles" : [ {
+        "name" : "bg_style_t",
+        "body_t" : {
+          "main_color" : 3881787,
+          "border" : {
+            "color" : 1842206
+          },
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "img_t" : { }
+      }, {
+        "style_part" : 131072,
+        "name" : "bar_style_t",
+        "body_t" : {
+          "main_color" : 6607615,
+          "border" : {
+            "color" : 6607615,
+            "width" : 2
+          }
+        },
+        "img_t" : { }
+      }, {
+        "style_part" : 196608,
+        "name" : "slider_style_t",
+        "body_t" : {
+          "main_color" : 6607615,
+          "grad_color" : 16758082,
+          "border" : {
+            "color" : 16752394
+          }
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label82",
+        "id" : 88,
+        "parent_id" : 82,
+        "pt" : {
+          "x" : 463,
+          "y" : 11
+        },
+        "size" : {
+          "width" : 161,
+          "height" : 46
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "animspeed" : 50,
+      "align_e" : 35,
+      "txt" : "24.00 V",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 16752394
+        },
+        "txt_t" : {
+          "color" : 16752394,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 26
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label83",
+        "id" : 89,
+        "parent_id" : 82,
+        "pt" : {
+          "x" : 463,
+          "y" : 98
+        },
+        "size" : {
+          "width" : 161,
+          "height" : 46
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "animspeed" : 50,
+      "align_e" : 35,
+      "txt" : "5.0 A",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 16752394
+        },
+        "txt_t" : {
+          "color" : 6607615,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 26
         },
         "img_t" : { }
       } ]

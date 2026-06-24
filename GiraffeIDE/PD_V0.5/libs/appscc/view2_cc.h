@@ -3,6 +3,8 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW2_CONTAINER0_ID,container0_event},
 	{VIEW2_LABEL78_ID,label78_event},
 	{VIEW2_LABEL79_ID,label79_event},
+	{VIEW2_IMAGE0_ID,image0_event},
+	{VIEW2_CONTAINER1_ID,container1_event},
 	{VIEW2_LABEL72_ID,label72_event},
 	{VIEW2_LABEL73_ID,label73_event},
 	{VIEW2_LABEL71_ID,label71_event},
@@ -80,5 +82,12 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW2_LABEL63_ID,label63_event},
 	{VIEW2_LABEL62_ID,label62_event},
 	{VIEW2_LABEL61_ID,label61_event},
-	{VIEW2_LABEL60_ID,label60_event}
+	{VIEW2_LABEL60_ID,label60_event},
+	{VIEW2_LABEL84_ID,label84_event},
+	{VIEW2_SLIDER0_ID,slider0_event},
+	{VIEW2_LABEL80_ID,label80_event},
+	{VIEW2_LABEL81_ID,label81_event},
+	{VIEW2_SLIDER1_ID,slider1_event},
+	{VIEW2_LABEL82_ID,label82_event},
+	{VIEW2_LABEL83_ID,label83_event}
 };
