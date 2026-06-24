@@ -121,7 +121,7 @@
       },
       "arc_value" : 180,
       "range_t" : {
-        "maxvalue" : 280
+        "maxvalue" : 360
       },
       "arc_t_main" : {
         "color" : 4281084974,
