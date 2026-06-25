@@ -105,10 +105,11 @@ static void sendProfileList()
       continue; // empty slot
 
     uint16_t pdo = b0 | (b1 << 8);
-    uint16_t vField = pdo & 0xFF;       // voltage_max field
-    uint8_t cField = (pdo >> 10) & 0xF; // current_max field
-    uint8_t typeBit = (pdo >> 14) & 1;  // 0=fixed, 1=PPS/AVS
-    bool isEPR = (idx >= 7);            // PDO 8..13 are EPR
+    uint16_t vField = pdo & 0xFF;         // voltage_max field
+    uint8_t cField = (pdo >> 10) & 0xF;   // current_max field
+    uint8_t typeBit = (pdo >> 14) & 1;    // 0=fixed, 1=PPS/AVS
+    uint8_t vminField = (pdo >> 8) & 0x3; // voltage_min field (1=floor 3.3V/15V, 2=floor up to 5V/20V)
+    bool isEPR = (idx >= 7);              // PDO 8..13 are EPR
 
     uint16_t type, vmin, vmax;
     if (!isEPR)
@@ -121,7 +122,7 @@ static void sendProfileList()
       else
       {
         type = 1;
-        vmin = 3300;
+        vmin = (vminField == 2) ? 5000 : 3300; // field 2: real min is >3.3V (up to 5V)
         vmax = vField * 100;
       } // PPS
     }
@@ -135,7 +136,7 @@ static void sendProfileList()
       else
       {
         type = 2;
-        vmin = 15000;
+        vmin = (vminField == 2) ? 20000 : 15000; // field 2: real min is >15V (up to 20V)
         vmax = vField * 200;
       } // AVS
     }
