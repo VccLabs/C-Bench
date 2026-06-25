@@ -193,13 +193,10 @@ value, and updates the matching label via `grf_label_set_txt()`.
 
 Note: the panel's `grf_reg_s_set` calls `grf_reg_set_user` **once per register**
 (`datalen=1`, base addr each time). Multi-register payloads are read back from
-`ctrlreg[]` via `grf_reg_get()` on a "ready" trigger (`0x0101`), not from the
-callback's `data` pointer.
-
-Note: the panel's `grf_reg_s_set` calls `grf_reg_set_user` **once per register**
-(`datalen=1`, base addr each time). Multi-register payloads are therefore read
-back from `ctrlreg[]` via `grf_reg_get()` on a "ready" trigger, not from the
-callback's `data` pointer.
+`ctrlreg[]` via `grf_reg_get()` on the `0x0101` "ready" trigger — that handler
+also caches each row into the panel's `g_prof[]` array, which the adjust panel
+and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
+`0x0110` handler; with `datalen=1` it never fires.)
 
 ### Register map
 
@@ -224,32 +221,31 @@ Type codes: `0` FIX, `1` PPS, `2` AVS, `3` EPR. Voltage = `voltage_max ×
 over I2C (`CMD_SRCPDO 0x20`) and normalizes them; the panel renders by **list
 position** and never relies on PDO index — so any charger works.
 
+PPS/AVS minimum voltage is decoded from the PDO `voltage_min` field (not
+hardcoded): field `2` ⇒ floor 5000 mV (PPS) / 20000 mV (AVS); field `1` ⇒
+3300/15000. Most consumer chargers report field `2`, i.e. a 5 V PPS floor.
+Requested current is clamped to **≤ 4999 mA** before any request, because the
+sink's current code maxes at 15 and `currentMap(5000)=16` is rejected — this is
+what made 5 A rails (e.g. 20 V @ 5 A) silently stay on the previous contract.
+
 **HMI → RP — control:**
 
-| Reg      | Value                       | Units | Status  |
-| -------- | --------------------------- | ----- | ------- |
-| `0x0020` | Requested voltage (PPS/AVS) | mV    | planned |
-| `0x0021` | Current limit (PPS/AVS)     | mA    | planned |
-| `0x0022` | Output enable               | 0/1   | done    |
-| `0x0023` | Selected profile position   | index | planned |
+| Reg      | Value                       | Units | Status |
+| -------- | --------------------------- | ----- | ------ |
+| `0x0020` | Requested voltage (PPS/AVS) | mV    | done   |
+| `0x0021` | Current limit (PPS/AVS)     | mA    | done   |
+| `0x0022` | Output enable               | 0/1   | done   |
+| `0x0023` | Selected profile position   | index | done   |
+| `0x0024` | Refresh-list request        | 1     | done   |
+
+`0x0024` is sent by the panel on **every view2 entry** (`view2_reset_panel`); the
+RP forces a fresh PDO re-read and re-pushes the list, so the list is always
+current regardless of HMI boot timing or a late source attach. On **apply** the
+panel sends `0x0020`/`0x0021` (range rails only), then `0x0023`; the RP latches
+the adjust values, maps the list position to the real PDO, requests it, arms the
+output, and the panel animates back to Monitor.
 
 ---
-
----
-
-## HMI UI (Giraffe)
-
-Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
-`grf_view_set_dis_view_anim()`.
-
-- **view1 — Monitor (boot):** hero voltage ring (`arc`, reg `0x0010`), V/I/P
-  labels, output toggle (`imgbtn` → reg `0x0022`, alpha-crossfade animation),
-  "Change" label → view2.
-- **view2 — Profiles:** scrolling `container` with a fixed pool of **13 rows**
-  (badge/voltage/meta/current/check/background labels each), filled from the
-  profile-list registers and shown/hidden by count. Empty-state labels show when
-  N = 0. Per-view control limit raised above the default 64.
-- view3 — Battery, view4 — Settings: planned.
 
 ---
 
@@ -260,17 +256,76 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
 
 - **view1 — Monitor (boot):** voltage ring (`arc`, reg `0x0010`), V/I/P labels,
   output toggle (`imgbtn`, toggle → reg `0x0022`, alpha-crossfade animation),
-  touchable "Change" label → view2.
-- **view2 — Profiles:** scrolling `container` holding a fixed pool of **13 rows**;
-  each row = 6 labels (badge / voltage / meta / current / check / background chip).
-  Rows are filled from the profile-list registers and shown/hidden by count.
-  Badge label is a colored chip (bg color + text per type). Empty-state labels
-  show when N = 0. Tap a row's background chip to select it (✓ + chip tint);
-  selection is tracked on the panel (`g_sel`).
+  touchable "Change" label → view2. On apply, the toggle is forced to its
+  checked (red "turn off") image in `view1_entry` — see gotchas.
+- **view2 — Profiles:** scrolling `container0` holding a fixed pool of **13 rows**;
+  each row = 6 controls (badge / voltage / meta / current / check / background),
+  all **label** widgets. Rows are filled from the profile-list registers and
+  shown/hidden by count. Badge is a colored chip (bg + text per type); empty-state
+  labels show when N = 0.
+  - **Select:** tap a row background → ✓ + chip tint + a single `#FF9F0A`
+    outline box (`selbox`, container id 84) repositioned over the row via
+    `grf_ctrl_get_x/y/width/height` + `grf_ctrl_set_pos/size`.
+  - **Adjust panel** (`container1`, id 82): on selecting a PPS/AVS rail it shows
+    two sliders (set-voltage → `0x0020`, current-limit → `0x0021`, ranges from
+    the PDO), value labels, and a **Use** button (label id 90) that applies and
+    returns to Monitor. Fixed rails hide the panel.
+  - **Active rail** is remembered (`g_applied`) and re-highlighted on return to
+    view2; tapping it again behaves as a fresh selection.
+  - **Tap outside** the open panel just dismisses it (no select) so scrolling
+    stays free.
 - view3 — Battery, view4 — Settings: planned.
 
 Row data lives in a `ROW_ID[13][6]` table in `grf_hw_uart.c` mapping each row's
-six Control IDs; `fill_row()` / `show_row()` / selection all index through it.
+six Control IDs; `fill_row()` / `show_row()` / `highlight_row()` / selection all
+index through it.
+
+---
+
+## Firmware behavior (RP `src/main.cpp`)
+
+- **PDO list:** `sendProfileList()` reads `CMD_SRCPDO` (26 B) over I2C, normalizes
+  each slot, and pushes only on change (signature compare). It also builds
+  `g_slots[]` mapping **list position → real 1-based PDO index + type + ranges**.
+  No-source pushes an empty list so the panel auto-clears.
+- **Apply (`0x0023`):** sets `pendingSel`; the main loop maps it via `g_slots[]`
+  and calls `setPPSPDO` / `setAVSPDO` (with latched `reqMV`/`limMA`) or
+  `setFixPDO`, then `setOutput(1)`. `activePdoIdx`/`activeType` track the armed
+  rail; the PPS/AVS keep-alive refreshes **that** rail only (fixed rails need no
+  keep-alive).
+- **Output toggle (`0x0022`):** acts whenever the HMI changes it (no longer gated
+  on a profile being active).
+- **Source attach:** a rising-edge detector (`g_prevSource` → `g_outAttach`, plus
+  a fast ~150 ms I2C presence poll) re-asserts the output state (default OFF) and
+  calls **`usbpd.begin()` to refresh the library's PDO array** — required so a
+  source plugged in *after* boot can actually be requested (the library only
+  reads PDOs in `begin()`; a stale array makes `setFixPDO/PPS` silently no-op).
+  A brief 5 V blip on attach is unavoidable (the sink brings up its default
+  contract before firmware can react).
+- **Boot window:** for the first ~5 s the list is force-re-pushed so a
+  slow-booting HMI still receives it; `0x0024` makes this robust thereafter.
+
+---
+
+## Giraffe IDE constraints / gotchas (learned)
+
+- **One style per control** — no per-state (Checked/Pressed) styles. "Selected"
+  styling is done in firmware; the selection border is a separate `selbox`
+  container moved over the active row (there is **no runtime border setter**).
+- **`grf_animation_set` is effectively non-functional** here (slide-up panel was
+  abandoned; the adjust panel uses instant `grf_ctrl_set_hidden`).
+- **Rolling Transfer** (scroll-chain to parent) must be enabled on the row
+  background controls for the list to scroll while rows are tappable — and it
+  **resets when those controls are edited in the IDE**, so re-check after IDE
+  changes. No code API for it.
+- **imgbtn has its own state machine** (`GRF_IMGBTN_STATE_*`), separate from
+  `GRF_STATE_CHECKED`. To show the checked image programmatically use
+  `grf_imgbtn_set_mode(..., GRF_IMGBTN_STATE_CHECKED_RELEASED)`, and apply it in
+  `view1_entry` (post-load) — setting it before navigation gets wiped by the load.
+- **Background "cards" are label widgets**; an unset label renders the IDE default
+  "Text". Set such labels' **text opacity to 0** (no firmware needed) or give them
+  empty text.
+- The checkmark label text is set in `fill_row()` (`✓`) so all rows show a tick.
 
 ## Other
 
@@ -319,6 +374,13 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] Reverse control path: HMI output enable → RP (reg 0x0022).
 - [x] Source-profile list transfer RP → HMI (regs 0x0100/0x0110+/0x0101); auto-clear on unplug.
 - [x] Profiles UI: 13-row scrolling pool, dynamic badges, real PDO data.
-- [ ] Row selection → reg 0x0023, PPS/AVS fine adjust → regs 0x0020/0x0021.
-- [ ] Apply selected profile on RP; return to Monitor armed.
+- [x] Row selection → reg 0x0023, PPS/AVS fine adjust → regs 0x0020/0x0021.
+- [x] Apply selected profile on RP; return to Monitor armed; sync toggle to ON.
+- [x] Adjust panel (sliders + Use), selection border, active-rail re-highlight.
+- [x] Robustness: fresh list on view2 entry (0x0024), late-attach PDO refresh,
+      current clamp ≤4999 mA, real PPS/AVS voltage_min floor, output re-assert.
 - [ ] Battery (view3) and Settings (view4) pages.
+- [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).
+- [ ] Optional dark/light theme (feasible via a firmware palette + per-theme
+      images, but non-trivial; deferred).
+- [ ] Persist last-used profile / settings across reboots.
