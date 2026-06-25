@@ -96,6 +96,7 @@ static void adj_labels(u16 mv, u16 ma)
 #define ADJ_Y_HIDDEN 720   /* parked just below the 720px screen */
 static u8 g_panel_up = 0;
 static u8 g_arm_pending = 0;   /* set on apply, consumed in view1_entry */
+static u8 g_applied = 0xFF;    /* last-applied list position, re-highlighted on return */
 
 static void adj_panel(u8 show)
 {
@@ -168,7 +169,8 @@ void view2_use_apply(void)
     grf_reg_set(0x0023, g_sel);
     grf_reg_com_send(0x0023, 1);               /* apply: RP maps pos -> PDO, arms */
     use_btn_set(1, "Applied");
-        g_arm_pending = 1;                          /* flip the toggle once view1 has loaded */
+        g_applied = g_sel;                          /* remember active rail to re-highlight on return */
+        g_arm_pending = 1;
         grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT,
                                    250, 0, GRF_ANIM_PATH_END_SLOW);
     }
@@ -218,7 +220,9 @@ static void fill_row(u8 i, prof_t *p)
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_VOLT]), v);
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_META]), range?"Adjustable rail":"Fixed rail");
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CURR]), c);
-    show_row(i, 1);
+        grf_label_set_txt      (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), "\xE2\x9C\x93");          /* tick, overrides placeholder */
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), GRF_COLOR_GET(0xFF,0x9F,0x0A));
+        show_row(i, 1);
 }
 
 void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
@@ -264,8 +268,13 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
         	                                        }
                             for(u8 i=g_prof_n; i<MAX_PROF; i++) show_row(i, 0);  /* hide unused rows */
                             for(u8 i=0; i<g_prof_n; i++)
-                                            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
-                            break;
+                                                                        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
+                                                        if (g_prof_n == 0) g_applied = 0xFF;          /* source gone -> forget selection */
+                                                        if (g_applied != 0xFF && g_applied < g_prof_n) {
+                                                            g_sel = g_applied;                       /* show active rail */
+                                                            highlight_row(g_applied, 1);
+                                                        }
+                                                        break;
                         }
     }
 }

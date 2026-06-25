@@ -344,10 +344,11 @@ void loop()
 
   // Output switch: act when the HMI changes it, or re-assert after a source attach
   static int lastOut = -1;
-  if (g_outAttach)
+if (g_outAttach)
   {
     g_outAttach = false;
-    lastOut = -1; // force re-apply of outputOn (default OFF) on the next check
+    usbpd.begin(); // refresh library PDO array so setFixPDO/setPPSPDO use the new source
+    lastOut = -1;  // force re-apply of outputOn (default OFF) on the next check
   }
   if ((int)outputOn != lastOut)
   {
