@@ -16,6 +16,7 @@ void select_row_by_bg(grf_ctrl_t *ctrl);
 void view2_slider_changed(u8 which);   /* 0 = V slider, 1 = C slider */
 void view2_use_apply(void);            /* Use button: send 0x0020/21/23, go Monitor */
 void view2_reset_panel(void);
+void view1_sync_armed(void);
 
 
 

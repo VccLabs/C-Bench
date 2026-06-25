@@ -149,7 +149,7 @@ void view1_init(void)
 
 void view1_entry(void) 
 {
-
+	view1_sync_armed();
 }
 
 void view1_exit(void)

@@ -95,6 +95,7 @@ static void adj_labels(u16 mv, u16 ma)
 #define ADJ_Y_SHOWN  405   /* must match container1's Y in the IDE */
 #define ADJ_Y_HIDDEN 720   /* parked just below the 720px screen */
 static u8 g_panel_up = 0;
+static u8 g_arm_pending = 0;   /* set on apply, consumed in view1_entry */
 
 static void adj_panel(u8 show)
 {
@@ -167,11 +168,18 @@ void view2_use_apply(void)
     grf_reg_set(0x0023, g_sel);
     grf_reg_com_send(0x0023, 1);               /* apply: RP maps pos -> PDO, arms */
     use_btn_set(1, "Applied");
-    grf_ctrl_add_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED);                  /* logical: armed */
-            grf_imgbtn_set_mode(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_IMGBTN_STATE_CHECKED_RELEASED); /* visual: red "turn off" */
+        g_arm_pending = 1;                          /* flip the toggle once view1 has loaded */
         grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT,
-                               250, 0, GRF_ANIM_PATH_END_SLOW);
-}
+                                   250, 0, GRF_ANIM_PATH_END_SLOW);
+    }
+
+    void view1_sync_armed(void)
+    {
+        if (!g_arm_pending) return;
+        g_arm_pending = 0;
+        grf_ctrl_add_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED);                  /* logical: armed */
+        grf_imgbtn_set_mode(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_IMGBTN_STATE_CHECKED_RELEASED); /* visual: red */
+    }
 
 void view2_reset_panel(void)
 {
