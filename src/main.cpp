@@ -28,6 +28,8 @@ struct Settings
   int16_t lastSel;      // remembered profile position for "Last used" (step 2)
 };
 Settings g_set;
+static bool g_bootRestore = false; // pending "Last used" rail restore at boot
+static int  g_bootRestoreOut = -1; // output state to force after that restore
 
 #define HMI Serial2 // UART1: IO8=TX, IO9=RX -> TR660
 
@@ -348,6 +350,9 @@ Serial.println("hi2");
   delay(300);           // let the HMI come up
   lastSig = 0xFFFFFFFF; // force the first render regardless of prior RAM state
   sendProfileList();    // initial render (clears list if no source)
+
+  // boot output state = "Last used": arm restore after list is known (reg 0x0031)
+  g_bootRestore = (g_set.bootLastUsed && g_set.lastSel >= 0 && g_set.lastSel < g_slotN);
 }
 
 void loop()
@@ -377,10 +382,20 @@ void loop()
       }
       activePdoIdx = s.pdoIndex;
       activeType = s.type;
+      if (g_set.lastSel != sel) // remember rail for "Last used" boot restore
+      {
+        g_set.lastSel = sel;
+        saveSettings();
+      }
       if (g_set.autoArm) // auto-arm setting (reg 0x0032)
       {
         usbpd.setOutput(1);
         outputOn = true;
+      }
+      if (g_bootRestoreOut >= 0) // boot "Last used": force saved output state
+      {
+        outputOn = (g_bootRestoreOut != 0);
+        g_bootRestoreOut = -1;
       }
     }
   }
@@ -404,11 +419,23 @@ void loop()
     usbpd.begin(); // refresh library PDO array so setFixPDO/setPPSPDO use the new source
     lastOut = -1;  // force re-apply of outputOn (default OFF) on the next check
   }
+  // boot "Last used": once the initial attach is consumed, restore the rail
+  if (g_bootRestore && !g_outAttach)
+  {
+    g_bootRestore = false;
+    pendingSel = g_set.lastSel;            // applied next loop pass
+    g_bootRestoreOut = g_set.lastOutputOn; // then forces saved output state
+  }
   if ((int)outputOn != lastOut)
   {
     lastOut = outputOn;
     usbpd.setOutput(outputOn ? 1 : 0);
     writeReg(0x0016, outputOn ? 1 : 0); /* tell the panel immediately */
+    if (g_set.lastOutputOn != (uint8_t)outputOn) // remember for "Last used"
+    {
+      g_set.lastOutputOn = outputOn;
+      saveSettings();
+    }
   }
 
   // Re-push settings to the panel for the first few seconds (panel boots slower than RP)
