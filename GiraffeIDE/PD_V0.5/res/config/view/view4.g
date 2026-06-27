@@ -202,7 +202,7 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Auto-restore profile",
+      "txt" : "Auto-arm output",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -269,7 +269,7 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Re-request last rail on boot",
+      "txt" : "Auto turn on output after selecting a profile",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
