@@ -17,7 +17,10 @@ touch UI. Open-source hardware and software, planned for launch on Crowd Supply.
 > Status: hardware defined; firmware bring-up in progress. Validated so far:
 > PD profile read, PPS request + output arm, INA260 readback, live V/I/P
 > telemetry, HMI→RP output control, full source-profile list transfer with
-> live 13-row Profiles UI (auto-clears on unplug), and row selection on the panel. This README is the single source of truth — keep it current.
+> live 13-row Profiles UI (auto-clears on unplug), row selection + apply, 4-page
+> tab navigation, a Settings page (boot-output state + auto-arm) persisted to
+> flash, and "Last used" restore of rail + voltage + output at boot. This README
+> is the single source of truth — keep it current.
 
 ---
 
@@ -200,13 +203,15 @@ and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
 
 ### Register map
 
-**RP → HMI — telemetry** (pushed at 2 Hz):
+**RP → HMI — telemetry / state** (pushed at 2 Hz; output state also on change):
 
-| Reg      | Value          | Units |
-| -------- | -------------- | ----- |
-| `0x0010` | Output voltage | mV    |
-| `0x0011` | Output current | mA    |
-| `0x0012` | Output power   | 0.1 W |
+| Reg      | Value                                               | Units |
+| -------- | --------------------------------------------------- | ----- |
+| `0x0010` | Output voltage                                      | mV    |
+| `0x0011` | Output current                                      | mA    |
+| `0x0012` | Output power                                        | 0.1 W |
+| `0x0016` | Real output state (drives the view1 toggle)         | 0/1   |
+| `0x0017` | Active list position for highlight; `0xFFFF` = none | index |
 
 **RP → HMI — profile list** (resent only on change; empty pushed while no source):
 
@@ -230,20 +235,31 @@ what made 5 A rails (e.g. 20 V @ 5 A) silently stay on the previous contract.
 
 **HMI → RP — control:**
 
-| Reg      | Value                       | Units | Status |
-| -------- | --------------------------- | ----- | ------ |
-| `0x0020` | Requested voltage (PPS/AVS) | mV    | done   |
-| `0x0021` | Current limit (PPS/AVS)     | mA    | done   |
-| `0x0022` | Output enable               | 0/1   | done   |
-| `0x0023` | Selected profile position   | index | done   |
-| `0x0024` | Refresh-list request        | 1     | done   |
+| Reg      | Value                                           | Units | Status |
+| -------- | ----------------------------------------------- | ----- | ------ |
+| `0x0020` | Requested voltage (PPS/AVS)                     | mV    | done   |
+| `0x0021` | Current limit (PPS/AVS)                         | mA    | done   |
+| `0x0022` | Output enable                                   | 0/1   | done   |
+| `0x0023` | Selected profile position                       | index | done   |
+| `0x0024` | Refresh-list request                            | 1     | done   |
+| `0x0031` | Boot output state (0 Off / 1 Last used)         | 0/1   | done   |
+| `0x0032` | Auto-arm output after apply                     | 0/1   | done   |
+| `0x0033` | Settings-sync request (view4 entry / HMI ready) | 1     | done   |
 
 `0x0024` is sent by the panel on **every view2 entry** (`view2_reset_panel`); the
 RP forces a fresh PDO re-read and re-pushes the list, so the list is always
 current regardless of HMI boot timing or a late source attach. On **apply** the
 panel sends `0x0020`/`0x0021` (range rails only), then `0x0023`; the RP latches
-the adjust values, maps the list position to the real PDO, requests it, arms the
-output, and the panel animates back to Monitor.
+the adjust values, maps the list position to the real PDO, requests it, and —
+**if auto-arm is enabled** (`0x0032`) — arms the output, then the panel animates
+back to Monitor. The toggle colour follows the **real** output state pushed on
+`0x0016`, not the apply event.
+
+`0x0031`/`0x0032` are written when the user changes them in Settings and are
+persisted to flash. `0x0033` is sent both on **view4 entry** and on **HMI ready**
+(`view1_entry`, after the panel's ~7 s boot); the RP replies by pushing the stored
+`0x0031`/`0x0032` so the panel reflects the saved state. The RP also re-pushes
+these for the first ~12 s after boot to cover the slow HMI bring-up.
 
 ---
 
@@ -255,30 +271,45 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
 `grf_view_set_dis_view_anim()`. Per-view control limit raised from 64 to 80.
 
 - **view1 — Monitor (boot):** voltage ring (`arc`, reg `0x0010`), V/I/P labels,
-  output toggle (`imgbtn`, toggle → reg `0x0022`, alpha-crossfade animation),
-  touchable "Change" label → view2. On apply, the toggle is forced to its
-  checked (red "turn off") image in `view1_entry` — see gotchas.
+  output toggle (`imgbtn`, toggle → reg `0x0022`). The toggle visual is driven by
+  the **real** output state (reg `0x0016`): `view1_entry` and the `0x0016` handler
+  both call `view1_set_output_btn()`, so it reads red/green correctly on every
+  entry — not just after an apply. `view1_entry` also sends `0x0033` (HMI ready).
 - **view2 — Profiles:** scrolling `container0` holding a fixed pool of **13 rows**;
   each row = 6 controls (badge / voltage / meta / current / check / background),
   all **label** widgets. Rows are filled from the profile-list registers and
   shown/hidden by count. Badge is a colored chip (bg + text per type); empty-state
   labels show when N = 0.
-  - **Select:** tap a row background → ✓ + chip tint + a single `#FF9F0A`
+- **Select:** tap a row background → ✓ + chip tint + a single `#FF9F0A`
     outline box (`selbox`, container id 84) repositioned over the row via
     `grf_ctrl_get_x/y/width/height` + `grf_ctrl_set_pos/size`.
-  - **Adjust panel** (`container1`, id 82): on selecting a PPS/AVS rail it shows
+- **Adjust panel** (`container1`, id 82): on selecting a PPS/AVS rail it shows
     two sliders (set-voltage → `0x0020`, current-limit → `0x0021`, ranges from
     the PDO), value labels, and a **Use** button (label id 90) that applies and
     returns to Monitor. Fixed rails hide the panel.
-  - **Active rail** is remembered (`g_applied`) and re-highlighted on return to
+- **Active rail** is remembered (`g_applied`) and re-highlighted on return to
     view2; tapping it again behaves as a fresh selection.
-  - **Tap outside** the open panel just dismisses it (no select) so scrolling
+- **Tap outside** the open panel just dismisses it (no select) so scrolling
     stays free.
-- view3 — Battery, view4 — Settings: planned.
+- **Back label** (`label85`, id 91) returns to Monitor (`MOVE_RIGHT`).
+ - The active-rail **highlight survives a boot restore**: the RP pushes the
+    active position on `0x0017` just before the list on every view2 entry, so the
+    restored rail highlights even though the panel didn't apply it itself.
+- **view3 — Battery:** scaffolded; content planned.
+- **view4 — Settings:** boot output state (segmented Off / Last used) and auto-arm
+  output (switch), wired to `0x0031`/`0x0032`. Controls are painted from a
+  panel-side shadow on entry (`view4_apply_settings`), kept in sync by RP pushes.
+  Brightness, appearance, and lifetime-energy widgets are mocked, not yet wired.
 
 Row data lives in a `ROW_ID[13][6]` table in `grf_hw_uart.c` mapping each row's
 six Control IDs; `fill_row()` / `show_row()` / `highlight_row()` / selection all
 index through it.
+
+**Navigation:** every page carries the same bottom tab bar — three touchable
+labels per view jumping to the other three pages via
+`grf_view_set_dis_view_anim(GRF_VIEWx_ID, GRF_SCR_LOAD_ANIM_NONE, …)`. Transitions
+are **instant** (no slide). Handlers bind by numeric Control ID in `viewX_cc.h`,
+which does **not** always match the IDE's label name — map by ID, not symbol.
 
 ---
 
@@ -290,11 +321,12 @@ index through it.
   No-source pushes an empty list so the panel auto-clears.
 - **Apply (`0x0023`):** sets `pendingSel`; the main loop maps it via `g_slots[]`
   and calls `setPPSPDO` / `setAVSPDO` (with latched `reqMV`/`limMA`) or
-  `setFixPDO`, then `setOutput(1)`. `activePdoIdx`/`activeType` track the armed
-  rail; the PPS/AVS keep-alive refreshes **that** rail only (fixed rails need no
-  keep-alive).
-- **Output toggle (`0x0022`):** acts whenever the HMI changes it (no longer gated
-  on a profile being active).
+  `setFixPDO`. Output is armed **only if auto-arm is on** (`g_set.autoArm`).
+  `activePdoIdx`/`activeType` track the armed rail and `g_activeSel` the list
+  position (for the `0x0017` highlight); the PPS/AVS keep-alive refreshes **that**
+  rail only (fixed rails need no keep-alive).
+- **Output toggle (`0x0022`):** acts whenever the HMI changes it; every change is
+  also pushed back on `0x0016` so the panel toggle stays truthful.
 - **Source attach:** a rising-edge detector (`g_prevSource` → `g_outAttach`, plus
   a fast ~150 ms I2C presence poll) re-asserts the output state (default OFF) and
   calls **`usbpd.begin()` to refresh the library's PDO array** — required so a
@@ -302,8 +334,20 @@ index through it.
   reads PDOs in `begin()`; a stale array makes `setFixPDO/PPS` silently no-op).
   A brief 5 V blip on attach is unavoidable (the sink brings up its default
   contract before firmware can react).
-- **Boot window:** for the first ~5 s the list is force-re-pushed so a
-  slow-booting HMI still receives it; `0x0024` makes this robust thereafter.
+- **Settings persistence:** a small `Settings` struct (magic `0xCB02`) lives in
+  flash via the earlephilhower **EEPROM** emulation — `loadSettings()` at boot,
+  `saveSettings()` on each change (guarded so only real changes write). Fields:
+  boot-output state, auto-arm, last output on/off, last list position, last mV/mA.
+  Changing the layout bumps the magic and resets settings once.
+- **Boot "Last used" restore:** if boot-output state = Last used, after the PDO
+  list is known the RP re-applies the saved rail (`lastSel`) at the saved voltage
+  (`lastMV`/`lastMA`) and forces the saved output state — fired only once the
+  initial source-attach is consumed, so the refreshed PDO array is used and the
+  contract sticks. Restore is by **list position**; a different charger at next
+  boot can map that position to a different rail.
+- **Boot window:** the list is force-re-pushed for the first seconds and the
+  settings for ~12 s, so a slow-booting HMI (~7 s) still gets both; `0x0024`
+  (list) and `0x0033` (settings, on HMI ready) make this robust thereafter.
 
 ---
 
@@ -326,6 +370,18 @@ index through it.
   "Text". Set such labels' **text opacity to 0** (no firmware needed) or give them
   empty text.
 - The checkmark label text is set in `fill_row()` (`✓`) so all rows show a tick.
+- **Views reset their controls on entry.** A value pushed while a view isn't
+  current (or set just before navigating in) is wiped on load, so reflectable
+  state (output toggle, Settings controls, active-rail highlight) is kept in a
+  firmware-side **shadow** and re-applied in the view's `_entry`. Live updates
+  while a view *is* current are guarded with `grf_view_get_cur_id(GRF_LAYER_UI)`.
+- **HMI boots slowly (~7 s); the RP boots fast.** Anything pushed in the first
+  seconds is lost. Drive reflect from a re-push window that outlasts HMI boot, or
+  better, from an "HMI ready" request the panel sends in `view1_entry` (`0x0033`).
+- **Handlers bind by numeric Control ID** in `viewX_cc.h`, not by label name —
+  IDE names and IDs diverge (a view's `label2` symbol ≠ Control ID 2). Wire by ID.
+- **`grf_sw_set_state()` fires no `VALUE_CHANGED`** — use it to reflect a switch
+  from stored state without echoing back to the RP.
 
 ## Other
 
@@ -379,8 +435,11 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] Adjust panel (sliders + Use), selection border, active-rail re-highlight.
 - [x] Robustness: fresh list on view2 entry (0x0024), late-attach PDO refresh,
       current clamp ≤4999 mA, real PPS/AVS voltage_min floor, output re-assert.
-- [ ] Battery (view3) and Settings (view4) pages.
+- [x] 4-page tab navigation (instant); view2 back button.
+- [x] Settings (view4): boot-output state + auto-arm, reflected on entry.
+- [x] Persist settings to flash; "Last used" restore of rail + voltage + output.
+- [x] Active-rail highlight after boot restore (reg 0x0017).
+- [ ] Battery page (view3) content.
+- [ ] Settings: brightness, dark/light theme, lifetime-energy odometer (mocked).
+- [ ] Session energy widget on Monitor (mocked; regs 0x0013–0x0015 reserved).
 - [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).
-- [ ] Optional dark/light theme (feasible via a firmware palette + per-theme
-      images, but non-trivial; deferred).
-- [ ] Persist last-used profile / settings across reboots.
