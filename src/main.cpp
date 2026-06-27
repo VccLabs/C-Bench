@@ -319,9 +319,9 @@ void setup()
   while (!Serial && millis() < 4000)
   {
   } // wait for USB-CDC
-
+Serial.println("hi");
   loadSettings(); // restore persisted settings from flash
-
+Serial.println("hi2");
   Wire.setSDA(20); // IO20
   Wire.setSCL(21); // IO21
   Wire.begin();
@@ -414,7 +414,7 @@ void loop()
   // Re-push settings to the panel for the first few seconds (panel boots slower than RP)
   static uint32_t tSet = 0;
   static uint8_t setPushes = 0;
-  if (setPushes < 6 && now - tSet >= 1000)
+if (setPushes < 12 && now - tSet >= 1000)
   {
     tSet = now;
     writeReg(0x0031, g_set.bootLastUsed);

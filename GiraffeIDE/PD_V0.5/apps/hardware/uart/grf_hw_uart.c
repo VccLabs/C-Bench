@@ -304,12 +304,16 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
                     g_out_on = data[0];
                     view1_set_output_btn(g_out_on);
                     break;
-        case 0x0031:  /* boot output state from RP -> shadow (painted on view4 entry) */
-                    g_v4_boot = data[0];
-                    break;
-                case 0x0032:  /* auto-arm from RP -> shadow (applied on view4 entry) */
-                    g_v4_autoarm = data[0];
-                    break;
+                case 0x0031:  /* boot output state from RP -> shadow + live repaint if on view4 */
+                                    g_v4_boot = data[0];
+                                    if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
+                                        boot_state_paint(g_v4_boot);
+                                    break;
+                                case 0x0032:  /* auto-arm from RP -> shadow + live repaint if on view4 */
+                                    g_v4_autoarm = data[0];
+                                    if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
+                                        grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
+                                    break;
         case 0x0101: {            /* list ready -> render */
         	g_prof_n = grf_reg_get(0x0100);
         	        	            if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
