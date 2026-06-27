@@ -207,6 +207,8 @@ static void loadSettings()
     g_set.lastSel = -1;
     saveSettings();
   }
+  Serial.printf("Settings loaded: magic=%04X boot=%u autoArm=%u\n",
+                g_set.magic, g_set.bootLastUsed, g_set.autoArm);
 }
 
 // Apply one decoded control register from the panel
@@ -238,6 +240,10 @@ static void applyControl(uint16_t addr, uint16_t val)
   case 0x0032:
     g_set.autoArm = (val != 0); // auto-arm output after apply
     saveSettings();
+    break;
+  case 0x0033: // panel entered view4 -> push stored settings back for display
+    writeReg(0x0031, g_set.bootLastUsed);
+    writeReg(0x0032, g_set.autoArm);
     break;
   }
 }
@@ -402,6 +408,17 @@ void loop()
   {
     lastOut = outputOn;
     usbpd.setOutput(outputOn ? 1 : 0);
+  }
+
+  // Re-push settings to the panel for the first few seconds (panel boots slower than RP)
+  static uint32_t tSet = 0;
+  static uint8_t setPushes = 0;
+  if (setPushes < 6 && now - tSet >= 1000)
+  {
+    tSet = now;
+    writeReg(0x0031, g_set.bootLastUsed);
+    writeReg(0x0032, g_set.autoArm);
+    setPushes++;
   }
 
   static uint32_t tProf = 0;

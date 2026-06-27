@@ -198,6 +198,9 @@ void view2_reset_panel(void)
             }
 
 /* ---- view4 (Settings) ---- */
+static u8 g_v4_boot    = 0;   /* shadow of reg 0x0031 (0=Off, 1=Last used) */
+static u8 g_v4_autoarm = 0;   /* shadow of reg 0x0032 (0/1)                */
+
 static void boot_state_paint(u8 last_used)            /* 0 = Off white, 1 = Last used white */
 {
     grf_color_t on  = GRF_COLOR_GET(0xFF,0xFF,0xFF);  /* selected   = white */
@@ -208,21 +211,30 @@ static void boot_state_paint(u8 last_used)            /* 0 = Off white, 1 = Last
 
 void view4_set_boot_state(u8 last_used)               /* user tap: paint + send */
 {
+    g_v4_boot = last_used;
     boot_state_paint(last_used);
     grf_reg_set(0x0031, last_used);
     grf_reg_com_send(0x0031, 1);
 }
 
-void view4_boot_state_default(void)                   /* entry: prime colors, Off selected */
+void view4_apply_settings(void)                       /* entry: paint controls from shadow */
 {
-    boot_state_paint(0);
+    boot_state_paint(g_v4_boot);
+    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
 }
 
-        void view4_set_autoarm(u8 on)                         /* 0/1 */
+void view4_set_autoarm(u8 on)                         /* 0/1 */
         {
+            g_v4_autoarm = on;
             grf_reg_set(0x0032, on);
             grf_reg_com_send(0x0032, 1);
         }
+
+void view4_request_settings(void)   /* ask RP to push stored 0x0031/0x0032 back */
+{
+    grf_reg_set(0x0033, 1);
+    grf_reg_com_send(0x0033, 1);
+}
 
         static void fill_row(u8 i, prof_t *p)
 {
@@ -275,9 +287,15 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
             grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
             break;
         case 0x0012:  /* power dW (0.1W) */
-            snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
-            grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
-            break;
+                    snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
+                    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
+                    break;
+        case 0x0031:  /* boot output state from RP -> shadow (painted on view4 entry) */
+                    g_v4_boot = data[0];
+                    break;
+                case 0x0032:  /* auto-arm from RP -> shadow (applied on view4 entry) */
+                    g_v4_autoarm = data[0];
+                    break;
         case 0x0101: {            /* list ready -> render */
         	g_prof_n = grf_reg_get(0x0100);
         	        	            if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
