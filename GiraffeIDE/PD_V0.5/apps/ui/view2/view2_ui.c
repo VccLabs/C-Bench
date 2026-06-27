@@ -795,7 +795,7 @@ static void label90_event(grf_ctrl_t *ctrl, grf_event_e event)
 static void label88_event(grf_ctrl_t *ctrl, grf_event_e event)  /* nav -> view3 Battery */
 {
 	if (event == GRF_EVENT_CLICKED)
-	    grf_view_set_dis_view_anim(GRF_VIEW3_ID, GRF_SCR_LOAD_ANIM_MOVE_LEFT, 250, 0, GRF_ANIM_PATH_END_SLOW);
+	    grf_view_set_dis_view_anim(GRF_VIEW3_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
@@ -812,14 +812,14 @@ static void label87_event(grf_ctrl_t *ctrl, grf_event_e event)
 static void label86_event(grf_ctrl_t *ctrl, grf_event_e event)  /* nav -> view1 Monitor */
 {
 	if (event == GRF_EVENT_CLICKED)
-	    grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT, 250, 0, GRF_ANIM_PATH_END_SLOW);
+	    grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
 static void label89_event(grf_ctrl_t *ctrl, grf_event_e event)  /* nav -> view4 Settings */
 {
 	if (event == GRF_EVENT_CLICKED)
-	    grf_view_set_dis_view_anim(GRF_VIEW4_ID, GRF_SCR_LOAD_ANIM_MOVE_LEFT, 250, 0, GRF_ANIM_PATH_END_SLOW);
+	    grf_view_set_dis_view_anim(GRF_VIEW4_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 

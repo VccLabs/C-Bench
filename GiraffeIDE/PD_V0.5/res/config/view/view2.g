@@ -70,7 +70,7 @@
         "id" : 90,
         "pt" : {
           "x" : 40,
-          "y" : 620
+          "y" : 560
         },
         "size" : {
           "width" : 641,
@@ -121,7 +121,7 @@
         },
         "size" : {
           "width" : 656,
-          "height" : 386
+          "height" : 361
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -153,7 +153,7 @@
         "ctrl_type" : 2,
         "pt" : {
           "x" : 38,
-          "y" : 405
+          "y" : 345
         },
         "size" : {
           "width" : 640,
@@ -916,11 +916,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -954,7 +953,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "5.000V",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -987,7 +985,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Fixed rail",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1019,7 +1016,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : "3.5A",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1051,7 +1047,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1083,7 +1078,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1115,7 +1109,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1148,7 +1141,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1182,7 +1174,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1215,11 +1206,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -1254,7 +1244,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1288,11 +1277,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -1327,7 +1315,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1360,7 +1347,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1393,7 +1379,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1425,11 +1410,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -1464,7 +1448,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1498,7 +1481,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1531,7 +1513,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1564,7 +1545,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1596,7 +1576,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1629,7 +1608,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1661,7 +1639,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1694,7 +1671,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1728,11 +1704,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -1767,11 +1742,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -1806,7 +1780,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1840,7 +1813,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1873,7 +1845,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1905,7 +1876,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1938,7 +1908,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -1970,7 +1939,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2003,7 +1971,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2036,7 +2003,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2070,11 +2036,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -2109,7 +2074,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2141,7 +2105,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2174,7 +2137,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2207,7 +2169,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2241,11 +2202,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -2280,7 +2240,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2312,7 +2271,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2345,7 +2303,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2378,7 +2335,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2412,11 +2368,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -2451,7 +2406,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2483,7 +2437,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2516,7 +2469,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2549,7 +2501,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2583,11 +2534,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -2622,11 +2572,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -2661,7 +2610,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2695,7 +2643,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2728,7 +2675,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2761,7 +2707,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2793,7 +2738,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2825,7 +2769,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2858,7 +2801,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2891,7 +2833,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2925,11 +2866,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -2964,11 +2904,10 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 8453888,
+          "main_color" : 1842206,
           "radius" : 9,
           "opa" : 255
         },
@@ -3003,7 +2942,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -3037,7 +2975,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -3070,7 +3007,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : ".",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -3103,7 +3039,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "✓",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {

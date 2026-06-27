@@ -153,20 +153,20 @@ static void label14_event(grf_ctrl_t *ctrl, grf_event_e event)
 static void label13_event(grf_ctrl_t *ctrl, grf_event_e event)  /* nav -> view3 Battery */
 {
 	if (event == GRF_EVENT_CLICKED)
-	    grf_view_set_dis_view_anim(GRF_VIEW3_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT, 250, 0, GRF_ANIM_PATH_END_SLOW);
+	    grf_view_set_dis_view_anim(GRF_VIEW3_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
 static void label12_event(grf_ctrl_t *ctrl, grf_event_e event)  /* nav -> view2 Profiles */
 {
 	if (event == GRF_EVENT_CLICKED)
-	    grf_view_set_dis_view_anim(GRF_VIEW2_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT, 250, 0, GRF_ANIM_PATH_END_SLOW);
+	    grf_view_set_dis_view_anim(GRF_VIEW2_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 static void label11_event(grf_ctrl_t *ctrl, grf_event_e event)  /* nav -> view1 Monitor */
 {
 	if (event == GRF_EVENT_CLICKED)
-	    grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT, 250, 0, GRF_ANIM_PATH_END_SLOW);
+	    grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 #include "../../../libs/appscc/view4_cc.h"
