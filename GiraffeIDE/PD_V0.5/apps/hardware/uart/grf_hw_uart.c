@@ -96,6 +96,7 @@ static void adj_labels(u16 mv, u16 ma)
 #define ADJ_Y_HIDDEN 720   /* parked just below the 720px screen */
 static u8 g_panel_up = 0;
 static u8 g_arm_pending = 0;   /* set on apply, consumed in view1_entry */
+static u8 g_out_on = 0;        /* shadow of real output state (RP reg 0x0016) */
 static u8 g_applied = 0xFF;    /* last-applied list position, re-highlighted on return */
 
 static void adj_panel(u8 show)
@@ -175,12 +176,21 @@ void view2_use_apply(void)
                                    250, 0, GRF_ANIM_PATH_END_SLOW);
     }
 
-    void view1_sync_armed(void)
+static void view1_set_output_btn(u8 on)   /* drive toggle from real output state */
     {
-        if (!g_arm_pending) return;
-        g_arm_pending = 0;
-        grf_ctrl_add_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED);                  /* logical: armed */
-        grf_imgbtn_set_mode(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_IMGBTN_STATE_CHECKED_RELEASED); /* visual: red */
+        if (on) {
+            grf_ctrl_add_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED);
+            grf_imgbtn_set_mode(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_IMGBTN_STATE_CHECKED_RELEASED); /* red */
+        } else {
+            grf_ctrl_clear_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED);
+            grf_imgbtn_set_mode(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_IMGBTN_STATE_REL);              /* green */
+        }
+    }
+
+    void view1_sync_armed(void)               /* called from view1_entry */
+    {
+        g_arm_pending = 0;                     /* no longer drives the visual */
+        view1_set_output_btn(g_out_on);        /* reflect the real state instead */
     }
 
 void view2_reset_panel(void)
@@ -289,6 +299,10 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
         case 0x0012:  /* power dW (0.1W) */
                     snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
                     grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
+                    break;
+                case 0x0016:  /* real output state from RP -> drive toggle */
+                    g_out_on = data[0];
+                    view1_set_output_btn(g_out_on);
                     break;
         case 0x0031:  /* boot output state from RP -> shadow (painted on view4 entry) */
                     g_v4_boot = data[0];

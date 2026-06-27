@@ -408,6 +408,7 @@ void loop()
   {
     lastOut = outputOn;
     usbpd.setOutput(outputOn ? 1 : 0);
+    writeReg(0x0016, outputOn ? 1 : 0); /* tell the panel immediately */
   }
 
   // Re-push settings to the panel for the first few seconds (panel boots slower than RP)
@@ -442,6 +443,7 @@ void loop()
     writeReg(0x0010, mV);
     writeReg(0x0011, mA);
     writeReg(0x0012, dW);
+    writeReg(0x0016, outputOn ? 1 : 0); /* real output state for the view1 toggle */
   }
   // Fast source-attach watch: kill VOUT ASAP after a contract appears
   static uint32_t tAtt = 0;
