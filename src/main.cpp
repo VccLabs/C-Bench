@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <AP33772S.h>
 #include <Adafruit_INA260.h>
+#include <EEPROM.h>
 
 AP33772S usbpd;         // defaults to Wire (I2C0)
 Adafruit_INA260 ina260; // output-bus monitor @ 0x40
@@ -15,6 +16,18 @@ volatile uint16_t reqMV = PPS_TARGET_MV; // reg 0x0020 (next milestone)
 volatile uint16_t limMA = PPS_LIMIT_MA;  // reg 0x0021 (next milestone)
 volatile bool outputOn = false;          // reg 0x0022 - default OFF for safety
 volatile int pendingSel = -1;            // reg 0x0023 list position, applied in loop()
+
+// ---- persisted settings (flash via EEPROM emulation) ----
+#define SET_MAGIC 0xCB01
+struct Settings
+{
+  uint16_t magic;
+  uint8_t bootLastUsed; // reg 0x0031: 0=Off at boot, 1=restore Last used
+  uint8_t autoArm;      // reg 0x0032: 0/1 auto turn output on after apply
+  uint8_t lastOutputOn; // remembered for "Last used" boot restore (step 2)
+  int16_t lastSel;      // remembered profile position for "Last used" (step 2)
+};
+Settings g_set;
 
 #define HMI Serial2 // UART1: IO8=TX, IO9=RX -> TR660
 
@@ -174,6 +187,28 @@ static void sendProfileList()
   writeRegs(0x0101, &rdy, 1);
 }
 
+static void saveSettings()
+{
+  g_set.magic = SET_MAGIC;
+  EEPROM.put(0, g_set);
+  EEPROM.commit();
+}
+
+static void loadSettings()
+{
+  EEPROM.begin(256);
+  EEPROM.get(0, g_set);
+  if (g_set.magic != SET_MAGIC)
+  { // first boot or invalid -> safe defaults
+    g_set.magic = SET_MAGIC;
+    g_set.bootLastUsed = 0; // Off at boot (safety)
+    g_set.autoArm = 1;      // keep today's behavior: apply auto-arms
+    g_set.lastOutputOn = 0;
+    g_set.lastSel = -1;
+    saveSettings();
+  }
+}
+
 // Apply one decoded control register from the panel
 static void applyControl(uint16_t addr, uint16_t val)
 {
@@ -195,6 +230,14 @@ static void applyControl(uint16_t addr, uint16_t val)
   case 0x0024:
     lastSig = 0xFFFFFFFF; // panel opened view2 -> force a fresh list push now
     sendProfileList();
+    break;
+  case 0x0031:
+    g_set.bootLastUsed = (val != 0); // boot output state: 0=Off, 1=Last used
+    saveSettings();
+    break;
+  case 0x0032:
+    g_set.autoArm = (val != 0); // auto-arm output after apply
+    saveSettings();
     break;
   }
 }
@@ -271,6 +314,8 @@ void setup()
   {
   } // wait for USB-CDC
 
+  loadSettings(); // restore persisted settings from flash
+
   Wire.setSDA(20); // IO20
   Wire.setSCL(21); // IO21
   Wire.begin();
@@ -326,8 +371,11 @@ void loop()
       }
       activePdoIdx = s.pdoIndex;
       activeType = s.type;
-      usbpd.setOutput(1);
-      outputOn = true;
+      if (g_set.autoArm) // auto-arm setting (reg 0x0032)
+      {
+        usbpd.setOutput(1);
+        outputOn = true;
+      }
     }
   }
 
@@ -344,7 +392,7 @@ void loop()
 
   // Output switch: act when the HMI changes it, or re-assert after a source attach
   static int lastOut = -1;
-if (g_outAttach)
+  if (g_outAttach)
   {
     g_outAttach = false;
     usbpd.begin(); // refresh library PDO array so setFixPDO/setPPSPDO use the new source
