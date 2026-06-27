@@ -102,23 +102,15 @@ static void label7_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label8_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label8_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Boot output: "Off" (ID10) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view4_set_boot_state(0);
 }
 
 
-static void label9_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label9_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Boot output: "Last used" (ID11) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view4_set_boot_state(1);
 }
 
 
@@ -132,13 +124,9 @@ static void label10_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void sw0_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void sw0_event(grf_ctrl_t *ctrl, grf_event_e event)      /* Auto-arm output (ID13) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_VALUE_CHANGED) view4_set_autoarm(grf_sw_get_state(ctrl));
 }
 
 #include "../../../libs/appscc/view4_cc.h"

@@ -194,10 +194,27 @@ void view2_reset_panel(void)
         grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SC), 24);
         use_btn_set(0, "Select a rail");
         grf_reg_set(0x0024, 1);      /* ask the RP to (re)push the PDO list now */
-        grf_reg_com_send(0x0024, 1);
-    }
+                grf_reg_com_send(0x0024, 1);
+            }
 
-static void fill_row(u8 i, prof_t *p)
+        /* ---- view4 (Settings) ---- */
+        void view4_set_boot_state(u8 last_used)               /* 0 = Off, 1 = Last used */
+        {
+            grf_color_t on  = GRF_COLOR_GET(0xFF,0xFF,0xFF);  /* selected   = white */
+            grf_color_t off = GRF_COLOR_GET(0x98,0x98,0x9F);  /* unselected = grey  */
+            grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), last_used?off:on); /* "Off"       ID10 */
+            grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), last_used?on:off); /* "Last used" ID11 */
+            grf_reg_set(0x0031, last_used);
+            grf_reg_com_send(0x0031, 1);
+        }
+
+        void view4_set_autoarm(u8 on)                         /* 0/1 */
+        {
+            grf_reg_set(0x0032, on);
+            grf_reg_com_send(0x0032, 1);
+        }
+
+        static void fill_row(u8 i, prof_t *p)
 {
     char v[20], c[16];
     const char *badge; grf_color_t bbg, btx;
