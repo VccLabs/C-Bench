@@ -137,7 +137,9 @@ void view4_init(void)
 
 void view4_entry(void)
 {
-
+	view4_boot_state_default();   /* prime label colors; Off selected by default */
+	grf_ctrl_set_ext_click_area(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), 12);  /* "Off"  bigger hit area */
+	grf_ctrl_set_ext_click_area(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), 12);  /* "Last used"           */
 }
 
 void view4_exit(void)

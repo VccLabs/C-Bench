@@ -197,16 +197,26 @@ void view2_reset_panel(void)
                 grf_reg_com_send(0x0024, 1);
             }
 
-        /* ---- view4 (Settings) ---- */
-        void view4_set_boot_state(u8 last_used)               /* 0 = Off, 1 = Last used */
-        {
-            grf_color_t on  = GRF_COLOR_GET(0xFF,0xFF,0xFF);  /* selected   = white */
-            grf_color_t off = GRF_COLOR_GET(0x98,0x98,0x9F);  /* unselected = grey  */
-            grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), last_used?off:on); /* "Off"       ID10 */
-            grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), last_used?on:off); /* "Last used" ID11 */
-            grf_reg_set(0x0031, last_used);
-            grf_reg_com_send(0x0031, 1);
-        }
+/* ---- view4 (Settings) ---- */
+static void boot_state_paint(u8 last_used)            /* 0 = Off white, 1 = Last used white */
+{
+    grf_color_t on  = GRF_COLOR_GET(0xFF,0xFF,0xFF);  /* selected   = white */
+    grf_color_t off = GRF_COLOR_GET(0x98,0x98,0x9F);  /* unselected = grey  */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), last_used?off:on); /* "Off"       ID10 */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), last_used?on:off); /* "Last used" ID11 */
+}
+
+void view4_set_boot_state(u8 last_used)               /* user tap: paint + send */
+{
+    boot_state_paint(last_used);
+    grf_reg_set(0x0031, last_used);
+    grf_reg_com_send(0x0031, 1);
+}
+
+void view4_boot_state_default(void)                   /* entry: prime colors, Off selected */
+{
+    boot_state_paint(0);
+}
 
         void view4_set_autoarm(u8 on)                         /* 0/1 */
         {
