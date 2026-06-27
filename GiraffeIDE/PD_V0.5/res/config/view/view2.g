@@ -182,6 +182,46 @@
     "theme" : "youth",
     "property" : {
       "pub_t" : {
+        "name" : "label85",
+        "id" : 91,
+        "pt" : { },
+        "size" : {
+          "width" : 186,
+          "height" : 81
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "Monitor",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : 15,
+            "bottom" : 2147483647,
+            "left" : 6,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 16752394,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 15
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
         "name" : "label72",
         "id" : 74,
         "parent_id" : 66,
@@ -3262,7 +3302,7 @@
     "v_name" : "view2",
     "v_id" : 2,
     "bg_scale" : 255,
-    "bg_color" : 4294967295,
+    "bg_color" : 4278190080,
     "bg_image" : "view2.png"
   }
 }

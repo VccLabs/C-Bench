@@ -3,10 +3,10 @@
 	"width":	720,
 	"height":	720,
 	"language":	"en",
-	"start_page":	1,
+	"start_page":	4,
 	"cacheImg":	20,
 	"app_ver":	"1.0.0",
-	"comp_time":	"260625120502",
+	"comp_time":	"260627152959",
 	"init_allview":	0,
 	"rotate":	0,
 	"show_en":	0,
@@ -47,5 +47,11 @@
 		}, {
 			"pageId":	2,
 			"pageName":	"view2.g"
+		}, {
+			"pageId":	3,
+			"pageName":	"view3.g"
+		}, {
+			"pageId":	4,
+			"pageName":	"view4.g"
 		}]
 }

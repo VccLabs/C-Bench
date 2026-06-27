@@ -6,5 +6,7 @@
 #include "grf_main.h"
 #include "ui/view1/view1.h"
 #include "ui/view2/view2.h"
+#include "ui/view3/view3.h"
+#include "ui/view4/view4.h"
 
 #endif

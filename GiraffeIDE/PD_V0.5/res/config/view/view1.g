@@ -180,7 +180,7 @@
         },
         "size" : {
           "width" : 145,
-          "height" : 32
+          "height" : 35
         },
         "t_mode" : 1,
         "scrollbar_t" : { },
@@ -193,6 +193,11 @@
       "txt" : "Change",
       "styles" : [ {
         "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : 8
+          }
+        },
         "txt_t" : {
           "color" : 16752394,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",

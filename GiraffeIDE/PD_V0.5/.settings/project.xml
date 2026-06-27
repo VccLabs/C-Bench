@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <page pageId="1" pageName="view1"/>
-<page pageId="2" pageName="view2"/></project>
+<page pageId="2" pageName="view2"/><page pageId="3" pageName="view3"/><page pageId="4" pageName="view4"/></project>
