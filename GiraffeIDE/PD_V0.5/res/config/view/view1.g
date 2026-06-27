@@ -76,7 +76,7 @@
         "id" : 8,
         "ctrl_type" : 3,
         "pt" : {
-          "y" : 624
+          "y" : 475
         },
         "size" : {
           "width" : 720,
@@ -202,6 +202,125 @@
           "color" : 16752394,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 15
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image0",
+        "id" : 10,
+        "ctrl_type" : 19,
+        "pt" : {
+          "y" : 641
+        },
+        "size" : {
+          "width" : 720,
+          "height" : 79
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "init_img" : "nav_monitor.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label8",
+        "id" : 12,
+        "pt" : {
+          "x" : 180,
+          "y" : 641
+        },
+        "size" : {
+          "width" : 180,
+          "height" : 79
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW1_LABEL8_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label9",
+        "id" : 13,
+        "pt" : {
+          "x" : 360,
+          "y" : 641
+        },
+        "size" : {
+          "width" : 180,
+          "height" : 79
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW1_LABEL9_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label10",
+        "id" : 14,
+        "pt" : {
+          "x" : 540,
+          "y" : 641
+        },
+        "size" : {
+          "width" : 180,
+          "height" : 79
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW1_LABEL10_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "opa" : 2147483647
         },
         "img_t" : { }
       } ]

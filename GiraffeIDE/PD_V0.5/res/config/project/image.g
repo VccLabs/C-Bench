@@ -19,7 +19,23 @@
   "imagePath" : "view2.png",
   "child" : [ ]
 }, {
-  "imageId" : 7,
-  "imagePath" : "view4..png",
+  "imageId" : 6,
+  "imagePath" : "nav_battery.png",
+  "child" : [ ]
+}, {
+  "imageId" : 8,
+  "imagePath" : "nav_monitor.png",
+  "child" : [ ]
+}, {
+  "imageId" : 9,
+  "imagePath" : "nav_profiles.png",
+  "child" : [ ]
+}, {
+  "imageId" : 10,
+  "imagePath" : "nav_settings.png",
+  "child" : [ ]
+}, {
+  "imageId" : 11,
+  "imagePath" : "view4.png",
   "child" : [ ]
 } ]
