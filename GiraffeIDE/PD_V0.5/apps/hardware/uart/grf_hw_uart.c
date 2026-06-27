@@ -300,10 +300,13 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
                     snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
                     grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
                     break;
-                case 0x0016:  /* real output state from RP -> drive toggle */
-                    g_out_on = data[0];
-                    view1_set_output_btn(g_out_on);
-                    break;
+        case 0x0016:  /* real output state from RP -> drive toggle */
+                            g_out_on = data[0];
+                            view1_set_output_btn(g_out_on);
+                            break;
+                        case 0x0017:  /* active rail position from RP -> highlight on list render */
+                            g_applied = (data[0] >= MAX_PROF) ? 0xFF : (u8)data[0];
+                            break;
                 case 0x0031:  /* boot output state from RP -> shadow + live repaint if on view4 */
                                     g_v4_boot = data[0];
                                     if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)

@@ -18,18 +18,21 @@ volatile bool outputOn = false;          // reg 0x0022 - default OFF for safety
 volatile int pendingSel = -1;            // reg 0x0023 list position, applied in loop()
 
 // ---- persisted settings (flash via EEPROM emulation) ----
-#define SET_MAGIC 0xCB01
+#define SET_MAGIC 0xCB02
 struct Settings
 {
   uint16_t magic;
   uint8_t bootLastUsed; // reg 0x0031: 0=Off at boot, 1=restore Last used
   uint8_t autoArm;      // reg 0x0032: 0/1 auto turn output on after apply
-  uint8_t lastOutputOn; // remembered for "Last used" boot restore (step 2)
-  int16_t lastSel;      // remembered profile position for "Last used" (step 2)
+  uint8_t lastOutputOn; // remembered for "Last used" boot restore
+  int16_t lastSel;      // remembered profile position for "Last used"
+  uint16_t lastMV;      // reqMV at last apply (PPS/AVS voltage restore)
+  uint16_t lastMA;      // limMA at last apply
 };
 Settings g_set;
 static bool g_bootRestore = false; // pending "Last used" rail restore at boot
-static int  g_bootRestoreOut = -1; // output state to force after that restore
+static int g_bootRestoreOut = -1;  // output state to force after that restore
+static int g_activeSel = -1;       // active list position (-1 none) -> reg 0x0017 highlight
 
 #define HMI Serial2 // UART1: IO8=TX, IO9=RX -> TR660
 
@@ -207,6 +210,8 @@ static void loadSettings()
     g_set.autoArm = 1;      // keep today's behavior: apply auto-arms
     g_set.lastOutputOn = 0;
     g_set.lastSel = -1;
+    g_set.lastMV = PPS_TARGET_MV;
+    g_set.lastMA = PPS_LIMIT_MA;
     saveSettings();
   }
   Serial.printf("Settings loaded: magic=%04X boot=%u autoArm=%u\n",
@@ -232,7 +237,8 @@ static void applyControl(uint16_t addr, uint16_t val)
       pendingSel = (int)val; // selected position, applied in loop()
     break;
   case 0x0024:
-    lastSig = 0xFFFFFFFF; // panel opened view2 -> force a fresh list push now
+    lastSig = 0xFFFFFFFF;                                                  // panel opened view2 -> force a fresh list push now
+    writeReg(0x0017, (g_activeSel >= 0) ? (uint16_t)g_activeSel : 0xFFFF); // active rail -> highlight
     sendProfileList();
     break;
   case 0x0031:
@@ -321,9 +327,9 @@ void setup()
   while (!Serial && millis() < 4000)
   {
   } // wait for USB-CDC
-Serial.println("hi");
+  Serial.println("hi");
   loadSettings(); // restore persisted settings from flash
-Serial.println("hi2");
+  Serial.println("hi2");
   Wire.setSDA(20); // IO20
   Wire.setSCL(21); // IO21
   Wire.begin();
@@ -382,9 +388,12 @@ void loop()
       }
       activePdoIdx = s.pdoIndex;
       activeType = s.type;
-      if (g_set.lastSel != sel) // remember rail for "Last used" boot restore
+      g_activeSel = sel; // active position for the profile-list highlight (reg 0x0017)
+      if (g_set.lastSel != sel || g_set.lastMV != reqMV || g_set.lastMA != limMA)
       {
-        g_set.lastSel = sel;
+        g_set.lastSel = sel; // remember rail + adjust for "Last used"
+        g_set.lastMV = reqMV;
+        g_set.lastMA = limMA;
         saveSettings();
       }
       if (g_set.autoArm) // auto-arm setting (reg 0x0032)
@@ -423,6 +432,8 @@ void loop()
   if (g_bootRestore && !g_outAttach)
   {
     g_bootRestore = false;
+    reqMV = g_set.lastMV;                  // restore PPS/AVS voltage...
+    limMA = g_set.lastMA;                  // ...and current limit
     pendingSel = g_set.lastSel;            // applied next loop pass
     g_bootRestoreOut = g_set.lastOutputOn; // then forces saved output state
   }
@@ -430,7 +441,7 @@ void loop()
   {
     lastOut = outputOn;
     usbpd.setOutput(outputOn ? 1 : 0);
-    writeReg(0x0016, outputOn ? 1 : 0); /* tell the panel immediately */
+    writeReg(0x0016, outputOn ? 1 : 0);          /* tell the panel immediately */
     if (g_set.lastOutputOn != (uint8_t)outputOn) // remember for "Last used"
     {
       g_set.lastOutputOn = outputOn;
@@ -441,7 +452,7 @@ void loop()
   // Re-push settings to the panel for the first few seconds (panel boots slower than RP)
   static uint32_t tSet = 0;
   static uint8_t setPushes = 0;
-if (setPushes < 12 && now - tSet >= 1000)
+  if (setPushes < 12 && now - tSet >= 1000)
   {
     tSet = now;
     writeReg(0x0031, g_set.bootLastUsed);
