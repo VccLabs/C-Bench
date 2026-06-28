@@ -38,4 +38,12 @@
   "imageId" : 11,
   "imagePath" : "view4.png",
   "child" : [ ]
+}, {
+  "imageId" : 7,
+  "imagePath" : "Brightness symbol_full.png",
+  "child" : [ ]
+}, {
+  "imageId" : 12,
+  "imagePath" : "Brightness symbol_small.png",
+  "child" : [ ]
 } ]
