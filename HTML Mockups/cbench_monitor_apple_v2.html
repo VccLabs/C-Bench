@@ -1,0 +1,236 @@
+<!--
+  C-Bench — Monitor (view1) — APPLE-STYLE v2  (+ session energy widget)
+  720x720. iOS system colors + SF-style type.
+  Build map (Giraffe):
+    ring + V/I/P numbers = native labels (regs 0x0010-0x0012)
+    active rail name     = label (from selected PDO)
+    output toggle        = imgbtn (reg 0x0022)
+    SESSION widget       = labels fed live by RP:
+        0x0013 session energy (mWh)   0x0014 session charge (mAh)   0x0015 session elapsed (s)
+    session reset        = panel->RP reg 0x0025 (1)
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C-Bench — Monitor v2 (Apple style)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --orange:#FF9F0A; --cyan:#64D2FF; --purple:#BF5AF2; --green:#30D158; --red:#FF453A; }
+  [data-theme="dark"]{
+    --bg:#000; --screenbg:#000; --card:#1C1C1E; --card2:#2C2C2E;
+    --txt:#FFF; --txt2:rgba(235,235,245,.60); --txt3:rgba(235,235,245,.30);
+    --track:#2C2C2E; --tabbar:rgba(20,20,22,.9); --sep:rgba(255,255,255,.07);
+    --bezel-a:#26262A; --bezel-b:#0A0A0C; --ringoff:#3A3A3C;
+  }
+  [data-theme="light"]{
+    --bg:#F2F2F7; --screenbg:#F2F2F7; --card:#FFF; --card2:#FFF;
+    --txt:#000; --txt2:rgba(60,60,67,.60); --txt3:rgba(60,60,67,.30);
+    --track:#E5E5EA; --tabbar:rgba(249,249,251,.92); --sep:rgba(60,60,67,.12);
+    --bezel-a:#D7DEE6; --bezel-b:#B7C2CE; --ringoff:#D1D1D6;
+    --orange:#FF9500; --cyan:#32ADE6; --purple:#AF52DE; --green:#34C759; --red:#FF3B30;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ background:#050507; font-family:'Inter',-apple-system,system-ui,sans-serif;
+        display:flex; flex-direction:column; align-items:center; gap:14px; padding:24px 12px 40px; overflow-x:hidden; }
+  .cap{ color:#5a6571; font-size:12px; letter-spacing:.04em; text-align:center; }
+  .cap b{ color:#9aa6b2; }
+  .stage{ width:100%; display:flex; justify-content:center; }
+  .fit{ width:720px; height:720px; transform-origin:top center; }
+
+  .device{ width:720px; height:720px; background:linear-gradient(160deg,var(--bezel-a),var(--bezel-b));
+           border-radius:40px; padding:18px; box-shadow:0 40px 90px -24px #000, inset 0 1px 0 rgba(255,255,255,.18); transition:background .35s; }
+  .screen{ width:100%; height:100%; background:var(--screenbg); border-radius:22px; overflow:hidden;
+           position:relative; display:flex; flex-direction:column; transition:background .35s; }
+
+  .top{ display:flex; align-items:center; justify-content:space-between; padding:18px 28px 2px; }
+  .top .brand{ font-weight:700; font-size:17px; letter-spacing:-.01em; color:var(--txt); }
+  .top .brand span{ color:var(--txt2); font-weight:500; }
+  .top .right{ display:flex; align-items:center; gap:10px; }
+  .src{ font-size:13px; color:var(--txt2); font-weight:500; }
+  .tbtn{ width:38px; height:38px; border-radius:50%; border:none; background:var(--card);
+         color:var(--txt); font-size:17px; cursor:pointer; display:grid; place-items:center; }
+  .tbtn:active{ transform:scale(.92); }
+
+  /* hero ring (rail folded in as subtitle) */
+  .hero{ display:flex; flex-direction:column; align-items:center; padding:4px 0 2px; }
+  .ringwrap{ position:relative; width:250px; height:250px; }
+  .ringwrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .ring-bg{ stroke:var(--track); }
+  .ring-fg{ stroke:var(--ringoff); transition:stroke .4s, stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1); stroke-linecap:round; }
+  .screen.live .ring-fg{ stroke:var(--orange); filter:drop-shadow(0 0 12px color-mix(in srgb,var(--orange) 55%,transparent)); }
+  .center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .vnum{ font-weight:700; font-size:72px; letter-spacing:-.04em; line-height:.9; color:var(--ringoff); transition:color .35s; }
+  .screen.live .vnum{ color:var(--txt); }
+  .vunit{ font-weight:600; font-size:18px; color:var(--txt2); margin-top:6px; letter-spacing:.02em; }
+  .vstate{ font-weight:600; font-size:12px; letter-spacing:.06em; text-transform:uppercase; margin-top:3px; color:var(--txt3); }
+  .screen.live .vstate{ color:var(--green); }
+  .rail{ margin-top:8px; font-size:14px; color:var(--txt2); font-weight:500; }
+  .rail b{ color:var(--orange); font-weight:600; }
+
+  /* metric cards */
+  .cards{ display:flex; gap:14px; padding:6px 22px 0; }
+  .card{ flex:1; background:var(--card); border-radius:20px; padding:14px 18px; }
+  .card .k{ font-size:12.5px; font-weight:600; letter-spacing:.02em; color:var(--txt2); display:flex; align-items:center; gap:7px; }
+  .card .k .ic{ width:9px; height:9px; border-radius:50%; }
+  .card.cur .ic{ background:var(--cyan); } .card.pow .ic{ background:var(--purple); }
+  .card .val{ font-weight:700; font-size:34px; letter-spacing:-.03em; margin-top:6px; color:var(--ringoff); transition:color .35s; }
+  .card .val small{ font-size:16px; font-weight:600; color:var(--txt2); margin-left:3px; letter-spacing:0; }
+  .screen.live .card.cur .val{ color:var(--cyan); }
+  .screen.live .card.pow .val{ color:var(--purple); }
+
+  /* SESSION energy widget */
+  .session{ margin:12px 22px 0; background:var(--card); border-radius:20px; padding:14px 18px 16px; }
+  .session .hd{ display:flex; align-items:center; justify-content:space-between; }
+  .session .hd .t{ font-size:12.5px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; color:var(--txt2);
+                   display:flex; align-items:center; gap:7px; }
+  .session .hd .t .dot{ width:8px; height:8px; border-radius:50%; background:var(--orange); }
+  .reset{ display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:var(--txt2);
+          background:var(--card2); border:none; border-radius:20px; padding:6px 12px; cursor:pointer; font-family:inherit; }
+  .reset:active{ transform:scale(.94); }
+  .srow{ display:flex; align-items:flex-end; gap:8px; margin-top:10px; }
+  .energy{ font-weight:700; font-size:40px; letter-spacing:-.03em; color:var(--orange); line-height:1; }
+  .energy small{ font-size:18px; font-weight:600; color:var(--txt2); margin-left:3px; }
+  .ssub{ margin-left:auto; display:flex; gap:22px; text-align:right; }
+  .ssub .s .sk{ font-size:11.5px; font-weight:500; color:var(--txt3); letter-spacing:.02em; }
+  .ssub .s .sv{ font-size:19px; font-weight:700; color:var(--txt); letter-spacing:-.02em; margin-top:2px;
+                font-variant-numeric:tabular-nums; }
+
+  /* output capsule */
+  .out{ margin-top:auto; padding:14px 22px 12px; }
+  .outbtn{ width:100%; height:60px; border:none; border-radius:30px; cursor:pointer;
+           font-family:inherit; font-weight:600; font-size:19px; letter-spacing:-.01em;
+           color:var(--txt2); background:var(--card); transition:.2s; display:flex; align-items:center; justify-content:center; gap:10px; }
+  .outbtn .pip{ width:11px; height:11px; border-radius:50%; background:var(--txt3); transition:.2s; }
+  .outbtn.able{ color:#fff; background:var(--green); } .outbtn.able .pip{ background:#fff; }
+  .outbtn.on{ color:#fff; background:var(--red); }
+  .outbtn.on .pip{ background:#fff; box-shadow:0 0 9px #fff; }
+  .outbtn:active{ transform:scale(.985); }
+
+  .tabs{ display:flex; padding:8px 0 14px; background:var(--tabbar); backdrop-filter:blur(20px); border-top:1px solid var(--sep); }
+  .tab{ flex:1; border:none; background:transparent; cursor:pointer; padding:6px 0;
+        display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--txt3); }
+  .tab .tl{ font-size:11px; font-weight:500; letter-spacing:.01em; }
+  .tab.on{ color:var(--orange); }
+  svg.ic{ display:block; }
+</style>
+
+<div class="cap"><b>Monitor / view1 · v2</b> · session energy widget · tap output to arm · ↺ resets the trip</div>
+
+<div class="stage"><div class="fit" id="fit">
+<div class="device"><div class="screen live" id="screen" data-theme="dark">
+
+  <div class="top">
+    <div class="brand">C-Bench <span>· Monitor</span></div>
+    <div class="right">
+      <span class="src">140 W source</span>
+      <button class="tbtn" id="theme">☾</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="ringwrap">
+      <svg viewBox="0 0 120 120">
+        <circle class="ring-bg" cx="60" cy="60" r="52" fill="none" stroke-width="11"/>
+        <circle class="ring-fg" id="ring" cx="60" cy="60" r="52" fill="none" stroke-width="11"
+                stroke-dasharray="326.7" stroke-dashoffset="120"/>
+      </svg>
+      <div class="center">
+        <div class="vnum" id="vnum">9.06</div>
+        <div class="vunit">VOLTS</div>
+        <div class="vstate" id="vstate">Output on</div>
+      </div>
+    </div>
+    <div class="rail" id="rail">PPS · <b>3.3–11 V</b> adjustable</div>
+  </div>
+
+  <div class="cards">
+    <div class="card cur">
+      <div class="k"><span class="ic"></span>Current</div>
+      <div class="val" id="cval">0.74<small>A</small></div>
+    </div>
+    <div class="card pow">
+      <div class="k"><span class="ic"></span>Power</div>
+      <div class="val" id="pval">6.7<small>W</small></div>
+    </div>
+  </div>
+
+  <div class="session">
+    <div class="hd">
+      <div class="t"><span class="dot"></span>This session</div>
+      <button class="reset" id="reset">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v4h4"/></svg>
+        Reset
+      </button>
+    </div>
+    <div class="srow">
+      <div class="energy" id="eval">6.74<small>Wh</small></div>
+      <div class="ssub">
+        <div class="s"><div class="sk">Charge</div><div class="sv" id="qval">1.82 Ah</div></div>
+        <div class="s"><div class="sk">Elapsed</div><div class="sv" id="tval">08:14</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="out">
+    <button class="outbtn on" id="outbtn"><span class="pip"></span><span id="outtxt">Turn output off</span></button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 1.5"/></svg><span class="tl">Monitor</span></button>
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="8" x2="19" y2="8"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="5" y1="16" x2="13" y2="16"/></svg><span class="tl">Profiles</span></button>
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="15" height="9" rx="2.5"/><line x1="21" y1="11" x2="21" y2="14"/></svg><span class="tl">Battery</span></button>
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.5 5.5l2 2M16.5 16.5l2 2M18.5 5.5l-2 2M7.5 16.5l-2 2"/></svg><span class="tl">Settings</span></button>
+  </div>
+
+</div></div>
+</div></div>
+
+<div class="cap">Session = resettable trip meter (Wh / Ah / time) · lifetime odometer lives in Settings</div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  const VMAX=28, C=2*Math.PI*52;
+  let on=true, e_mWh=6740, q_mAh=1820, t_s=494;   /* session accumulators */
+
+  function setRing(v){ $('ring').style.strokeDashoffset = C*(1 - Math.min(v/VMAX,1)); }
+  function fmtT(s){ const m=Math.floor(s/60), ss=s%60; const h=Math.floor(m/60);
+    return h? `${h}:${String(m%60).padStart(2,'0')}:${String(ss).padStart(2,'0')}`
+            : `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`; }
+  function paintSession(){
+    $('eval').innerHTML = (e_mWh/1000).toFixed(2)+'<small>Wh</small>';
+    $('qval').textContent = (q_mAh/1000).toFixed(2)+' Ah';
+    $('tval').textContent = fmtT(t_s);
+  }
+  function render(){
+    const sc=$('screen'), b=$('outbtn');
+    if(on){
+      sc.classList.add('live');
+      $('vnum').textContent='9.06'; setRing(9.06);
+      $('cval').innerHTML='0.74<small>A</small>'; $('pval').innerHTML='6.7<small>W</small>';
+      $('vstate').textContent='Output on'; $('vstate').style.color='var(--green)';
+      b.className='outbtn on'; $('outtxt').textContent='Turn output off';
+    } else {
+      sc.classList.remove('live');
+      $('vnum').textContent='9.06'; setRing(0);
+      $('cval').innerHTML='–<small>A</small>'; $('pval').innerHTML='–<small>W</small>';
+      $('vstate').textContent='Ready'; $('vstate').style.color='';
+      b.className='outbtn able'; $('outtxt').textContent='Turn output on';
+    }
+    paintSession();
+  }
+  $('outbtn').onclick=()=>{ on=!on; render(); };
+  $('reset').onclick=()=>{ e_mWh=0; q_mAh=0; t_s=0; paintSession(); };
+  $('theme').onclick=()=>{ const s=$('screen'); const d=s.dataset.theme==='dark';
+    s.dataset.theme=d?'light':'dark'; $('theme').textContent=d?'☀':'☾'; };
+
+  /* live integration demo: ~6.7W @ 9.06V -> 0.74A */
+  setInterval(()=>{ if(!on) return;
+    t_s+=1; e_mWh += 6.7*1000/3600; q_mAh += 740/3600; paintSession();
+  }, 1000);
+
+  function fit(){ const avail=Math.min(window.innerWidth-24,760), s=Math.min(1,avail/720);
+    const f=$('fit'); f.style.transform=`scale(${s})`; f.parentElement.style.height=(720*s)+'px'; }
+  addEventListener('resize',fit); fit(); render();
+</script>
