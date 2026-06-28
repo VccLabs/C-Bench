@@ -7,14 +7,6 @@
   "imagePath" : "view1.png",
   "child" : [ ]
 }, {
-  "imageId" : 3,
-  "imagePath" : "turn_off.png",
-  "child" : [ ]
-}, {
-  "imageId" : 4,
-  "imagePath" : "turn_on.png",
-  "child" : [ ]
-}, {
   "imageId" : 5,
   "imagePath" : "view2.png",
   "child" : [ ]
@@ -45,5 +37,9 @@
 }, {
   "imageId" : 12,
   "imagePath" : "Brightness symbol_small.png",
+  "child" : [ ]
+}, {
+  "imageId" : 3,
+  "imagePath" : "arrow.png",
   "child" : [ ]
 } ]

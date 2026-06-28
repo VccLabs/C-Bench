@@ -9,7 +9,7 @@ static grf_drv_t *drv_uart = NULL;
 
 #define LBL_CURR   3
 #define LBL_POWER  5
-#define BTN_OUT    8   /* view1 output toggle imgbtn (VIEW1_IMAGE_BUTTON0_ID) */
+#define LBL_OUT    11  /* view1 output toggle label (VIEW1_LABEL7_ID) */
 
 #define MAX_PROF 13
 typedef struct { u16 type, vmin, vmax, imax; } prof_t;
@@ -176,15 +176,13 @@ void view2_use_apply(void)
                                    250, 0, GRF_ANIM_PATH_END_SLOW);
     }
 
-static void view1_set_output_btn(u8 on)   /* drive toggle from real output state */
+static void view1_set_output_btn(u8 on)   /* drive output label from real state */
     {
-        if (on) {
-            grf_ctrl_add_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED);
-            grf_imgbtn_set_mode(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_IMGBTN_STATE_CHECKED_RELEASED); /* red */
-        } else {
-            grf_ctrl_clear_state(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_STATE_CHECKED);
-            grf_imgbtn_set_mode(GCL(GRF_VIEW1_ID, BTN_OUT), GRF_IMGBTN_STATE_REL);              /* green */
-        }
+        grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_OUT), on ? "Turn output off" : "Turn output on");
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_OUT),
+            on ? GRF_COLOR_GET(0xFF,0x45,0x3A)     /* red  #ff453a */
+               : GRF_COLOR_GET(0x30,0xD1,0x58), 0);/* green #30D158 */
+        grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_OUT), GRF_COLOR_GET(0xFF,0xFF,0xFF));
     }
 
     void view1_sync_armed(void)               /* called from view1_entry */
@@ -192,6 +190,13 @@ static void view1_set_output_btn(u8 on)   /* drive toggle from real output state
         g_arm_pending = 0;                     /* no longer drives the visual */
         view1_set_output_btn(g_out_on);        /* reflect the real state instead */
     }
+
+    void view1_toggle_output(void)            /* label7 click: request opposite of real state */
+        {
+            u16 want = g_out_on ? 0 : 1;
+            grf_reg_set(0x0022, want);
+            grf_reg_com_send(0x0022, 1);          /* RP flips output, pushes 0x0016 back to repaint */
+        }
 
 void view2_reset_panel(void)
 {

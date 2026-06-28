@@ -72,13 +72,8 @@ static void label2_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void image_button0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-    if (event == GRF_EVENT_VALUE_CHANGED) {
-        u16 on = (grf_ctrl_get_state(ctrl) & GRF_STATE_CHECKED) ? 1 : 0;
-        grf_reg_set(0x0022, on);
-        grf_reg_com_send(0x0022, 1);
-    }
+	(void)ctrl; (void)event;   /* output toggle moved to label7 (ID11) */
 }
-
 
 static void arc0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
@@ -152,13 +147,9 @@ static void image0_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label7_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label7_event(grf_ctrl_t *ctrl, grf_event_e event)   /* output toggle (ID11) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_toggle_output();
 }
 
 
@@ -180,6 +171,116 @@ static void label8_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> view2 
 {
 	if (event == GRF_EVENT_CLICKED)
 	    grf_view_set_dis_view_anim(GRF_VIEW2_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
+}
+
+
+static void label11_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label13_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label12_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label14_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label15_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label16_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label17_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void image1_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label18_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label19_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label20_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
 }
 
 #include "../../../libs/appscc/view1_cc.h"
