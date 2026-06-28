@@ -18,6 +18,7 @@ void view2_use_apply(void);            /* Use button: send 0x0020/21/23, go Moni
 void view2_reset_panel(void);
 void view4_set_boot_state(u8 last_used); /* view4: 0=Off,1=Last used -> reg 0x0031 */
 void view4_set_autoarm(u8 on);           /* view4: 0/1 -> reg 0x0032 */
+void view4_set_bright(u8 pct);           /* view4: brightness 10..100 % -> reg 0x0030 */
 void view4_request_settings(void);       /* view4 entry: ask RP to push 0x0031/0x0032 */
 void view4_apply_settings(void);         /* view4 entry: paint controls from shadow */
 void view1_sync_armed(void);

@@ -18,7 +18,7 @@ volatile bool outputOn = false;          // reg 0x0022 - default OFF for safety
 volatile int pendingSel = -1;            // reg 0x0023 list position, applied in loop()
 
 // ---- persisted settings (flash via EEPROM emulation) ----
-#define SET_MAGIC 0xCB02
+#define SET_MAGIC 0xCB03
 struct Settings
 {
   uint16_t magic;
@@ -28,11 +28,14 @@ struct Settings
   int16_t lastSel;      // remembered profile position for "Last used"
   uint16_t lastMV;      // reqMV at last apply (PPS/AVS voltage restore)
   uint16_t lastMA;      // limMA at last apply
+  uint8_t bright;       // reg 0x0030: panel brightness % (10..100)
 };
 Settings g_set;
 static bool g_bootRestore = false; // pending "Last used" rail restore at boot
 static int g_bootRestoreOut = -1;  // output state to force after that restore
 static int g_activeSel = -1;       // active list position (-1 none) -> reg 0x0017 highlight
+static bool g_brightDirty = false;
+static uint32_t g_brightT = 0;
 
 #define HMI Serial2 // UART1: IO8=TX, IO9=RX -> TR660
 
@@ -212,6 +215,7 @@ static void loadSettings()
     g_set.lastSel = -1;
     g_set.lastMV = PPS_TARGET_MV;
     g_set.lastMA = PPS_LIMIT_MA;
+    g_set.bright = 100;
     saveSettings();
   }
   Serial.printf("Settings loaded: magic=%04X boot=%u autoArm=%u\n",
@@ -253,6 +257,17 @@ static void applyControl(uint16_t addr, uint16_t val)
     writeReg(0x0031, g_set.bootLastUsed);
     writeReg(0x0032, g_set.autoArm);
     break;
+  case 0x0030:
+  { // brightness % (10..100) from panel; persist debounced
+    uint16_t b = (val < 10) ? 10 : (val > 100 ? 100 : val);
+    if (b != g_set.bright)
+    {
+      g_set.bright = (uint8_t)b;
+      g_brightDirty = true;
+      g_brightT = millis();
+    }
+    break;
+  }
   }
 }
 
@@ -455,9 +470,15 @@ void loop()
   if (setPushes < 12 && now - tSet >= 1000)
   {
     tSet = now;
+    writeReg(0x0030, g_set.bright);
     writeReg(0x0031, g_set.bootLastUsed);
     writeReg(0x0032, g_set.autoArm);
     setPushes++;
+  }
+  if (g_brightDirty && now - g_brightT >= 800)
+  {
+    g_brightDirty = false;
+    saveSettings();
   }
 
   static uint32_t tProf = 0;

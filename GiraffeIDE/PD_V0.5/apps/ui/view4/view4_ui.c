@@ -170,13 +170,9 @@ static void label11_event(grf_ctrl_t *ctrl, grf_event_e event)  /* nav -> view1 
 }
 
 
-static void slider0_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void slider0_event(grf_ctrl_t *ctrl, grf_event_e event)  /* brightness (ID19) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_VALUE_CHANGED) view4_set_bright((u8)grf_slider_get_value(ctrl));
 }
 
 

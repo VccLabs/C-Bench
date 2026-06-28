@@ -211,6 +211,17 @@ void view2_reset_panel(void)
 static u8 g_v4_boot    = 0;   /* shadow of reg 0x0031 (0=Off, 1=Last used) */
 static u8 g_v4_autoarm = 0;   /* shadow of reg 0x0032 (0/1)                */
 
+#define V4_BRIGHT_SLD 19      /* slider0 - brightness 10..100 % */
+#define V4_BRIGHT_LBL 23      /* label16 - brightness %         */
+static u8 g_v4_bright  = 100; /* shadow of reg 0x0030 brightness % (10..100) */
+static u8 g_bright_guard = 0; /* suppress slider VALUE_CHANGED echo on programmatic set */
+
+static void bright_label(u8 pct){ char b[8]; snprintf(b,sizeof(b),"%u%%",pct);
+    grf_label_set_txt(GCL(GRF_VIEW4_ID, V4_BRIGHT_LBL), b); }
+static void bright_backlight(u8 pct){ grf_disp_set_bright((u8)((u16)pct*99/100)); } /* 10..100% -> 0..99 */
+static void bright_slider(u8 pct){ g_bright_guard=1;
+    grf_slider_set_value(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), pct); g_bright_guard=0; }
+
 static void boot_state_paint(u8 last_used)            /* 0 = Off white, 1 = Last used white */
 {
     grf_color_t on  = GRF_COLOR_GET(0xFF,0xFF,0xFF);  /* selected   = white */
@@ -231,6 +242,9 @@ void view4_apply_settings(void)                       /* entry: paint controls f
 {
     boot_state_paint(g_v4_boot);
     grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
+    grf_slider_set_range(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), 10, 100);
+    bright_slider(g_v4_bright);
+    bright_label(g_v4_bright);
 }
 
 void view4_set_autoarm(u8 on)                         /* 0/1 */
@@ -239,6 +253,17 @@ void view4_set_autoarm(u8 on)                         /* 0/1 */
             grf_reg_set(0x0032, on);
             grf_reg_com_send(0x0032, 1);
         }
+
+void view4_set_bright(u8 pct)            /* slider moved: live backlight + label + persist on RP */
+{
+    if (g_bright_guard) return;          /* programmatic set -> don't echo back */
+    if (pct < 10) pct = 10; else if (pct > 100) pct = 100;
+    g_v4_bright = pct;
+    bright_backlight(pct);               /* instant local dimming */
+    bright_label(pct);
+    grf_reg_set(0x0030, pct);
+    grf_reg_com_send(0x0030, 1);
+}
 
 void view4_request_settings(void)   /* ask RP to push stored 0x0031/0x0032 back */
 {
@@ -312,6 +337,14 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
                                     if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
                                         boot_state_paint(g_v4_boot);
                                     break;
+                case 0x0030:  /* brightness % from RP -> backlight now; repaint if on view4 */
+                                                    g_v4_bright = (data[0] < 10) ? 10 : (data[0] > 100 ? 100 : data[0]);
+                                                    bright_backlight(g_v4_bright);   /* global: applies even when off view4 */
+                                                    if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID) {
+                                                        bright_slider(g_v4_bright);
+                                                        bright_label(g_v4_bright);
+                                                    }
+                                                    break;
                                 case 0x0032:  /* auto-arm from RP -> shadow + live repaint if on view4 */
                                     g_v4_autoarm = data[0];
                                     if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
