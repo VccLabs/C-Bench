@@ -242,6 +242,14 @@ static void bright_backlight(u8 pct){ grf_disp_set_bright((u8)((u16)pct*99/100))
 static void bright_slider(u8 pct){ g_bright_guard=1;
     grf_slider_set_value(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), pct); g_bright_guard=0; }
 
+static u32 g_sess_mWh = 0;                 /* reassembled 32-bit session energy (mWh) */
+static void wh_paint(void)                 /* show as "X.XXX" (mWh resolution) */
+{
+    char b[16];
+    snprintf(b,sizeof(b),"%u.%03u",(unsigned)(g_sess_mWh/1000),(unsigned)(g_sess_mWh%1000));
+    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_WH), b);
+}
+
 static void boot_state_paint(u8 last_used)            /* 0 = Off white, 1 = Last used white */
 {
     grf_color_t on  = GRF_COLOR_GET(0xFF,0xFF,0xFF);  /* selected   = white */
@@ -345,9 +353,13 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
                     snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
                     grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
                     break;
-        case 0x0013:  /* session energy cWh -> "X.XX" Wh label */
-                    snprintf(buf,sizeof(buf),"%u.%02u", data[0]/100, data[0]%100);
-                    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_WH), buf);
+        case 0x0013:  /* session energy mWh, low 16 */
+                    g_sess_mWh = (g_sess_mWh & 0xFFFF0000UL) | (u32)data[0];
+                    wh_paint();
+                    break;
+                case 0x0014:  /* session energy mWh, high 16 */
+                    g_sess_mWh = (g_sess_mWh & 0x0000FFFFUL) | ((u32)data[0] << 16);
+                    wh_paint();
                     break;
         case 0x0016:  /* real output state from RP -> drive toggle */
                             g_out_on = data[0];

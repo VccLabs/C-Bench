@@ -830,6 +830,7 @@
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,
+        "click_area" : 20,
         "controlIDEnum" : "VIEW1_LABEL21_ID"
       },
       "auto_hight" : 1,
