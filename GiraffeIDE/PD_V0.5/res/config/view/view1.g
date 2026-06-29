@@ -534,8 +534,9 @@
       "styles" : [ {
         "name" : "style",
         "body_t" : {
-          "main_color" : 32896,
-          "radius" : 16
+          "main_color" : 1842206,
+          "radius" : 16,
+          "opa" : 255
         },
         "txt_t" : {
           "opa" : 2147483647
@@ -785,6 +786,71 @@
           "color" : 3199320,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 15
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label22",
+        "id" : 26,
+        "pt" : {
+          "x" : 615,
+          "y" : 499
+        },
+        "size" : {
+          "width" : 71,
+          "height" : 40
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "14:15",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 22
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label23",
+        "id" : 27,
+        "pt" : {
+          "x" : 625,
+          "y" : 482
+        },
+        "size" : {
+          "width" : 86,
+          "height" : 28
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW1_LABEL23_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Elapsed",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 14
         },
         "img_t" : { }
       } ]
