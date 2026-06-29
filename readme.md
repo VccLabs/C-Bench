@@ -205,13 +205,29 @@ and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
 
 **RP → HMI — telemetry / state** (pushed at 2 Hz; output state also on change):
 
-| Reg      | Value                                               | Units |
-| -------- | --------------------------------------------------- | ----- |
-| `0x0010` | Output voltage                                      | mV    |
-| `0x0011` | Output current                                      | mA    |
-| `0x0012` | Output power                                        | 0.1 W |
-| `0x0016` | Real output state (drives the view1 toggle)         | 0/1   |
-| `0x0017` | Active list position for highlight; `0xFFFF` = none | index |
+| Reg      | Value                                               | Units    |
+| -------- | --------------------------------------------------- | -------- |
+| `0x0010` | Output voltage                                      | mV       |
+| `0x0011` | Output current                                      | mA       |
+| `0x0012` | Output power                                        | 0.1 W    |
+| `0x0013` | Session energy — **low 16 bits** of a 32-bit value  | mWh      |
+| `0x0014` | Session energy — **high 16 bits**                   | mWh      |
+| `0x0015` | Session charge (pushed; no panel label yet)         | mAh      |
+| `0x0016` | Real output state (drives the view1 toggle)         | 0/1      |
+| `0x0017` | Active list position for highlight; `0xFFFF` = none | index    |
+| `0x0018` | Session elapsed time                                | s        |
+| `0x0019` | Active profile type: 0 none, 1 Fixed, 2 PPS, 3 AVS, 4 EPR | enum |
+| `0x001A` | Active profile setpoint voltage                     | mV       |
+| `0x003A` | Lifetime energy odometer — **high 16 bits** of cWh  | 0.01 Wh  |
+| `0x003B` | Lifetime energy odometer — **low 16 bits** of cWh   | 0.01 Wh  |
+
+**32-bit values over a 16-bit bus:** session energy (`0x0013/0x0014`) and the
+lifetime odometer (`0x003A/0x003B`) are 32-bit, split high/low across two
+registers. Registers arrive **one at a time**, so the panel keeps a 32-bit shadow
+(`g_sess_mWh`) and recombines on each half (`(hi<<16)|lo`), repainting on either.
+Units were chosen to fit `u16` halves where single-register: session/charge use
+mWh/mAh, the odometer uses cWh. Session energy is shown as `X.XXX` Wh (mWh
+resolution) on `label3` (id 4); elapsed as `M:SS` / `H:MM:SS` on `label22` (id 26).
 
 **RP → HMI — profile list** (resent only on change; empty pushed while no source):
 
@@ -242,9 +258,12 @@ what made 5 A rails (e.g. 20 V @ 5 A) silently stay on the previous contract.
 | `0x0022` | Output enable                                   | 0/1   | done   |
 | `0x0023` | Selected profile position                       | index | done   |
 | `0x0024` | Refresh-list request                            | 1     | done   |
+| `0x0025` | Session trip reset (zeros energy/charge/elapsed)| 1     | done   |
+| `0x0030` | Display brightness                              | 10–100% | done |
 | `0x0031` | Boot output state (0 Off / 1 Last used)         | 0/1   | done   |
 | `0x0032` | Auto-arm output after apply                     | 0/1   | done   |
 | `0x0033` | Settings-sync request (view4 entry / HMI ready) | 1     | done   |
+| `0x0039` | Theme (0 dark / 1 light)                        | 0/1   | done   |
 
 `0x0024` is sent by the panel on **every view2 entry** (`view2_reset_panel`); the
 RP forces a fresh PDO re-read and re-pushes the list, so the list is always
@@ -255,11 +274,23 @@ the adjust values, maps the list position to the real PDO, requests it, and —
 back to Monitor. The toggle colour follows the **real** output state pushed on
 `0x0016`, not the apply event.
 
-`0x0031`/`0x0032` are written when the user changes them in Settings and are
-persisted to flash. `0x0033` is sent both on **view4 entry** and on **HMI ready**
-(`view1_entry`, after the panel's ~7 s boot); the RP replies by pushing the stored
-`0x0031`/`0x0032` so the panel reflects the saved state. The RP also re-pushes
-these for the first ~12 s after boot to cover the slow HMI bring-up.
+`0x0031`/`0x0032`/`0x0030`/`0x0039` are written when the user changes them in the
+UI and are persisted to flash. `0x0033` is sent both on **view4 entry** and on
+**HMI ready** (`view1_entry`, after the panel's ~7 s boot); the RP replies by
+pushing the stored boot-state, auto-arm, **theme**, and lifetime odometer so the
+panel reflects saved state. The RP also re-pushes boot-state, auto-arm,
+**brightness**, and **theme** for the first ~12 s after boot to cover the slow HMI
+bring-up — so brightness and theme are restored even before any view is opened.
+
+**Session trip meter:** the RP integrates measured power/current over **real `dt`**
+(`micros()`) into `µWh`/`µAh` accumulators while output is on, and pushes session
+energy/charge/elapsed at 2 Hz (`0x0013/0x0014/0x0015/0x0018`). `0x0025` zeros the
+session. The **lifetime odometer** accumulates always, is persisted (debounced:
+every ~60 s while running + on output-off) and echoed on `0x0033`/boot window.
+
+**Active profile:** pushed at 2 Hz (`0x0019` type + `0x001A` setpoint mV) so the
+view1 `label18` (id 22) reads e.g. `PPS 9.00 V` / `Fixed 20.00 V`, or `—` when
+nothing is applied; survives output-off (driven by `g_activeSel`).
 
 ---
 
@@ -270,11 +301,23 @@ these for the first ~12 s after boot to cover the slow HMI bring-up.
 Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
 `grf_view_set_dis_view_anim()`. Per-view control limit raised from 64 to 80.
 
-- **view1 — Monitor (boot):** voltage ring (`arc`, reg `0x0010`), V/I/P labels,
-  output toggle (`imgbtn`, toggle → reg `0x0022`). The toggle visual is driven by
-  the **real** output state (reg `0x0016`): `view1_entry` and the `0x0016` handler
-  both call `view1_set_output_btn()`, so it reads red/green correctly on every
-  entry — not just after an apply. `view1_entry` also sends `0x0033` (HMI ready).
+- **view1 — Monitor (boot):** voltage ring (`arc` id 7, reg `0x0010`), V/I/P
+  labels (`label0`/`label2`/`label4` = ids 1/3/5).
+  - **Output toggle** is now a **label** (`label7`, id 11), not an imgbtn — green
+    `#30D158` "Turn output on" / red `#ff453a` "Turn output off", styled via
+    `grf_ctrl_style_set_bg_color` + `grf_label_set_txt_color`. It's driven by the
+    **real** output state (`0x0016`): `view1_entry` and the `0x0016` handler both
+    call `view1_set_output_btn()`. Tapping it sends `0x0022 = !g_out_on` (a label
+    has no checked state, so the RP flips and pushes `0x0016` back to repaint).
+  - **Session energy** `label3` (id 4, Wh `X.XXX`) + **elapsed** `label22`
+    (id 26). **Reset button** `label13` (id 16) with a nested icon `image1`
+    (id 21); a semi-transparent **press-tint overlay** `label21` (id 25) is shown
+    on `GRF_EVENT_PRESSED` and hidden on `RELEASED`/`PRESS_LOST` (image colors
+    can't be changed, so the overlay supplies the touch feedback); `CLICKED`
+    sends `0x0025`.
+  - **Active profile** `label18` (id 22), fed by `0x0019`/`0x001A`.
+  - **Theme toggle (TEST)** `label24` (id 28) → `view1_toggle_theme()`; see Theme.
+  - `view1_entry` also sends `0x0033` (HMI ready) and calls `view1_apply_theme()`.
 - **view2 — Profiles:** scrolling `container0` holding a fixed pool of **13 rows**;
   each row = 6 controls (badge / voltage / meta / current / check / background),
   all **label** widgets. Rows are filled from the profile-list registers and
@@ -299,7 +342,14 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
 - **view4 — Settings:** boot output state (segmented Off / Last used) and auto-arm
   output (switch), wired to `0x0031`/`0x0032`. Controls are painted from a
   panel-side shadow on entry (`view4_apply_settings`), kept in sync by RP pushes.
-  Brightness, appearance, and lifetime-energy widgets are mocked, not yet wired.
+  - **Brightness** (done): `slider0` (id 19) 10–100% + `label16` (id 23) percent.
+    `view4_set_bright()` applies the backlight **live** via `grf_disp_set_bright()`
+    (panel maps `pct → pct*99/100`, range 0–99) and sends `0x0030`; the RP
+    persists it (debounced) and echoes it back on boot/sync. A guard
+    (`g_bright_guard`) suppresses the slider's `VALUE_CHANGED` echo when the value
+    is set programmatically.
+  - Appearance (theme) currently lives as a TEST toggle on view1; lifetime-energy
+    odometer is pushed (`0x003A/0x003B`) but **not yet displayed** here.
 
 Row data lives in a `ROW_ID[13][6]` table in `grf_hw_uart.c` mapping each row's
 six Control IDs; `fill_row()` / `show_row()` / `highlight_row()` / selection all
@@ -334,11 +384,30 @@ which does **not** always match the IDE's label name — map by ID, not symbol.
   reads PDOs in `begin()`; a stale array makes `setFixPDO/PPS` silently no-op).
   A brief 5 V blip on attach is unavoidable (the sink brings up its default
   contract before firmware can react).
-- **Settings persistence:** a small `Settings` struct (magic `0xCB02`) lives in
+- **Settings persistence:** a small `Settings` struct (magic **`0xCB05`**) lives in
   flash via the earlephilhower **EEPROM** emulation — `loadSettings()` at boot,
   `saveSettings()` on each change (guarded so only real changes write). Fields:
-  boot-output state, auto-arm, last output on/off, last list position, last mV/mA.
-  Changing the layout bumps the magic and resets settings once.
+  boot-output state, auto-arm, last output on/off, last list position, last mV/mA,
+  **brightness** (`0x0030`), **lifetime odometer `lifeCWh`** (`0x003A/0x003B`),
+  **theme** (`0x0039`). Changing the layout bumps the magic and resets settings
+  once. (History: `0xCB02` original → … → `0xCB05` adds theme.)
+- **Energy metering:** in the 2 Hz telemetry block the RP reads INA260 V/I/P and
+  integrates into session + lifetime accumulators (`energyAccumulate`). **Reads are
+  validated first:** negatives are floored to 0, and implausible values
+  (`> 160000 mW` / `> 6000 mA` — above the supply's ~140 W / 5 A ceiling) mark the
+  sample bad so it is **not** integrated (the INA260 power register tops out at
+  655 W on a glitch, and a bad `µWh` add runs the odometer away). `dt > 2 s` is
+  also rejected. A bad/off sample freezes the interval; the next good sample
+  restarts cleanly at `dt = 0`. **The INA260 has no on-chip energy/charge
+  accumulator** (INA228/229 do) — integration is firmware-side by necessity.
+- **Theme (dark/light):** stored as `g_set.theme`, persisted, echoed on
+  boot/sync (`0x0039`). Panel keeps a `g_dark` shadow; `theme_apply()` repaints
+  themed controls (currently a TEST set on view1: `label16`/`label17`/`label1` =
+  ids 19/20/2) via `grf_ctrl_style_set_bg_color(..., 0)`. Applied on `0x0039` RX,
+  on user toggle (`view1_toggle_theme`, which also sends `0x0039`), and on view
+  entry (`view1_apply_theme`). **NOTE:** the visible `#1C1C1E` on these "cards" is
+  their **background fill**, not text — theming surfaces uses `set_bg_color`, not
+  `set_txt_color`.
 - **Boot "Last used" restore:** if boot-output state = Last used, after the PDO
   list is known the RP re-applies the saved rail (`lastSel`) at the saved voltage
   (`lastMV`/`lastMA`) and forces the saved output state — fired only once the
@@ -382,6 +451,26 @@ which does **not** always match the IDE's label name — map by ID, not symbol.
   IDE names and IDs diverge (a view's `label2` symbol ≠ Control ID 2). Wire by ID.
 - **`grf_sw_set_state()` fires no `VALUE_CHANGED`** — use it to reflect a switch
   from stored state without echoing back to the RP.
+- **`grf_slider_set_value()` has no such "no-event" guarantee** — assume a
+  programmatic set *can* fire `VALUE_CHANGED`, so wrap programmatic sets in a guard
+  flag (e.g. `g_bright_guard`) to avoid echoing back to the RP.
+- **A label's visible color is its background fill, not its text.** To theme/recolor
+  a "card" use `grf_ctrl_style_set_bg_color(ctrl, color, 0)` (part 0); use
+  `grf_label_set_txt_color()` only for the glyphs. Both take effect at runtime with
+  no explicit refresh. A label used as a button needs a solid fill + radius +
+  **clickable** set in the IDE, and any nested image must be **non-clickable** or it
+  eats the touch.
+- **`grf_disp_set_bright(u8)` takes 0–99** (99 brightest) — map a percent slider as
+  `pct*99/100`. It's a global backlight call (no view guard needed).
+- **Registers are 16-bit.** For 32-bit quantities (energy, odometer) split high/low
+  across two registers; they arrive one at a time, so reassemble via a panel shadow.
+- **Continuous 2 Hz pushes self-heal the view-entry control reset** — telemetry-style
+  labels (V/I/P, session energy, elapsed, active profile) need no shadow because the
+  next push (≤500 ms) repaints them. Only *state* controls (toggles, settings,
+  theme) need a shadow + `_entry` re-apply.
+- **INA260 reads can be negative (near no-load) or railed (655 W on glitch).** Casting
+  a negative float to unsigned yields garbage. Validate/clamp before display **and**
+  before integrating, or an energy integrator runs away.
 
 ## Other
 
@@ -439,7 +528,19 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] Settings (view4): boot-output state + auto-arm, reflected on entry.
 - [x] Persist settings to flash; "Last used" restore of rail + voltage + output.
 - [x] Active-rail highlight after boot restore (reg 0x0017).
+- [x] Settings: persistent **brightness** slider (reg 0x0030, RP-backed, debounced).
+- [x] Monitor: output toggle as a colored **label** (green/red, reg 0x0022).
+- [x] Monitor: **session energy** trip meter — energy `X.XXX` Wh (0x0013/0x0014,
+      32-bit mWh), elapsed (0x0018), reset button + press-tint (0x0025). Charge
+      (0x0015) pushed but intentionally **not** shown.
+- [x] **Lifetime energy** accumulation + persistence (0x003A/0x003B). *(display TBD)*
+- [x] Monitor: **active profile** label (0x0019 type + 0x001A mV).
+- [x] INA read validation + `dt` cap so the energy integrator can't run away.
+- [x] **Theme persistence** plumbing (reg 0x0039, RP-backed, re-applied on entry).
+- [~] **Dark/light theme — IN PROGRESS.** Proven on a TEST set (view1 `label16`/
+      `label17`/`label1`, ids 19/20/2) + toggle `label24` (id 28). **Next: extend to
+      all objects across all 4 views.** See the "Theme" notes in Firmware behavior.
+- [ ] Settings UI for theme (move the toggle off view1 into view4 appearance).
+- [ ] Lifetime-energy **odometer display** in Settings (data already on 0x003A/3B).
 - [ ] Battery page (view3) content.
-- [ ] Settings: brightness, dark/light theme, lifetime-energy odometer (mocked).
-- [ ] Session energy widget on Monitor (mocked; regs 0x0013–0x0015 reserved).
 - [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).
