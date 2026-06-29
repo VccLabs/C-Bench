@@ -6,7 +6,7 @@
   "start_page" : 1,
   "cacheImg" : 20,
   "app_ver" : "1.0.0",
-  "comp_time" : "260629192006",
+  "comp_time" : "260629192727",
   "init_allview" : 0,
   "rotate" : 0,
   "show_en" : 0,

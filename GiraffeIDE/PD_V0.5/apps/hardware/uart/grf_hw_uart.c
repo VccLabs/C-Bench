@@ -265,14 +265,21 @@ void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
 #define LBL_T2 20  /* label17 */
 #define LBL_T3  2  /* label1  */
 static u8 g_dark = 0;
-void view1_toggle_theme(void)               /* TEST: flip text color of 3 labels */
+static void theme_apply(void)               /* paint themed controls from g_dark */
+{
+    u32 c = g_dark ? GRF_COLOR_GET(0xFF,0xFF,0xFF)
+                   : GRF_COLOR_GET(0x1C,0x1C,0x1E);
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T1), c, 0);
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T2), c, 0);
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T3), c, 0);
+}
+void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
+void view1_toggle_theme(void)               /* user tap: flip + apply + persist */
 {
     g_dark ^= 1;
-    u32 c = g_dark ? GRF_COLOR_GET(0xFF,0xFF,0xFF)   /* dark mode -> white text */
-                   : GRF_COLOR_GET(0x1C,0x1C,0x1E);  /* light mode -> #1C1C1E   */
-        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T1), c, 0);
-        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T2), c, 0);
-        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T3), c, 0);
+    theme_apply();
+    grf_reg_set(0x0039, g_dark);
+    grf_reg_com_send(0x0039, 1);
 }
 
 void view2_reset_panel(void)
@@ -506,6 +513,10 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         g_v4_autoarm = data[0];
         if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
             grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
+        break;
+    case 0x0039:  /* theme from RP -> shadow + apply */
+         g_dark = data[0] ? 1 : 0;
+         theme_apply();
         break;
     case 0x0101:
     { /* list ready -> render */

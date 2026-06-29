@@ -18,7 +18,7 @@ volatile bool outputOn = false;          // reg 0x0022 - default OFF for safety
 volatile int pendingSel = -1;            // reg 0x0023 list position, applied in loop()
 
 // ---- persisted settings (flash via EEPROM emulation) ----
-#define SET_MAGIC 0xCB04
+#define SET_MAGIC 0xCB05
 struct Settings
 {
   uint16_t magic;
@@ -30,6 +30,7 @@ struct Settings
   uint16_t lastMA;      // limMA at last apply
   uint8_t bright;       // reg 0x0030: panel brightness % (10..100)
   uint32_t lifeCWh;     // lifetime energy odometer, centi-Wh (0x003A/0x003B)
+  uint8_t theme;        // reg 0x0039: 0=dark, 1=light
 };
 Settings g_set;
 static bool g_bootRestore = false; // pending "Last used" rail restore at boot
@@ -221,6 +222,7 @@ static void loadSettings()
     g_set.lastMA = PPS_LIMIT_MA;
     g_set.bright = 100;
     g_set.lifeCWh = 0;
+    g_set.theme = 0;
     saveSettings();
   }
   g_lifeE_uWh = (uint64_t)g_set.lifeCWh * 10000ULL;
@@ -230,10 +232,15 @@ static void loadSettings()
 
 static void activeProfileInfo(uint16_t *type, uint16_t *mV)
 {
-  if (g_activeSel < 0 || g_activeSel >= g_slotN) { *type = 0; *mV = 0; return; }
+  if (g_activeSel < 0 || g_activeSel >= g_slotN)
+  {
+    *type = 0;
+    *mV = 0;
+    return;
+  }
   Slot &s = g_slots[g_activeSel];
-  *type = (uint16_t)(s.type + 1);                       // 1=Fixed,2=PPS,3=AVS,4=EPR
-  *mV   = (s.type == 1 || s.type == 2) ? reqMV : s.vmin; // PPS/AVS: requested; else PDO voltage
+  *type = (uint16_t)(s.type + 1);                      // 1=Fixed,2=PPS,3=AVS,4=EPR
+  *mV = (s.type == 1 || s.type == 2) ? reqMV : s.vmin; // PPS/AVS: requested; else PDO voltage
 }
 
 static void pushSession()
@@ -330,6 +337,14 @@ static void applyControl(uint16_t addr, uint16_t val)
   case 0x0033: // panel entered view4 -> push stored settings back for display
     writeReg(0x0031, g_set.bootLastUsed);
     writeReg(0x0032, g_set.autoArm);
+    writeReg(0x0039, g_set.theme);
+    break;
+  case 0x0039: // theme from panel (0=dark,1=light)
+    if (g_set.theme != (uint8_t)(val ? 1 : 0))
+    {
+      g_set.theme = val ? 1 : 0;
+      saveSettings();
+    }
     break;
   case 0x0030:
   { // brightness % (10..100) from panel; persist debounced
@@ -547,6 +562,7 @@ void loop()
   {
     tSet = now;
     writeReg(0x0030, g_set.bright);
+    writeReg(0x0039, g_set.theme);
     writeReg(0x0031, g_set.bootLastUsed);
     writeReg(0x0032, g_set.autoArm);
     setPushes++;
@@ -588,9 +604,10 @@ void loop()
     writeReg(0x0012, (uint16_t)(mW / 100));
     writeReg(0x0016, outputOn ? 1 : 0);  /* real output state for the view1 toggle */
     energyAccumulate(now, mW, mA, good); /* session + lifetime integration */
-    uint16_t apType, apMV; activeProfileInfo(&apType, &apMV);
-    writeReg(0x0019, apType);            /* active profile type (0=none) */
-    writeReg(0x001A, apMV);             /* active profile setpoint mV   */
+    uint16_t apType, apMV;
+    activeProfileInfo(&apType, &apMV);
+    writeReg(0x0019, apType); /* active profile type (0=none) */
+    writeReg(0x001A, apMV);   /* active profile setpoint mV   */
   }
   // Fast source-attach watch: kill VOUT ASAP after a contract appears
   static uint32_t tAtt = 0;

@@ -331,6 +331,7 @@ void view1_entry(void)
 {
 	view1_sync_armed();
 	view4_request_settings();   /* HMI is up -> pull saved settings into the shadow */
+	view1_apply_theme();
 }
 
 void view1_exit(void)
