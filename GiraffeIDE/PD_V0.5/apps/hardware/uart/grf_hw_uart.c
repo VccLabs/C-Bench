@@ -270,9 +270,9 @@ void view1_toggle_theme(void)               /* TEST: flip text color of 3 labels
     g_dark ^= 1;
     u32 c = g_dark ? GRF_COLOR_GET(0xFF,0xFF,0xFF)   /* dark mode -> white text */
                    : GRF_COLOR_GET(0x1C,0x1C,0x1E);  /* light mode -> #1C1C1E   */
-    grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_T1), c);
-    grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_T2), c);
-    grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_T3), c);
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T1), c, 0);
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T2), c, 0);
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T3), c, 0);
 }
 
 void view2_reset_panel(void)
