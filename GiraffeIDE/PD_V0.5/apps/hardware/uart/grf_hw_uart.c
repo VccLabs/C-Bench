@@ -11,6 +11,11 @@ static grf_drv_t *drv_uart = NULL;
 #define LBL_POWER  5
 #define LBL_OUT    11  /* view1 output toggle label (VIEW1_LABEL7_ID) */
 
+#define LBL_OUT    11  /* view1 output toggle label (VIEW1_LABEL7_ID) */
+#define LBL_WH      4  /* view1 session energy Wh   (VIEW1_LABEL3_ID)  */
+#define BTN_RST    16  /* view1 session reset btn   (VIEW1_LABEL13_ID) */
+#define RST_TINT   25  /* view1 reset press overlay (VIEW1_LABEL21_ID) */
+
 #define MAX_PROF 13
 typedef struct { u16 type, vmin, vmax, imax; } prof_t;
 static prof_t g_prof[MAX_PROF];
@@ -198,6 +203,16 @@ static void view1_set_output_btn(u8 on)   /* drive output label from real state 
             grf_reg_com_send(0x0022, 1);          /* RP flips output, pushes 0x0016 back to repaint */
         }
 
+    void view1_reset_press(u8 down)           /* show/hide the reset press-tint overlay */
+        {
+            grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, RST_TINT), down ? 0 : 1);
+        }
+        void view1_reset_session(void)            /* reset button -> tell RP to zero the trip */
+        {
+            grf_reg_set(0x0025, 1);
+            grf_reg_com_send(0x0025, 1);
+        }
+
 void view2_reset_panel(void)
 {
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");
@@ -329,6 +344,10 @@ void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
         case 0x0012:  /* power dW (0.1W) */
                     snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
                     grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
+                    break;
+        case 0x0013:  /* session energy cWh -> "X.XX" Wh label */
+                    snprintf(buf,sizeof(buf),"%u.%02u", data[0]/100, data[0]%100);
+                    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_WH), buf);
                     break;
         case 0x0016:  /* real output state from RP -> drive toggle */
                             g_out_on = data[0];

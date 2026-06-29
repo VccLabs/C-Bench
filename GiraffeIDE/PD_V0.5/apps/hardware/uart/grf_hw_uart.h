@@ -23,6 +23,9 @@ void view4_request_settings(void);       /* view4 entry: ask RP to push 0x0031/0
 void view4_apply_settings(void);         /* view4 entry: paint controls from shadow */
 void view1_sync_armed(void);
 void view1_toggle_output(void);          /* view1 label7 click -> reg 0x0022 (toggle) */
+void view1_toggle_output(void);          /* view1 label7 click -> reg 0x0022 (toggle) */
+void view1_reset_press(u8 down);         /* view1 reset press-tint overlay show/hide   */
+void view1_reset_session(void);          /* view1 ↺ click -> reg 0x0025 (trip reset)    */
 
 
 #endif

@@ -184,13 +184,15 @@ static void label11_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label13_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label13_event(grf_ctrl_t *ctrl, grf_event_e event)   /* session reset (ID16) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	switch (event) {
+		case GRF_EVENT_PRESSED:     view1_reset_press(1); break;  /* finger down -> tint */
+		case GRF_EVENT_RELEASED:
+		case GRF_EVENT_PRESS_LOST:  view1_reset_press(0); break;  /* up / slid off -> clear */
+		case GRF_EVENT_CLICKED:     view1_reset_session();  break;/* completed tap -> reset */
+		default: break;
+	}
 }
 
 
