@@ -856,6 +856,31 @@
       } ]
     }
   }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label24",
+        "id" : 28,
+        "pt" : {
+          "x" : 585,
+          "y" : 20
+        },
+        "size" : {
+          "width" : 111,
+          "height" : 101
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "Label"
+    }
+  }, {
     "CLASSNAME" : "image",
     "theme" : "youth",
     "type" : 19,

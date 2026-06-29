@@ -261,6 +261,20 @@ void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
     grf_reg_com_send(0x0025, 1);
 }
 
+#define LBL_T1 19  /* label16 */
+#define LBL_T2 20  /* label17 */
+#define LBL_T3  2  /* label1  */
+static u8 g_dark = 0;
+void view1_toggle_theme(void)               /* TEST: flip text color of 3 labels */
+{
+    g_dark ^= 1;
+    u32 c = g_dark ? GRF_COLOR_GET(0xFF,0xFF,0xFF)   /* dark mode -> white text */
+                   : GRF_COLOR_GET(0x1C,0x1C,0x1E);  /* light mode -> #1C1C1E   */
+    grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_T1), c);
+    grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_T2), c);
+    grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_T3), c);
+}
+
 void view2_reset_panel(void)
 {
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");

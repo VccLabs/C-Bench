@@ -26,6 +26,7 @@ void view1_toggle_output(void);          /* view1 label7 click -> reg 0x0022 (to
 void view1_toggle_output(void);          /* view1 label7 click -> reg 0x0022 (toggle) */
 void view1_reset_press(u8 down);         /* view1 reset press-tint overlay show/hide   */
 void view1_reset_session(void);          /* view1 ↺ click -> reg 0x0025 (trip reset)    */
+void view1_toggle_theme(void);           /* TEST: dark/light text color toggle */
 
 
 #endif
