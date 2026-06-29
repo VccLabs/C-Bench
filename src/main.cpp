@@ -18,7 +18,7 @@ volatile bool outputOn = false;          // reg 0x0022 - default OFF for safety
 volatile int pendingSel = -1;            // reg 0x0023 list position, applied in loop()
 
 // ---- persisted settings (flash via EEPROM emulation) ----
-#define SET_MAGIC 0xCB03
+#define SET_MAGIC 0xCB04
 struct Settings
 {
   uint16_t magic;
@@ -29,6 +29,7 @@ struct Settings
   uint16_t lastMV;      // reqMV at last apply (PPS/AVS voltage restore)
   uint16_t lastMA;      // limMA at last apply
   uint8_t bright;       // reg 0x0030: panel brightness % (10..100)
+  uint32_t lifeCWh;     // lifetime energy odometer, centi-Wh (0x003A/0x003B)
 };
 Settings g_set;
 static bool g_bootRestore = false; // pending "Last used" rail restore at boot
@@ -36,6 +37,9 @@ static int g_bootRestoreOut = -1;  // output state to force after that restore
 static int g_activeSel = -1;       // active list position (-1 none) -> reg 0x0017 highlight
 static bool g_brightDirty = false;
 static uint32_t g_brightT = 0;
+static uint64_t g_sessE_uWh = 0, g_sessQ_uAh = 0, g_lifeE_uWh = 0; // µWh / µAh accumulators
+static uint32_t g_sessMs = 0, g_eLastUs = 0, g_lifeSaveT = 0;
+static bool g_eRunning = false;
 
 #define HMI Serial2 // UART1: IO8=TX, IO9=RX -> TR660
 
@@ -216,10 +220,63 @@ static void loadSettings()
     g_set.lastMV = PPS_TARGET_MV;
     g_set.lastMA = PPS_LIMIT_MA;
     g_set.bright = 100;
+    g_set.lifeCWh = 0;
     saveSettings();
   }
+  g_lifeE_uWh = (uint64_t)g_set.lifeCWh * 10000ULL;
   Serial.printf("Settings loaded: magic=%04X boot=%u autoArm=%u\n",
                 g_set.magic, g_set.bootLastUsed, g_set.autoArm);
+}
+
+static void pushSession()
+{
+  uint32_t cWh = (uint32_t)(g_sessE_uWh / 10000ULL); // µWh -> cWh (0.01 Wh)
+  uint32_t cAh = (uint32_t)(g_sessQ_uAh / 10000ULL); // µAh -> cAh (0.01 Ah)
+  uint32_t s = g_sessMs / 1000UL;
+  writeReg(0x0013, cWh > 65535 ? 65535 : (uint16_t)cWh);
+  writeReg(0x0014, cAh > 65535 ? 65535 : (uint16_t)cAh);
+  writeReg(0x0015, s > 65535 ? 65535 : (uint16_t)s);
+}
+
+static void persistLifetimeFlash() // debounced flash write of the odometer
+{
+  uint32_t cWh = (uint32_t)(g_lifeE_uWh / 10000ULL);
+  if (cWh != g_set.lifeCWh)
+  {
+    g_set.lifeCWh = cWh;
+    saveSettings();
+  }
+}
+
+// Integrate measured power/current over real dt; accumulate only while output is on.
+static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA)
+{
+  uint32_t us = micros();
+  if (outputOn)
+  {
+    if (!g_eRunning)
+    {
+      g_eLastUs = us;
+      g_eRunning = true;
+    }                                             // start interval cleanly
+    uint32_t dt = us - g_eLastUs;                 // unsigned: wrap-safe
+    uint64_t dE = (uint64_t)mW * dt / 3600000ULL; // µWh
+    g_sessE_uWh += dE;
+    g_lifeE_uWh += dE;
+    g_sessQ_uAh += (uint64_t)mA * dt / 3600000ULL; // µAh
+    g_sessMs += dt / 1000;
+    g_eLastUs = us;
+  }
+  else
+  {
+    g_eRunning = false; // freeze when off
+  }
+  pushSession();
+  if (now_ms - g_lifeSaveT >= 60000UL)
+  {
+    g_lifeSaveT = now_ms;
+    persistLifetimeFlash();
+  }
 }
 
 // Apply one decoded control register from the panel
@@ -244,6 +301,12 @@ static void applyControl(uint16_t addr, uint16_t val)
     lastSig = 0xFFFFFFFF;                                                  // panel opened view2 -> force a fresh list push now
     writeReg(0x0017, (g_activeSel >= 0) ? (uint16_t)g_activeSel : 0xFFFF); // active rail -> highlight
     sendProfileList();
+    break;
+  case 0x0025: // session trip reset from panel (view1 ↺)
+    g_sessE_uWh = 0;
+    g_sessQ_uAh = 0;
+    g_sessMs = 0;
+    pushSession();
     break;
   case 0x0031:
     g_set.bootLastUsed = (val != 0); // boot output state: 0=Off, 1=Last used
@@ -456,7 +519,9 @@ void loop()
   {
     lastOut = outputOn;
     usbpd.setOutput(outputOn ? 1 : 0);
-    writeReg(0x0016, outputOn ? 1 : 0);          /* tell the panel immediately */
+    writeReg(0x0016, outputOn ? 1 : 0); /* tell the panel immediately */
+    if (!outputOn)
+      persistLifetimeFlash();                    /* <-- ADD: commit odometer at end of run */
     if (g_set.lastOutputOn != (uint8_t)outputOn) // remember for "Last used"
     {
       g_set.lastOutputOn = outputOn;
@@ -498,11 +563,12 @@ void loop()
     tTel = now;
     uint16_t mV = (uint16_t)ina260.readBusVoltage();
     uint16_t mA = (uint16_t)ina260.readCurrent();
-    uint16_t dW = (uint16_t)(ina260.readPower() / 100);
+    uint32_t mW = (uint32_t)ina260.readPower();
     writeReg(0x0010, mV);
     writeReg(0x0011, mA);
-    writeReg(0x0012, dW);
+    writeReg(0x0012, (uint16_t)(mW / 100));
     writeReg(0x0016, outputOn ? 1 : 0); /* real output state for the view1 toggle */
+    energyAccumulate(now, mW, mA);      /* session + lifetime integration */
   }
   // Fast source-attach watch: kill VOUT ASAP after a contract appears
   static uint32_t tAtt = 0;

@@ -813,6 +813,50 @@
       "init_img" : "arrow.png",
       "rotate_pt" : { }
     }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label21",
+        "id" : 25,
+        "parent_id" : 16,
+        "pt" : { },
+        "size" : {
+          "width" : 82,
+          "height" : 30
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW1_LABEL21_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 35,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : -1,
+          "opa" : 90,
+          "padding" : {
+            "top" : 2,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 12,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 10461093,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 14,
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
   } ],
   "view" : {
     "v_name" : "view1",

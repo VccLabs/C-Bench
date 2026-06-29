@@ -283,6 +283,16 @@ static void label20_event(grf_ctrl_t *ctrl, grf_event_e event)
 //	}
 }
 
+
+static void label21_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view1_cc.h"
 void view1_init(void)
 {
