@@ -230,12 +230,13 @@ static void loadSettings()
 
 static void pushSession()
 {
-  uint32_t cWh = (uint32_t)(g_sessE_uWh / 10000ULL); // µWh -> cWh (0.01 Wh)
-  uint32_t cAh = (uint32_t)(g_sessQ_uAh / 10000ULL); // µAh -> cAh (0.01 Ah)
+  uint32_t mWh = (uint32_t)(g_sessE_uWh / 1000ULL); // µWh -> mWh (0.001 Wh)
+  uint32_t mAh = (uint32_t)(g_sessQ_uAh / 1000ULL); // µAh -> mAh (0.001 Ah)
   uint32_t s = g_sessMs / 1000UL;
-  writeReg(0x0013, cWh > 65535 ? 65535 : (uint16_t)cWh);
-  writeReg(0x0014, cAh > 65535 ? 65535 : (uint16_t)cAh);
-  writeReg(0x0015, s > 65535 ? 65535 : (uint16_t)s);
+  writeReg(0x0013, (uint16_t)(mWh & 0xFFFF)); // energy mWh, low 16
+  writeReg(0x0014, (uint16_t)(mWh >> 16));    // energy mWh, high 16
+  writeReg(0x0015, mAh > 65535 ? 65535 : (uint16_t)mAh);
+  writeReg(0x0018, s > 65535 ? 65535 : (uint16_t)s);
 }
 
 static void persistLifetimeFlash() // debounced flash write of the odometer
@@ -249,17 +250,19 @@ static void persistLifetimeFlash() // debounced flash write of the odometer
 }
 
 // Integrate measured power/current over real dt; accumulate only while output is on.
-static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA)
+static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA, bool good)
 {
   uint32_t us = micros();
-  if (outputOn)
+  if (outputOn && good)
   {
     if (!g_eRunning)
     {
       g_eLastUs = us;
       g_eRunning = true;
-    }                                             // start interval cleanly
-    uint32_t dt = us - g_eLastUs;                 // unsigned: wrap-safe
+    } // start interval cleanly
+    uint32_t dt = us - g_eLastUs; // unsigned: wrap-safe
+    if (dt > 2000000UL)
+      dt = 0;                                     // >2s gap: stall/anomaly -> no phantom energy
     uint64_t dE = (uint64_t)mW * dt / 3600000ULL; // µWh
     g_sessE_uWh += dE;
     g_lifeE_uWh += dE;
@@ -561,14 +564,22 @@ void loop()
   if (now - tTel >= 500) // 2 Hz
   {
     tTel = now;
-    uint16_t mV = (uint16_t)ina260.readBusVoltage();
-    uint16_t mA = (uint16_t)ina260.readCurrent();
-    uint32_t mW = (uint32_t)ina260.readPower();
+    float fmV = ina260.readBusVoltage();
+    float fmA = ina260.readCurrent();
+    float fmW = ina260.readPower();
+    if (fmA < 0)
+      fmA = 0; // INA reads slightly negative near no-load
+    if (fmW < 0)
+      fmW = 0;
+    bool good = (fmW <= 160000.0f && fmA <= 6000.0f); // plausible? supply max ~140W / 5A
+    uint16_t mV = (uint16_t)fmV;
+    uint16_t mA = (uint16_t)fmA;
+    uint32_t mW = (uint32_t)fmW;
     writeReg(0x0010, mV);
     writeReg(0x0011, mA);
     writeReg(0x0012, (uint16_t)(mW / 100));
-    writeReg(0x0016, outputOn ? 1 : 0); /* real output state for the view1 toggle */
-    energyAccumulate(now, mW, mA);      /* session + lifetime integration */
+    writeReg(0x0016, outputOn ? 1 : 0);  /* real output state for the view1 toggle */
+    energyAccumulate(now, mW, mA, good); /* session + lifetime integration */
   }
   // Fast source-attach watch: kill VOUT ASAP after a contract appears
   static uint32_t tAtt = 0;
