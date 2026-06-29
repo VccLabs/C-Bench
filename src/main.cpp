@@ -228,6 +228,14 @@ static void loadSettings()
                 g_set.magic, g_set.bootLastUsed, g_set.autoArm);
 }
 
+static void activeProfileInfo(uint16_t *type, uint16_t *mV)
+{
+  if (g_activeSel < 0 || g_activeSel >= g_slotN) { *type = 0; *mV = 0; return; }
+  Slot &s = g_slots[g_activeSel];
+  *type = (uint16_t)(s.type + 1);                       // 1=Fixed,2=PPS,3=AVS,4=EPR
+  *mV   = (s.type == 1 || s.type == 2) ? reqMV : s.vmin; // PPS/AVS: requested; else PDO voltage
+}
+
 static void pushSession()
 {
   uint32_t mWh = (uint32_t)(g_sessE_uWh / 1000ULL); // µWh -> mWh (0.001 Wh)
@@ -580,6 +588,9 @@ void loop()
     writeReg(0x0012, (uint16_t)(mW / 100));
     writeReg(0x0016, outputOn ? 1 : 0);  /* real output state for the view1 toggle */
     energyAccumulate(now, mW, mA, good); /* session + lifetime integration */
+    uint16_t apType, apMV; activeProfileInfo(&apType, &apMV);
+    writeReg(0x0019, apType);            /* active profile type (0=none) */
+    writeReg(0x001A, apMV);             /* active profile setpoint mV   */
   }
   // Fast source-attach watch: kill VOUT ASAP after a contract appears
   static uint32_t tAtt = 0;

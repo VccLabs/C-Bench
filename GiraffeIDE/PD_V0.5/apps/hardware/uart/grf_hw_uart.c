@@ -4,77 +4,91 @@
 
 static grf_drv_t *drv_uart = NULL;
 
-#define LBL_VOLT   1
-#define ARC_VOLT   7   /* <- your arc's Control ID from view1.h */
+#define LBL_VOLT 1
+#define ARC_VOLT 7 /* <- your arc's Control ID from view1.h */
 
-#define LBL_CURR   3
-#define LBL_POWER  5
-#define LBL_OUT    11  /* view1 output toggle label (VIEW1_LABEL7_ID) */
+#define LBL_CURR 3
+#define LBL_POWER 5
+#define LBL_OUT 11 /* view1 output toggle label (VIEW1_LABEL7_ID) */
 
-#define LBL_OUT    11  /* view1 output toggle label (VIEW1_LABEL7_ID) */
-#define LBL_WH      4  /* view1 session energy Wh   (VIEW1_LABEL3_ID)  */
-#define BTN_RST    16  /* view1 session reset btn   (VIEW1_LABEL13_ID) */
-#define RST_TINT   25  /* view1 reset press overlay (VIEW1_LABEL21_ID) */
+#define LBL_OUT 11  /* view1 output toggle label (VIEW1_LABEL7_ID) */
+#define LBL_WH 4    /* view1 session energy Wh   (VIEW1_LABEL3_ID)  */
+#define BTN_RST 16  /* view1 session reset btn   (VIEW1_LABEL13_ID) */
+#define RST_TINT 25 /* view1 reset press overlay (VIEW1_LABEL21_ID) */
 
 #define MAX_PROF 13
-typedef struct { u16 type, vmin, vmax, imax; } prof_t;
+typedef struct
+{
+    u16 type, vmin, vmax, imax;
+} prof_t;
 static prof_t g_prof[MAX_PROF];
 static u8 g_prof_n = 0;
 
-#define LBL_EMPTY1  80   /* label78 - "No profiles..." view2*/
-#define LBL_EMPTY2  81   /* label79 - subtitle view2*/
+#define LBL_EMPTY1 80 /* label78 - "No profiles..." view2*/
+#define LBL_EMPTY2 81 /* label79 - subtitle view2*/
 
 /* view2 adjust panel + Use button (PPS/AVS fine-adjust) */
-#define ADJ_CONT 82   /* container1            */
-#define ADJ_SV   83   /* slider0 - set voltage  -> reg 0x0020 (mV) */
-#define ADJ_SC   87   /* slider1 - current limit-> reg 0x0021 (mA) */
-#define ADJ_LV   88   /* label82 - voltage value */
-#define ADJ_LC   89   /* label83 - current value */
-#define BTN_USE  90   /* label84 - Use/apply button */
-#define SEL_BOX  84   /* <- set to the selbox outline control's ID */
+#define ADJ_CONT 82 /* container1            */
+#define ADJ_SV 83   /* slider0 - set voltage  -> reg 0x0020 (mV) */
+#define ADJ_SC 87   /* slider1 - current limit-> reg 0x0021 (mA) */
+#define ADJ_LV 88   /* label82 - voltage value */
+#define ADJ_LC 89   /* label83 - current value */
+#define BTN_USE 90  /* label84 - Use/apply button */
+#define SEL_BOX 84  /* <- set to the selbox outline control's ID */
 
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
-enum { COL_BADGE, COL_VOLT, COL_META, COL_CURR, COL_CHECK, COL_BG };
+enum
+{
+    COL_BADGE,
+    COL_VOLT,
+    COL_META,
+    COL_CURR,
+    COL_CHECK,
+    COL_BG
+};
 static const u16 ROW_ID[MAX_PROF][6] = {
-  /* {badge, volt, meta, curr, check, bg} */
-  {  6,  2,  3,  4,  5, 67 },  /* row 0  */
-  { 10,  9,  8,  7,  1, 68 },  /* row 1  */
-  { 12, 11, 13, 14, 15, 79 },  /* row 2  */
-  { 26, 27, 28, 29, 30, 78 },  /* row 3  */
-  { 25, 24, 18, 22, 21, 77 },  /* row 4  */
-  { 16, 17, 23, 19, 20, 76 },  /* row 5  */
-  { 55, 54, 43, 42, 31, 69 },  /* row 6  */
-  { 56, 53, 44, 41, 32, 70 },  /* row 7  */
-  { 57, 52, 45, 40, 33, 71 },  /* row 8  */
-  { 58, 51, 46, 39, 34, 72 },  /* row 9  */
-  { 59, 50, 47, 38, 35, 73 },  /* row 10 */
-  { 60, 49, 48, 37, 36, 75 },  /* row 11 */
-  { 65, 64, 63, 62, 61, 74 },  /* row 12 */
+    /* {badge, volt, meta, curr, check, bg} */
+    {6, 2, 3, 4, 5, 67},      /* row 0  */
+    {10, 9, 8, 7, 1, 68},     /* row 1  */
+    {12, 11, 13, 14, 15, 79}, /* row 2  */
+    {26, 27, 28, 29, 30, 78}, /* row 3  */
+    {25, 24, 18, 22, 21, 77}, /* row 4  */
+    {16, 17, 23, 19, 20, 76}, /* row 5  */
+    {55, 54, 43, 42, 31, 69}, /* row 6  */
+    {56, 53, 44, 41, 32, 70}, /* row 7  */
+    {57, 52, 45, 40, 33, 71}, /* row 8  */
+    {58, 51, 46, 39, 34, 72}, /* row 9  */
+    {59, 50, 47, 38, 35, 73}, /* row 10 */
+    {60, 49, 48, 37, 36, 75}, /* row 11 */
+    {65, 64, 63, 62, 61, 74}, /* row 12 */
 };
 static void show_row(u8 i, u8 vis)
 {
-	for(u8 k=0;k<6;k++)
-        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][k]), vis?0:1);
+    for (u8 k = 0; k < 6; k++)
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][k]), vis ? 0 : 1);
 }
 
-static u8 g_sel = 0xFF;   /* selected row, 0xFF = none */
+static u8 g_sel = 0xFF; /* selected row, 0xFF = none */
 
 static void highlight_row(u8 i, u8 on)
 {
-    grf_ctrl_t *bg  = GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]);
+    grf_ctrl_t *bg = GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]);
     grf_ctrl_t *box = GCL(GRF_VIEW2_ID, SEL_BOX);
     /* check mark */
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), on ? 0 : 1);
     /* background chip: orange tint when selected, default card when not */
     grf_ctrl_style_set_bg_color(bg,
-        on ? GRF_COLOR_GET(0x3A,0x2A,0x10) : GRF_COLOR_GET(0x1C,0x1C,0x1E), 0);
+                                on ? GRF_COLOR_GET(0x3A, 0x2A, 0x10) : GRF_COLOR_GET(0x1C, 0x1C, 0x1E), 0);
     /* #ff9f0a border: move the single outline box over the selected row */
-    if (on) {
-        grf_ctrl_set_pos (box, grf_ctrl_get_x(bg),     grf_ctrl_get_y(bg));
+    if (on)
+    {
+        grf_ctrl_set_pos(box, grf_ctrl_get_x(bg), grf_ctrl_get_y(bg));
         grf_ctrl_set_size(box, grf_ctrl_get_width(bg), grf_ctrl_get_height(bg));
         grf_ctrl_move_forground(box);
         grf_ctrl_set_hidden(box, 0);
-    } else {
+    }
+    else
+    {
         grf_ctrl_set_hidden(box, 1);
     }
 }
@@ -83,30 +97,50 @@ static void use_btn_set(u8 enabled, const char *txt)
 {
     grf_label_set_txt(GCL(GRF_VIEW2_ID, BTN_USE), txt);
     grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, BTN_USE),
-        enabled ? GRF_COLOR_GET(0xFF,0x9F,0x0A) : GRF_COLOR_GET(0x2C,0x2C,0x2E), 0);
+                                enabled ? GRF_COLOR_GET(0xFF, 0x9F, 0x0A) : GRF_COLOR_GET(0x2C, 0x2C, 0x2E), 0);
     grf_label_set_txt_color(GCL(GRF_VIEW2_ID, BTN_USE),
-        enabled ? GRF_COLOR_GET(0x23,0x13,0x00) : GRF_COLOR_GET(0x8E,0x8E,0x93));
+                            enabled ? GRF_COLOR_GET(0x23, 0x13, 0x00) : GRF_COLOR_GET(0x8E, 0x8E, 0x93));
 }
 
 static void adj_labels(u16 mv, u16 ma)
 {
     char b[16];
-    snprintf(b,sizeof(b),"%u.%02u V", mv/1000, (mv%1000)/10);
+    snprintf(b, sizeof(b), "%u.%02u V", mv / 1000, (mv % 1000) / 10);
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), b);
-    snprintf(b,sizeof(b),"%u.%u A", ma/1000, (ma%1000)/100);
+    snprintf(b, sizeof(b), "%u.%u A", ma / 1000, (ma % 1000) / 100);
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), b);
 }
 
-#define ADJ_Y_SHOWN  405   /* must match container1's Y in the IDE */
-#define ADJ_Y_HIDDEN 720   /* parked just below the 720px screen */
+#define LBL_PROF 22 /* view1 active profile (VIEW1_LABEL18_ID) */
+static u8 g_ap_type = 0;
+static u16 g_ap_mV = 0;
+static void ap_paint(void)
+{
+    const char *nm = (g_ap_type == 1) ? "Fixed" : (g_ap_type == 2) ? "PPS"
+                                              : (g_ap_type == 3)   ? "AVS"
+                                              : (g_ap_type == 4)   ? "EPR"
+                                                                   : 0;
+    if (!nm)
+    {
+        grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_PROF), "—");
+        return;
+    }
+    char b[24];
+    snprintf(b, sizeof(b), "%s %u.%02u V", nm, g_ap_mV / 1000, (g_ap_mV % 1000) / 10);
+    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_PROF), b);
+}
+
+#define ADJ_Y_SHOWN 405  /* must match container1's Y in the IDE */
+#define ADJ_Y_HIDDEN 720 /* parked just below the 720px screen */
 static u8 g_panel_up = 0;
-static u8 g_arm_pending = 0;   /* set on apply, consumed in view1_entry */
-static u8 g_out_on = 0;        /* shadow of real output state (RP reg 0x0016) */
-static u8 g_applied = 0xFF;    /* last-applied list position, re-highlighted on return */
+static u8 g_arm_pending = 0; /* set on apply, consumed in view1_entry */
+static u8 g_out_on = 0;      /* shadow of real output state (RP reg 0x0016) */
+static u8 g_applied = 0xFF;  /* last-applied list position, re-highlighted on return */
 
 static void adj_panel(u8 show)
 {
-    if (show == g_panel_up) return;
+    if (show == g_panel_up)
+        return;
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), show ? 0 : 1);
     g_panel_up = show;
 }
@@ -114,38 +148,49 @@ static void adj_panel(u8 show)
 static void update_adjust(u8 i)
 {
     prof_t *p = &g_prof[i];
-    u8 range = (p->type==1 || p->type==2) && (p->vmin != p->vmax);
+    u8 range = (p->type == 1 || p->type == 2) && (p->vmin != p->vmax);
     char b[20];
-    if (range) {
+    if (range)
+    {
         grf_slider_set_range(GCL(GRF_VIEW2_ID, ADJ_SV), p->vmin, p->vmax);
         grf_slider_set_value(GCL(GRF_VIEW2_ID, ADJ_SV), p->vmax);
         grf_slider_set_range(GCL(GRF_VIEW2_ID, ADJ_SC), 0, p->imax);
         grf_slider_set_value(GCL(GRF_VIEW2_ID, ADJ_SC), p->imax);
         adj_labels(p->vmax, p->imax);
-                adj_panel(1);                                          /* slide up */
-                snprintf(b,sizeof(b),"Use %u.%02u V", p->vmax/1000, (p->vmax%1000)/10);
-            } else {
-                adj_panel(0);                                          /* slide down */
-        snprintf(b,sizeof(b),"Use %u.%02u V", p->vmin/1000, (p->vmin%1000)/10);
+        adj_panel(1); /* slide up */
+        snprintf(b, sizeof(b), "Use %u.%02u V", p->vmax / 1000, (p->vmax % 1000) / 10);
+    }
+    else
+    {
+        adj_panel(0); /* slide down */
+        snprintf(b, sizeof(b), "Use %u.%02u V", p->vmin / 1000, (p->vmin % 1000) / 10);
     }
     use_btn_set(1, b);
 }
 
 void select_row_by_bg(grf_ctrl_t *ctrl)
 {
-    if (g_panel_up) {                                 /* panel open: tap outside just dismisses it */
-        if (g_sel != 0xFF) { highlight_row(g_sel, 0); g_sel = 0xFF; }
+    if (g_panel_up)
+    { /* panel open: tap outside just dismisses it */
+        if (g_sel != 0xFF)
+        {
+            highlight_row(g_sel, 0);
+            g_sel = 0xFF;
+        }
         adj_panel(0);
         use_btn_set(0, "Select a rail");
-        return;                                       /* don't select the tapped card */
+        return; /* don't select the tapped card */
     }
-    for (u8 i = 0; i < MAX_PROF; i++) {
-        if (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]) == ctrl) {
-            if (g_sel != 0xFF) highlight_row(g_sel, 0);   /* clear previous */
+    for (u8 i = 0; i < MAX_PROF; i++)
+    {
+        if (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]) == ctrl)
+        {
+            if (g_sel != 0xFF)
+                highlight_row(g_sel, 0); /* clear previous */
             g_sel = i;
-                        highlight_row(i, 1);                          /* highlight new */
-                        update_adjust(i);                             /* drive panel + Use btn */
-                        return;
+            highlight_row(i, 1); /* highlight new */
+            update_adjust(i);    /* drive panel + Use btn */
+            return;
         }
     }
 }
@@ -157,108 +202,130 @@ void view2_slider_changed(u8 which)
     char b[20];
     (void)which;
     adj_labels(mv, ma);
-    snprintf(b,sizeof(b),"Use %u.%02u V", mv/1000, (mv%1000)/10);
+    snprintf(b, sizeof(b), "Use %u.%02u V", mv / 1000, (mv % 1000) / 10);
     use_btn_set(1, b);
 }
 
 void view2_use_apply(void)
 {
     prof_t *p;
-    if (g_sel == 0xFF) return;                 /* nothing selected */
+    if (g_sel == 0xFF)
+        return; /* nothing selected */
     p = &g_prof[g_sel];
-    if ((p->type==1 || p->type==2) && (p->vmin != p->vmax)) {
+    if ((p->type == 1 || p->type == 2) && (p->vmin != p->vmax))
+    {
         grf_reg_set(0x0020, grf_slider_get_value(GCL(GRF_VIEW2_ID, ADJ_SV)));
-        grf_reg_com_send(0x0020, 1);           /* latch mV first */
+        grf_reg_com_send(0x0020, 1); /* latch mV first */
         grf_reg_set(0x0021, grf_slider_get_value(GCL(GRF_VIEW2_ID, ADJ_SC)));
-        grf_reg_com_send(0x0021, 1);           /* then mA */
+        grf_reg_com_send(0x0021, 1); /* then mA */
     }
     grf_reg_set(0x0023, g_sel);
-    grf_reg_com_send(0x0023, 1);               /* apply: RP maps pos -> PDO, arms */
+    grf_reg_com_send(0x0023, 1); /* apply: RP maps pos -> PDO, arms */
     use_btn_set(1, "Applied");
-        g_applied = g_sel;                          /* remember active rail to re-highlight on return */
-        g_arm_pending = 1;
-        grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT,
-                                   250, 0, GRF_ANIM_PATH_END_SLOW);
-    }
+    g_applied = g_sel; /* remember active rail to re-highlight on return */
+    g_arm_pending = 1;
+    grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_MOVE_RIGHT,
+                               250, 0, GRF_ANIM_PATH_END_SLOW);
+}
 
-static void view1_set_output_btn(u8 on)   /* drive output label from real state */
-    {
-        grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_OUT), on ? "Turn output off" : "Turn output on");
-        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_OUT),
-            on ? GRF_COLOR_GET(0xFF,0x45,0x3A)     /* red  #ff453a */
-               : GRF_COLOR_GET(0x30,0xD1,0x58), 0);/* green #30D158 */
-        grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_OUT), GRF_COLOR_GET(0xFF,0xFF,0xFF));
-    }
+static void view1_set_output_btn(u8 on) /* drive output label from real state */
+{
+    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_OUT), on ? "Turn output off" : "Turn output on");
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_OUT),
+                                on ? GRF_COLOR_GET(0xFF, 0x45, 0x3A) /* red  #ff453a */
+                                   : GRF_COLOR_GET(0x30, 0xD1, 0x58),
+                                0); /* green #30D158 */
+    grf_label_set_txt_color(GCL(GRF_VIEW1_ID, LBL_OUT), GRF_COLOR_GET(0xFF, 0xFF, 0xFF));
+}
 
-    void view1_sync_armed(void)               /* called from view1_entry */
-    {
-        g_arm_pending = 0;                     /* no longer drives the visual */
-        view1_set_output_btn(g_out_on);        /* reflect the real state instead */
-    }
+void view1_sync_armed(void) /* called from view1_entry */
+{
+    g_arm_pending = 0;              /* no longer drives the visual */
+    view1_set_output_btn(g_out_on); /* reflect the real state instead */
+}
 
-    void view1_toggle_output(void)            /* label7 click: request opposite of real state */
-        {
-            u16 want = g_out_on ? 0 : 1;
-            grf_reg_set(0x0022, want);
-            grf_reg_com_send(0x0022, 1);          /* RP flips output, pushes 0x0016 back to repaint */
-        }
+void view1_toggle_output(void) /* label7 click: request opposite of real state */
+{
+    u16 want = g_out_on ? 0 : 1;
+    grf_reg_set(0x0022, want);
+    grf_reg_com_send(0x0022, 1); /* RP flips output, pushes 0x0016 back to repaint */
+}
 
-    void view1_reset_press(u8 down)           /* show/hide the reset press-tint overlay */
-        {
-            grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, RST_TINT), down ? 0 : 1);
-        }
-        void view1_reset_session(void)            /* reset button -> tell RP to zero the trip */
-        {
-            grf_reg_set(0x0025, 1);
-            grf_reg_com_send(0x0025, 1);
-        }
+void view1_reset_press(u8 down) /* show/hide the reset press-tint overlay */
+{
+    grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, RST_TINT), down ? 0 : 1);
+}
+void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
+{
+    grf_reg_set(0x0025, 1);
+    grf_reg_com_send(0x0025, 1);
+}
 
 void view2_reset_panel(void)
 {
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LV), "0.00 V");
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ADJ_LC), "0.0 A");
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
-            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, SEL_BOX), 1);   /* hide selection border until a row is picked */
-            g_panel_up = 0;
-        grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SV), 24); /* enlarge hit area, keep graphics */
-        grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SC), 24);
-        use_btn_set(0, "Select a rail");
-        grf_reg_set(0x0024, 1);      /* ask the RP to (re)push the PDO list now */
-                grf_reg_com_send(0x0024, 1);
-            }
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, SEL_BOX), 1); /* hide selection border until a row is picked */
+    g_panel_up = 0;
+    grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SV), 24); /* enlarge hit area, keep graphics */
+    grf_ctrl_set_ext_click_area(GCL(GRF_VIEW2_ID, ADJ_SC), 24);
+    use_btn_set(0, "Select a rail");
+    grf_reg_set(0x0024, 1); /* ask the RP to (re)push the PDO list now */
+    grf_reg_com_send(0x0024, 1);
+}
 
 /* ---- view4 (Settings) ---- */
-static u8 g_v4_boot    = 0;   /* shadow of reg 0x0031 (0=Off, 1=Last used) */
-static u8 g_v4_autoarm = 0;   /* shadow of reg 0x0032 (0/1)                */
+static u8 g_v4_boot = 0;    /* shadow of reg 0x0031 (0=Off, 1=Last used) */
+static u8 g_v4_autoarm = 0; /* shadow of reg 0x0032 (0/1)                */
 
 #define V4_BRIGHT_SLD 19      /* slider0 - brightness 10..100 % */
 #define V4_BRIGHT_LBL 23      /* label16 - brightness %         */
-static u8 g_v4_bright  = 100; /* shadow of reg 0x0030 brightness % (10..100) */
+static u8 g_v4_bright = 100;  /* shadow of reg 0x0030 brightness % (10..100) */
 static u8 g_bright_guard = 0; /* suppress slider VALUE_CHANGED echo on programmatic set */
 
-static void bright_label(u8 pct){ char b[8]; snprintf(b,sizeof(b),"%u%%",pct);
-    grf_label_set_txt(GCL(GRF_VIEW4_ID, V4_BRIGHT_LBL), b); }
-static void bright_backlight(u8 pct){ grf_disp_set_bright((u8)((u16)pct*99/100)); } /* 10..100% -> 0..99 */
-static void bright_slider(u8 pct){ g_bright_guard=1;
-    grf_slider_set_value(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), pct); g_bright_guard=0; }
+static void bright_label(u8 pct)
+{
+    char b[8];
+    snprintf(b, sizeof(b), "%u%%", pct);
+    grf_label_set_txt(GCL(GRF_VIEW4_ID, V4_BRIGHT_LBL), b);
+}
+static void bright_backlight(u8 pct) { grf_disp_set_bright((u8)((u16)pct * 99 / 100)); } /* 10..100% -> 0..99 */
+static void bright_slider(u8 pct)
+{
+    g_bright_guard = 1;
+    grf_slider_set_value(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), pct);
+    g_bright_guard = 0;
+}
 
-static u32 g_sess_mWh = 0;                 /* reassembled 32-bit session energy (mWh) */
-static void wh_paint(void)                 /* show as "X.XXX" (mWh resolution) */
+static u32 g_sess_mWh = 0; /* reassembled 32-bit session energy (mWh) */
+static void wh_paint(void) /* show as "X.XXX" (mWh resolution) */
 {
     char b[16];
-    snprintf(b,sizeof(b),"%u.%03u",(unsigned)(g_sess_mWh/1000),(unsigned)(g_sess_mWh%1000));
+    snprintf(b, sizeof(b), "%u.%03u", (unsigned)(g_sess_mWh / 1000), (unsigned)(g_sess_mWh % 1000));
     grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_WH), b);
 }
 
-static void boot_state_paint(u8 last_used)            /* 0 = Off white, 1 = Last used white */
+#define LBL_ELAPSED 26           /* view1 session elapsed (VIEW1_LABEL22_ID) */
+static void elapsed_paint(u16 s) /* MM:SS, rolls to H:MM:SS past 1h */
 {
-    grf_color_t on  = GRF_COLOR_GET(0xFF,0xFF,0xFF);  /* selected   = white */
-    grf_color_t off = GRF_COLOR_GET(0x98,0x98,0x9F);  /* unselected = grey  */
-    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), last_used?off:on); /* "Off"       ID10 */
-    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), last_used?on:off); /* "Last used" ID11 */
+    char b[12];
+    if (s < 3600)
+        snprintf(b, sizeof(b), "%u:%02u", s / 60, s % 60);
+    else
+        snprintf(b, sizeof(b), "%u:%02u:%02u", s / 3600, (s % 3600) / 60, s % 60);
+    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_ELAPSED), b);
 }
 
-void view4_set_boot_state(u8 last_used)               /* user tap: paint + send */
+static void boot_state_paint(u8 last_used) /* 0 = Off white, 1 = Last used white */
+{
+    grf_color_t on = GRF_COLOR_GET(0xFF, 0xFF, 0xFF);                                  /* selected   = white */
+    grf_color_t off = GRF_COLOR_GET(0x98, 0x98, 0x9F);                                 /* unselected = grey  */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), last_used ? off : on); /* "Off"       ID10 */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), last_used ? on : off); /* "Last used" ID11 */
+}
+
+void view4_set_boot_state(u8 last_used) /* user tap: paint + send */
 {
     g_v4_boot = last_used;
     boot_state_paint(last_used);
@@ -266,7 +333,7 @@ void view4_set_boot_state(u8 last_used)               /* user tap: paint + send 
     grf_reg_com_send(0x0031, 1);
 }
 
-void view4_apply_settings(void)                       /* entry: paint controls from shadow */
+void view4_apply_settings(void) /* entry: paint controls from shadow */
 {
     boot_state_paint(g_v4_boot);
     grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
@@ -275,154 +342,200 @@ void view4_apply_settings(void)                       /* entry: paint controls f
     bright_label(g_v4_bright);
 }
 
-void view4_set_autoarm(u8 on)                         /* 0/1 */
-        {
-            g_v4_autoarm = on;
-            grf_reg_set(0x0032, on);
-            grf_reg_com_send(0x0032, 1);
-        }
-
-void view4_set_bright(u8 pct)            /* slider moved: live backlight + label + persist on RP */
+void view4_set_autoarm(u8 on) /* 0/1 */
 {
-    if (g_bright_guard) return;          /* programmatic set -> don't echo back */
-    if (pct < 10) pct = 10; else if (pct > 100) pct = 100;
+    g_v4_autoarm = on;
+    grf_reg_set(0x0032, on);
+    grf_reg_com_send(0x0032, 1);
+}
+
+void view4_set_bright(u8 pct) /* slider moved: live backlight + label + persist on RP */
+{
+    if (g_bright_guard)
+        return; /* programmatic set -> don't echo back */
+    if (pct < 10)
+        pct = 10;
+    else if (pct > 100)
+        pct = 100;
     g_v4_bright = pct;
-    bright_backlight(pct);               /* instant local dimming */
+    bright_backlight(pct); /* instant local dimming */
     bright_label(pct);
     grf_reg_set(0x0030, pct);
     grf_reg_com_send(0x0030, 1);
 }
 
-void view4_request_settings(void)   /* ask RP to push stored 0x0031/0x0032 back */
+void view4_request_settings(void) /* ask RP to push stored 0x0031/0x0032 back */
 {
     grf_reg_set(0x0033, 1);
     grf_reg_com_send(0x0033, 1);
 }
 
-        static void fill_row(u8 i, prof_t *p)
+static void fill_row(u8 i, prof_t *p)
 {
     char v[20], c[16];
-    const char *badge; grf_color_t bbg, btx;
-    switch(p->type){
-      case 1: badge="PPS"; bbg=GRF_COLOR_GET(0x64,0xD2,0xFF); btx=GRF_COLOR_GET(0x06,0x2A,0x30); break;
-      case 2: badge="AVS"; bbg=GRF_COLOR_GET(0xFF,0x9F,0x0A); btx=GRF_COLOR_GET(0x2A,0x18,0x00); break;
-      case 3: badge="EPR"; bbg=GRF_COLOR_GET(0xBF,0x5A,0xF2); btx=GRF_COLOR_GET(0x1E,0x0C,0x33); break;
-      default:badge="FIX"; bbg=GRF_COLOR_GET(0x2C,0x2C,0x2E); btx=GRF_COLOR_GET(0x8E,0x8E,0x93); break;
+    const char *badge;
+    grf_color_t bbg, btx;
+    switch (p->type)
+    {
+    case 1:
+        badge = "PPS";
+        bbg = GRF_COLOR_GET(0x64, 0xD2, 0xFF);
+        btx = GRF_COLOR_GET(0x06, 0x2A, 0x30);
+        break;
+    case 2:
+        badge = "AVS";
+        bbg = GRF_COLOR_GET(0xFF, 0x9F, 0x0A);
+        btx = GRF_COLOR_GET(0x2A, 0x18, 0x00);
+        break;
+    case 3:
+        badge = "EPR";
+        bbg = GRF_COLOR_GET(0xBF, 0x5A, 0xF2);
+        btx = GRF_COLOR_GET(0x1E, 0x0C, 0x33);
+        break;
+    default:
+        badge = "FIX";
+        bbg = GRF_COLOR_GET(0x2C, 0x2C, 0x2E);
+        btx = GRF_COLOR_GET(0x8E, 0x8E, 0x93);
+        break;
     }
     u8 range = (p->vmin != p->vmax);
 
-    if(!range) snprintf(v,sizeof(v),"%u.%02u V", p->vmin/1000, (p->vmin%1000)/10);
-    else       snprintf(v,sizeof(v),"%u.%u-%u.%u V", p->vmin/1000,(p->vmin%1000)/100,
-                                                     p->vmax/1000,(p->vmax%1000)/100);
-    snprintf(c,sizeof(c),"%u.%u A", p->imax/1000, (p->imax%1000)/100);
+    if (!range)
+        snprintf(v, sizeof(v), "%u.%02u V", p->vmin / 1000, (p->vmin % 1000) / 10);
+    else
+        snprintf(v, sizeof(v), "%u.%u-%u.%u V", p->vmin / 1000, (p->vmin % 1000) / 100,
+                 p->vmax / 1000, (p->vmax % 1000) / 100);
+    snprintf(c, sizeof(c), "%u.%u A", p->imax / 1000, (p->imax % 1000) / 100);
 
-    grf_label_set_txt          (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]), badge);
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]), badge);
     grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]), bbg, 0);
-    grf_label_set_txt_color    (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]), btx);
+    grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]), btx);
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_VOLT]), v);
-    grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_META]), range?"Adjustable rail":"Fixed rail");
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_META]), range ? "Adjustable rail" : "Fixed rail");
     grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CURR]), c);
-        grf_label_set_txt      (GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), "\xE2\x9C\x93");          /* tick, overrides placeholder */
-        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), GRF_COLOR_GET(0xFF,0x9F,0x0A));
-        show_row(i, 1);
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), "\xE2\x9C\x93"); /* tick, overrides placeholder */
+    grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), GRF_COLOR_GET(0xFF, 0x9F, 0x0A));
+    show_row(i, 1);
 }
 
-void grf_reg_set_user(u16 addr,u16* data,u8 datalen)
+void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
 {
     char buf[16];
 
     /* profile rows: 0x0110 + i*4 = [type, vmin, vmax, imax] */
-    if(addr>=0x0110 && addr<0x0110+MAX_PROF*4 && datalen>=4){
-        u8 i=(addr-0x0110)/4;
-        g_prof[i].type=data[0]; g_prof[i].vmin=data[1];
-        g_prof[i].vmax=data[2]; g_prof[i].imax=data[3];
+    if (addr >= 0x0110 && addr < 0x0110 + MAX_PROF * 4 && datalen >= 4)
+    {
+        u8 i = (addr - 0x0110) / 4;
+        g_prof[i].type = data[0];
+        g_prof[i].vmin = data[1];
+        g_prof[i].vmax = data[2];
+        g_prof[i].imax = data[3];
         return;
     }
 
-    switch(addr){
-    case 0x0010:  /* voltage mV */
-                snprintf(buf,sizeof(buf),"%u.%02u", data[0]/1000, (data[0]%1000)/10);
-                grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
-                grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), data[0]/100); /* 0..280 = 0..28.0V */
-                break;
-        case 0x0011:  /* current mA */
-            snprintf(buf,sizeof(buf),"%u.%03u A", data[0]/1000, data[0]%1000);
-            grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
-            break;
-        case 0x0012:  /* power dW (0.1W) */
-                    snprintf(buf,sizeof(buf),"%u.%u W", data[0]/10, data[0]%10);
-                    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
-                    break;
-        case 0x0013:  /* session energy mWh, low 16 */
-                    g_sess_mWh = (g_sess_mWh & 0xFFFF0000UL) | (u32)data[0];
-                    wh_paint();
-                    break;
-                case 0x0014:  /* session energy mWh, high 16 */
-                    g_sess_mWh = (g_sess_mWh & 0x0000FFFFUL) | ((u32)data[0] << 16);
-                    wh_paint();
-                    break;
-        case 0x0016:  /* real output state from RP -> drive toggle */
-                            g_out_on = data[0];
-                            view1_set_output_btn(g_out_on);
-                            break;
-                        case 0x0017:  /* active rail position from RP -> highlight on list render */
-                            g_applied = (data[0] >= MAX_PROF) ? 0xFF : (u8)data[0];
-                            break;
-                case 0x0031:  /* boot output state from RP -> shadow + live repaint if on view4 */
-                                    g_v4_boot = data[0];
-                                    if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
-                                        boot_state_paint(g_v4_boot);
-                                    break;
-                case 0x0030:  /* brightness % from RP -> backlight now; repaint if on view4 */
-                                                    g_v4_bright = (data[0] < 10) ? 10 : (data[0] > 100 ? 100 : data[0]);
-                                                    bright_backlight(g_v4_bright);   /* global: applies even when off view4 */
-                                                    if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID) {
-                                                        bright_slider(g_v4_bright);
-                                                        bright_label(g_v4_bright);
-                                                    }
-                                                    break;
-                                case 0x0032:  /* auto-arm from RP -> shadow + live repaint if on view4 */
-                                    g_v4_autoarm = data[0];
-                                    if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
-                                        grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
-                                    break;
-        case 0x0101: {            /* list ready -> render */
-        	g_prof_n = grf_reg_get(0x0100);
-        	        	            if(g_prof_n > MAX_PROF) g_prof_n = MAX_PROF;
-        	        	            g_sel = 0xFF;
-        	        	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
-        	        	            use_btn_set(0, "Select a rail");
-        	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY1), g_prof_n ? 1 : 0);
-        	            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY2), g_prof_n ? 1 : 0);
-        	            for(u8 i=0; i<g_prof_n; i++){
-        	                                            g_prof[i].type = grf_reg_get(0x0110 + i*4 + 0);
-        	                                            g_prof[i].vmin = grf_reg_get(0x0110 + i*4 + 1);
-        	                                            g_prof[i].vmax = grf_reg_get(0x0110 + i*4 + 2);
-        	                                            g_prof[i].imax = grf_reg_get(0x0110 + i*4 + 3);
-        	                                            fill_row(i, &g_prof[i]);
-        	                                        }
-                            for(u8 i=g_prof_n; i<MAX_PROF; i++) show_row(i, 0);  /* hide unused rows */
-                            for(u8 i=0; i<g_prof_n; i++)
-                                                                        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
-                                                        if (g_prof_n == 0) g_applied = 0xFF;          /* source gone -> forget selection */
-                                                        if (g_applied != 0xFF && g_applied < g_prof_n) {
-                                                            g_sel = g_applied;                       /* show active rail */
-                                                            highlight_row(g_applied, 1);
-                                                        }
-                                                        break;
-                        }
+    switch (addr)
+    {
+    case 0x0010: /* voltage mV */
+        snprintf(buf, sizeof(buf), "%u.%02u", data[0] / 1000, (data[0] % 1000) / 10);
+        grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
+        grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), data[0] / 100); /* 0..280 = 0..28.0V */
+        break;
+    case 0x0011: /* current mA */
+        snprintf(buf, sizeof(buf), "%u.%03u A", data[0] / 1000, data[0] % 1000);
+        grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
+        break;
+    case 0x0012: /* power dW (0.1W) */
+        snprintf(buf, sizeof(buf), "%u.%u W", data[0] / 10, data[0] % 10);
+        grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
+        break;
+    case 0x0013: /* session energy mWh, low 16 */
+        g_sess_mWh = (g_sess_mWh & 0xFFFF0000UL) | (u32)data[0];
+        wh_paint();
+        break;
+    case 0x0014: /* session energy mWh, high 16 */
+        g_sess_mWh = (g_sess_mWh & 0x0000FFFFUL) | ((u32)data[0] << 16);
+        wh_paint();
+        break;
+    case 0x0018: /* session elapsed seconds */
+        elapsed_paint(data[0]);
+        break;
+    case 0x0019: /* active profile type */
+        g_ap_type = (u8)data[0];
+        ap_paint();
+        break;
+    case 0x001A: /* active profile setpoint mV */
+        g_ap_mV = data[0];
+        ap_paint();
+        break;
+    case 0x0016: /* real output state from RP -> drive toggle */
+        g_out_on = data[0];
+        view1_set_output_btn(g_out_on);
+        break;
+    case 0x0017: /* active rail position from RP -> highlight on list render */
+        g_applied = (data[0] >= MAX_PROF) ? 0xFF : (u8)data[0];
+        break;
+    case 0x0031: /* boot output state from RP -> shadow + live repaint if on view4 */
+        g_v4_boot = data[0];
+        if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
+            boot_state_paint(g_v4_boot);
+        break;
+    case 0x0030: /* brightness % from RP -> backlight now; repaint if on view4 */
+        g_v4_bright = (data[0] < 10) ? 10 : (data[0] > 100 ? 100 : data[0]);
+        bright_backlight(g_v4_bright); /* global: applies even when off view4 */
+        if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
+        {
+            bright_slider(g_v4_bright);
+            bright_label(g_v4_bright);
+        }
+        break;
+    case 0x0032: /* auto-arm from RP -> shadow + live repaint if on view4 */
+        g_v4_autoarm = data[0];
+        if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
+            grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
+        break;
+    case 0x0101:
+    { /* list ready -> render */
+        g_prof_n = grf_reg_get(0x0100);
+        if (g_prof_n > MAX_PROF)
+            g_prof_n = MAX_PROF;
+        g_sel = 0xFF;
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
+        use_btn_set(0, "Select a rail");
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY1), g_prof_n ? 1 : 0);
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY2), g_prof_n ? 1 : 0);
+        for (u8 i = 0; i < g_prof_n; i++)
+        {
+            g_prof[i].type = grf_reg_get(0x0110 + i * 4 + 0);
+            g_prof[i].vmin = grf_reg_get(0x0110 + i * 4 + 1);
+            g_prof[i].vmax = grf_reg_get(0x0110 + i * 4 + 2);
+            g_prof[i].imax = grf_reg_get(0x0110 + i * 4 + 3);
+            fill_row(i, &g_prof[i]);
+        }
+        for (u8 i = g_prof_n; i < MAX_PROF; i++)
+            show_row(i, 0); /* hide unused rows */
+        for (u8 i = 0; i < g_prof_n; i++)
+            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
+        if (g_prof_n == 0)
+            g_applied = 0xFF; /* source gone -> forget selection */
+        if (g_applied != 0xFF && g_applied < g_prof_n)
+        {
+            g_sel = g_applied; /* show active rail */
+            highlight_row(g_applied, 1);
+        }
+        break;
+    }
     }
 }
 
-
 #define HEAD_FH 0x5A
 #define HEAD_FL 0xA5
-#define REG_LEN 0x800 
+#define REG_LEN 0x800
 static u16 ctrlreg[REG_LEN] = {0};
 
-s32 grf_reg_set(u16 addr,u16 data)
+s32 grf_reg_set(u16 addr, u16 data)
 {
-    if(addr>REG_LEN){
+    if (addr > REG_LEN)
+    {
         return GRF_FAIL;
     }
     ctrlreg[addr] = data;
@@ -432,74 +545,79 @@ s32 grf_reg_set(u16 addr,u16 data)
 
 s32 grf_reg_get(u16 addr)
 {
-    if(addr>REG_LEN){
+    if (addr > REG_LEN)
+    {
         return GRF_FAIL;
     }
     // grf_printf("get reg %04X = %04X\n",addr,ctrlreg[addr]);
     return ctrlreg[addr];
 }
-//*********write reg********** 
-//TX - FH FL len cmd addr data0 data1
+//*********write reg**********
+// TX - FH FL len cmd addr data0 data1
 //     5A A5 07  82  0001 FFFF  FFFF
-//RX - 无
+// RX - 无
 
-//*********read reg********** 
-//TX -  FH FL len cmd addr reglen
+//*********read reg**********
+// TX -  FH FL len cmd addr reglen
 //      5A A5 04  83  0001  02
-//RX -  FH FL len cmd addr reglen data0 data1
+// RX -  FH FL len cmd addr reglen data0 data1
 //      5A A5 08  83  0001  02    FFFF  FFFF
 
-static s32 grf_reg_s_set(u16 addr,u8* data,u8 len)
+static s32 grf_reg_s_set(u16 addr, u8 *data, u8 len)
 {
-    if(addr>REG_LEN){
+    if (addr > REG_LEN)
+    {
         return GRF_FAIL;
     }
-    u8 i=0;
-    for(i=0;i<len;i++){
-        ctrlreg[addr+i] = (data[i*2]<<8)+data[i*2+1];
+    u8 i = 0;
+    for (i = 0; i < len; i++)
+    {
+        ctrlreg[addr + i] = (data[i * 2] << 8) + data[i * 2 + 1];
         // grf_printf("reg_s_set %04X = %04X\n",addr+i,ctrlreg[addr+i]);
-        grf_reg_set_user(addr,ctrlreg+addr+i,1);
+        grf_reg_set_user(addr, ctrlreg + addr + i, 1);
     }
     return GRF_OK;
 }
-s32 grf_reg_com_send(u16 addr,u16 len)
+s32 grf_reg_com_send(u16 addr, u16 len)
 {
     u8 txdata[257] = {0};
-    u32 i=0,j=0;
+    u32 i = 0, j = 0;
     txdata[i++] = HEAD_FH;
     txdata[i++] = HEAD_FL;
-    txdata[i++] = len*2+4;
+    txdata[i++] = len * 2 + 4;
     txdata[i++] = 0x83;
-    txdata[i++] = addr>>8;
-    txdata[i++] = (addr&0x00ff);
+    txdata[i++] = addr >> 8;
+    txdata[i++] = (addr & 0x00ff);
     txdata[i++] = len;
-    for(j=0;j<len;j++){
-        txdata[i++] = (ctrlreg[addr+j]>>8);
-        txdata[i++] = (ctrlreg[addr+j]&0x00ff);
+    for (j = 0; j < len; j++)
+    {
+        txdata[i++] = (ctrlreg[addr + j] >> 8);
+        txdata[i++] = (ctrlreg[addr + j] & 0x00ff);
     }
-    grf_drv_uart_send(drv_uart,txdata,i);
+    grf_drv_uart_send(drv_uart, txdata, i);
 }
 
-static s32 grf_comm_handle(u8* data)
+static s32 grf_comm_handle(u8 *data)
 {
-	u8 cmd = data[3];
-	u8 len = data[2];
-    u16 addr = (data[4]<<8)+data[5];
-    u32 i=0;
-    if(addr>REG_LEN){
+    u8 cmd = data[3];
+    u8 len = data[2];
+    u16 addr = (data[4] << 8) + data[5];
+    u32 i = 0;
+    if (addr > REG_LEN)
+    {
         return GRF_FAIL;
     }
-//    grf_printf("cmd=%x\n",cmd);
+    //    grf_printf("cmd=%x\n",cmd);
     switch (cmd)
     {
-        case 0x82: //写寄存器
-        {
-            u32 regcount = (len-3)>>1;
-            grf_reg_s_set(addr,data+6,regcount);
-        }
-        break;
-        case 0x83: //读寄存器
-        	grf_reg_com_send(addr,data[6]);
+    case 0x82: // 写寄存器
+    {
+        u32 regcount = (len - 3) >> 1;
+        grf_reg_s_set(addr, data + 6, regcount);
+    }
+    break;
+    case 0x83: // 读寄存器
+        grf_reg_com_send(addr, data[6]);
         break;
     }
     return GRF_OK;
@@ -507,23 +625,25 @@ static s32 grf_comm_handle(u8* data)
 
 #define UART_LASTBUFF 1
 #if UART_LASTBUFF
-#define RX_BUF_LEN   1024
+#define RX_BUF_LEN 1024
 static u8 RX_HAND_BUF[RX_BUF_LEN];
 #endif
-static void recive_data_handle(u8* databuf,u32 datalen)
+static void recive_data_handle(u8 *databuf, u32 datalen)
 {
-	u16 i = 0;
-	static u16 last_data_num=0;
+    u16 i = 0;
+    static u16 last_data_num = 0;
 #if UART_LASTBUFF
-	if(last_data_num + datalen > RX_BUF_LEN){
-		datalen = RX_BUF_LEN - last_data_num;
-	}
-	if(last_data_num){ 
-		memcpy(RX_HAND_BUF+last_data_num,databuf,datalen);
-		databuf=RX_HAND_BUF;
-		datalen+=last_data_num;
-		last_data_num = 0;
-	}
+    if (last_data_num + datalen > RX_BUF_LEN)
+    {
+        datalen = RX_BUF_LEN - last_data_num;
+    }
+    if (last_data_num)
+    {
+        memcpy(RX_HAND_BUF + last_data_num, databuf, datalen);
+        databuf = RX_HAND_BUF;
+        datalen += last_data_num;
+        last_data_num = 0;
+    }
 #endif
 #if 0
     u16 j;
@@ -533,37 +653,42 @@ static void recive_data_handle(u8* databuf,u32 datalen)
 	}
 	grf_printf("\n",datalen);
 #endif
-	if(datalen >= 6){//最短的指令为6个
-		for(i = 0;i <= datalen-6; i++)
+    if (datalen >= 6)
+    { // 最短的指令为6个
+        for (i = 0; i <= datalen - 6; i++)
         {
-			if((databuf[i]==HEAD_FH) && (databuf[i+1]==HEAD_FL))
-			{
-    			if(databuf[i+2] <= (datalen-i-3)){
-                    if(grf_comm_handle(databuf+i)==GRF_OK){
-                        i += (databuf[i+2]+3)-1;
+            if ((databuf[i] == HEAD_FH) && (databuf[i + 1] == HEAD_FL))
+            {
+                if (databuf[i + 2] <= (datalen - i - 3))
+                {
+                    if (grf_comm_handle(databuf + i) == GRF_OK)
+                    {
+                        i += (databuf[i + 2] + 3) - 1;
                     }
-    			}
-			}	
-		}
-	}
-    if(i < datalen){
-        last_data_num = datalen-i;
+                }
+            }
+        }
+    }
+    if (i < datalen)
+    {
+        last_data_num = datalen - i;
     }
 
-#if UART_LASTBUFF	
-	if(last_data_num <= 256 && last_data_num != 0)
-	{
-		u8  last_data_buf[256] = {0};
-		memcpy(last_data_buf,databuf+i,last_data_num);
-		memcpy(RX_HAND_BUF,last_data_buf,last_data_num);
-	}else{
-		last_data_num=0;			
-	}
+#if UART_LASTBUFF
+    if (last_data_num <= 256 && last_data_num != 0)
+    {
+        u8 last_data_buf[256] = {0};
+        memcpy(last_data_buf, databuf + i, last_data_num);
+        memcpy(RX_HAND_BUF, last_data_buf, last_data_num);
+    }
+    else
+    {
+        last_data_num = 0;
+    }
 #else
-	last_data_num = 0;
+    last_data_num = 0;
 #endif
 }
-
 
 void grf_uart_init(void)
 {
@@ -575,13 +700,10 @@ void grf_uart_init(void)
     cfg_t.parity_e = UART_PARITY_NONE;
     cfg_t.stop_e = UART_STOP_1;
     drv_uart = grf_drv_uart_open(cfg_t);
-    if(drv_uart){
-        grf_drv_uart_rev_set_bfun(drv_uart,recive_data_handle,1024);
+    if (drv_uart)
+    {
+        grf_drv_uart_rev_set_bfun(drv_uart, recive_data_handle, 1024);
     }
 }
 
-
 #endif
-
-
-
