@@ -42,7 +42,7 @@ static u8 g_prof_n = 0;
  * That doubles as the column index into THEME[role][0=dark | 1=light]. */
 enum {
     TC_BG, TC_SURF, TC_SURF2, TC_TRACK, TC_TXT, TC_TXT2, TC_TXT3,
-    TC_GREEN, TC_RED, TC_ORANGE, TC_BLUE, TC_N
+	TC_GREEN, TC_RED, TC_ORANGE, TC_BLUE, TC_CHIP, TC_N
 };
 static const u32 THEME[TC_N][2] = {
     /*               dark                          light                       */
@@ -56,8 +56,9 @@ static const u32 THEME[TC_N][2] = {
     /* TC_GREEN  */ { GRF_COLOR_GET(0x30,0xD1,0x58), GRF_COLOR_GET(0x34,0xC7,0x59) },
     /* TC_RED    */ { GRF_COLOR_GET(0xFF,0x45,0x3A), GRF_COLOR_GET(0xFF,0x3B,0x30) },
     /* TC_ORANGE */ { GRF_COLOR_GET(0xFF,0x9F,0x0A), GRF_COLOR_GET(0xFF,0x95,0x00) },
-    /* TC_BLUE   */ { GRF_COLOR_GET(0x0A,0x84,0xFF), GRF_COLOR_GET(0x00,0x7A,0xFF) },
-};
+	/* TC_BLUE   */ { GRF_COLOR_GET(0x0A,0x84,0xFF), GRF_COLOR_GET(0x00,0x7A,0xFF) },
+	/* TC_CHIP   */ { GRF_COLOR_GET(0x2C,0x2C,0x2E), GRF_COLOR_GET(0xFF,0xFF,0xFF) },
+	};
 static u8 g_dark = 0;
 #define TCOL(role) (THEME[(role)][g_dark])          /* current color for a role */
 #define THEME_BG(ctrl, role)  grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
@@ -105,7 +106,7 @@ static void highlight_row(u8 i, u8 on)
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), on ? 0 : 1);
     /* background chip: orange tint when selected, default card when not */
     grf_ctrl_style_set_bg_color(bg,
-                                on ? GRF_COLOR_GET(0x3A, 0x2A, 0x10) : GRF_COLOR_GET(0x1C, 0x1C, 0x1E), 0);
+                                    on ? GRF_COLOR_GET(0x3A, 0x2A, 0x10) : TCOL(TC_SURF), 0);
     /* #ff9f0a border: move the single outline box over the selected row */
     if (on)
     {
@@ -353,7 +354,39 @@ static void theme_apply_view1(void)
 #define V2_BRAND  91   /* label85 — "C-Bench"     txt  */
 #define V2_SUB    94   /* label87 — "· Profiles"  txt2 */
 #define V2_TITLE  97   /* label90 — "Profiles"    txt  */
+#define V2_NAV    92   /* image0  — nav bar image  img swap */
 /* status line label91 (id 98) reuses LBL_STAT */
+
+static void row_badge_colors(u8 i)   /* per-type badge bg/txt */
+{
+    grf_ctrl_t *b = GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]);
+    switch (g_prof[i].type)
+    {
+    case 1: grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0x64,0xD2,0xFF), 0); /* PPS */
+            grf_label_set_txt_color(b, GRF_COLOR_GET(0x06,0x2A,0x30)); break;
+    case 2: grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0xFF,0x9F,0x0A), 0); /* AVS */
+            grf_label_set_txt_color(b, GRF_COLOR_GET(0x2A,0x18,0x00)); break;
+    case 3: grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0xBF,0x5A,0xF2), 0); /* EPR */
+            grf_label_set_txt_color(b, GRF_COLOR_GET(0x1E,0x0C,0x33)); break;
+    default: grf_ctrl_style_set_bg_color(b, TCOL(TC_CHIP), 0);                /* FIX */
+            grf_label_set_txt_color(b, TCOL(TC_TXT2)); break;
+    }
+}
+
+static void view2_paint_cards(void)   /* single row-color authority: render + entry + theme */
+{
+    for (u8 i = 0; i < MAX_PROF; i++)
+    {
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]),
+            (i == g_sel) ? GRF_COLOR_GET(0x3A, 0x2A, 0x10) : TCOL(TC_SURF), 0);
+        if (i >= g_prof_n) continue;
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_VOLT]),  TCOL(TC_TXT));                /* range "5.0-11.0 V" */
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_META]),  TCOL(TC_TXT2));               /* "adjustable rail" */
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CURR]),  GRF_COLOR_GET(0x64,0xD2,0xFF)); /* current = blue, both themes */
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), GRF_COLOR_GET(0xFF,0x9F,0x0A)); /* check = orange, both themes */
+        row_badge_colors(i);
+    }
+}
 
 static void theme_apply_view2(void)
 {
@@ -362,10 +395,13 @@ static void theme_apply_view2(void)
     THEME_TXT(GCL(GRF_VIEW2_ID, V2_SUB),   TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW2_ID, V2_TITLE), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW2_ID, LBL_STAT), TC_TXT2);
-        THEME_TXT(GCL(GRF_VIEW2_ID, LBL_EMPTY1), TC_TXT3);
-        THEME_TXT(GCL(GRF_VIEW2_ID, LBL_EMPTY2), TC_TXT3);
-        use_btn_paint();   /* re-apply Use button idle colors / visibility for theme */
-    }
+    THEME_TXT(GCL(GRF_VIEW2_ID, LBL_EMPTY1), TC_TXT3);
+    THEME_TXT(GCL(GRF_VIEW2_ID, LBL_EMPTY2), TC_TXT3);
+    use_btn_paint();   /* re-apply Use button idle colors / visibility for theme */
+    view2_paint_cards(); /* row cards (selection-aware) + FIX badges */
+    grf_img_set_src(GCL(GRF_VIEW2_ID, V2_NAV),
+    g_dark ? "nav-profiles-light.png" : "nav-profiles.png");
+}
 static void theme_apply(void)               /* repaint all themed views from g_dark */
 {
 	theme_apply_view1();
@@ -513,9 +549,9 @@ static void fill_row(u8 i, prof_t *p)
         btx = GRF_COLOR_GET(0x1E, 0x0C, 0x33);
         break;
     default:
-        badge = "FIX";
-        bbg = GRF_COLOR_GET(0x2C, 0x2C, 0x2E);
-        btx = GRF_COLOR_GET(0x8E, 0x8E, 0x93);
+            badge = "FIX";
+            bbg = TCOL(TC_CHIP);
+            btx = TCOL(TC_TXT2);
         break;
     }
     u8 range = (p->vmin != p->vmax);
@@ -669,11 +705,12 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         if (g_prof_n == 0)
             g_applied = 0xFF; /* source gone -> forget selection */
         if (g_applied != 0xFF && g_applied < g_prof_n)
-        {
-            g_sel = g_applied; /* show active rail */
-            highlight_row(g_applied, 1);
-        }
-        break;
+                {
+                    g_sel = g_applied; /* show active rail */
+                    highlight_row(g_applied, 1);
+                }
+                view2_paint_cards(); /* apply all row column colors after render */
+                break;
     }
     }
 }
