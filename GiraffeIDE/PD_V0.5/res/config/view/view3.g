@@ -20,7 +20,7 @@
         "alpha" : 255,
         "pub" : true
       },
-      "init_img" : "nav_battery.png",
+      "init_img" : "nav-battery.png",
       "rotate_pt" : { }
     }
   }, {

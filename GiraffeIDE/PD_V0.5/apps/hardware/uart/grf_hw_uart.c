@@ -265,14 +265,15 @@ void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
  * g_dark holds the 0x0039 reg value: 0 = dark, 1 = light.
  * That doubles as the column index into THEME[role][0=dark | 1=light]. */
 enum {
-    TC_BG, TC_SURF, TC_SURF2, TC_TXT, TC_TXT2,
-    TC_GREEN, TC_RED, TC_ORANGE, TC_BLUE, TC_N
+	TC_BG, TC_SURF, TC_SURF2, TC_TRACK, TC_TXT, TC_TXT2,
+	    TC_GREEN, TC_RED, TC_ORANGE, TC_BLUE, TC_N
 };
 static const u32 THEME[TC_N][2] = {
     /*               dark                          light                       */
     /* TC_BG     */ { GRF_COLOR_GET(0x00,0x00,0x00), GRF_COLOR_GET(0xF2,0xF2,0xF7) },
     /* TC_SURF   */ { GRF_COLOR_GET(0x1C,0x1C,0x1E), GRF_COLOR_GET(0xFF,0xFF,0xFF) },
-    /* TC_SURF2  */ { GRF_COLOR_GET(0x2C,0x2C,0x2E), GRF_COLOR_GET(0xE5,0xE5,0xEA) },
+	/* TC_SURF2  */ { GRF_COLOR_GET(0x2C,0x2C,0x2E), GRF_COLOR_GET(0xE5,0xE5,0xEA) },
+	/* TC_TRACK  */ { GRF_COLOR_GET(0x44,0x44,0x46), GRF_COLOR_GET(0xC7,0xC7,0xCC) },
     /* TC_TXT    */ { GRF_COLOR_GET(0xFF,0xFF,0xFF), GRF_COLOR_GET(0x00,0x00,0x00) },
     /* TC_TXT2   */ { GRF_COLOR_GET(0x8E,0x8E,0x93), GRF_COLOR_GET(0x6C,0x6C,0x70) },
     /* TC_GREEN  */ { GRF_COLOR_GET(0x30,0xD1,0x58), GRF_COLOR_GET(0x34,0xC7,0x59) },
@@ -285,16 +286,53 @@ static u8 g_dark = 0;
 #define THEME_BG(ctrl, role)  grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
 
-#define LBL_T1 19  /* label16 */
-#define LBL_T2 20  /* label17 */
-#define LBL_T3  2  /* label1  */
-static void theme_apply(void)               /* paint themed controls from g_dark */
+/* ── view1 (Monitor) themed control IDs ── */
+#define V1_VVAL    1   /* label0  — voltage value      txt */
+#define V1_LBL25  29   /* label25 —                    txt */
+#define V1_LBL26  30   /* label26 —                    txt2 */
+#define V1_LBL19  23   /* label19 —                    txt2 */
+#define V1_LBL20  24   /* label20 —                    green */
+#define V1_PROF   22   /* label18 — active profile     txt2 */
+#define V1_CARD1  19   /* label16 — card surface       surf */
+#define V1_CARD2  20   /* label17 — card surface       surf */
+#define V1_CARD3   2   /* label1  — card surface       surf */
+#define V1_RST    16   /* label13 — reset chip         surf2 + txt2 */
+#define V1_ARROW  21   /* image1  — reset arrow icon   img swap */
+#define V1_RSTHL  25   /* label21 — reset press tint   txt (press dir) */
+#define V1_ELAP   26   /* label22 — elapsed value      txt */
+#define V1_NAV    10   /* image0  — nav bar image      img swap */
+
+static void theme_apply_view1(void)
 {
-    /* TEST set (view1 cards) — now uses the real SURFACE role.
-     * Replaced per-view by theme_apply_viewN() as we extend coverage. */
-    THEME_BG(GCL(GRF_VIEW1_ID, LBL_T1), TC_SURF);
-    THEME_BG(GCL(GRF_VIEW1_ID, LBL_T2), TC_SURF);
-    THEME_BG(GCL(GRF_VIEW1_ID, LBL_T3), TC_SURF);
+    grf_view_set_bgcolor(GRF_VIEW1_ID, TCOL(TC_BG));        /* screen bg */
+    THEME_TXT(GCL(GRF_VIEW1_ID, V1_VVAL), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW1_ID, V1_LBL25), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW1_ID, V1_LBL26), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW1_ID, V1_LBL19), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW1_ID, V1_LBL20), TC_GREEN);
+    THEME_TXT(GCL(GRF_VIEW1_ID, V1_PROF), TC_TXT2);
+    THEME_BG(GCL(GRF_VIEW1_ID, V1_CARD1), TC_SURF);
+    THEME_BG(GCL(GRF_VIEW1_ID, V1_CARD2), TC_SURF);
+    THEME_BG(GCL(GRF_VIEW1_ID, V1_CARD3), TC_SURF);
+    {   /* arc voltage ring — track is a line (part 0): color,width,opa,rounded */
+            grf_line_disp_t arc_bg = { TCOL(TC_TRACK), 27, 255, 12 };
+            grf_arc_set_dis(GCL(GRF_VIEW1_ID, ARC_VOLT), 0, arc_bg);
+        }
+        /* session: reset chip + elapsed */
+        THEME_BG (GCL(GRF_VIEW1_ID, V1_RST),   TC_SURF2);
+        THEME_TXT(GCL(GRF_VIEW1_ID, V1_RST),   TC_TXT2);
+        THEME_BG (GCL(GRF_VIEW1_ID, V1_RSTHL), TC_TXT);     /* press-tint color; opacity from IDE */
+        THEME_TXT(GCL(GRF_VIEW1_ID, V1_ELAP),  TC_TXT);
+        /* image swaps (dark vs light asset) */
+        grf_img_set_src(GCL(GRF_VIEW1_ID, V1_ARROW),
+                        g_dark ? "arrow-light.png"        : "arrow-dark.png");
+        grf_img_set_src(GCL(GRF_VIEW1_ID, V1_NAV),
+                        g_dark ? "nav-monitor-light.png"  : "nav-monitor.png");
+    }
+
+static void theme_apply(void)               /* repaint all themed views from g_dark */
+{
+    theme_apply_view1();
 }
 void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
 void view1_toggle_theme(void)               /* user tap: flip + apply + persist */

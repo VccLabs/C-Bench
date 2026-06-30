@@ -11,22 +11,6 @@
   "imagePath" : "view2.png",
   "child" : [ ]
 }, {
-  "imageId" : 6,
-  "imagePath" : "nav_battery.png",
-  "child" : [ ]
-}, {
-  "imageId" : 8,
-  "imagePath" : "nav_monitor.png",
-  "child" : [ ]
-}, {
-  "imageId" : 9,
-  "imagePath" : "nav_profiles.png",
-  "child" : [ ]
-}, {
-  "imageId" : 10,
-  "imagePath" : "nav_settings.png",
-  "child" : [ ]
-}, {
   "imageId" : 11,
   "imagePath" : "view4.png",
   "child" : [ ]
@@ -39,7 +23,27 @@
   "imagePath" : "Brightness symbol_small.png",
   "child" : [ ]
 }, {
+  "imageId" : 4,
+  "imagePath" : "arrow-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 13,
+  "imagePath" : "arrow-light.png",
+  "child" : [ ]
+}, {
   "imageId" : 3,
-  "imagePath" : "arrow.png",
+  "imagePath" : "nav-battery.png",
+  "child" : [ ]
+}, {
+  "imageId" : 14,
+  "imagePath" : "nav-monitor.png",
+  "child" : [ ]
+}, {
+  "imageId" : 15,
+  "imagePath" : "nav-profiles.png",
+  "child" : [ ]
+}, {
+  "imageId" : 16,
+  "imagePath" : "nav-settings.png",
   "child" : [ ]
 } ]

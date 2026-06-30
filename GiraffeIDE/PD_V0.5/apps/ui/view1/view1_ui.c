@@ -352,6 +352,7 @@ void view1_entry(void)
 	view1_sync_armed();
 	view4_request_settings();   /* HMI is up -> pull saved settings into the shadow */
 	view1_apply_theme();
+	view1_reset_press(0);       /* force press-tint overlay hidden on entry (default-visible fix) */
 }
 
 void view1_exit(void)

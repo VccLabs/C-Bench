@@ -86,15 +86,15 @@
   .session .hd .t{ font-size:12.5px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; color:var(--txt2);
                    display:flex; align-items:center; gap:7px; }
   .session .hd .t .dot{ width:8px; height:8px; border-radius:50%; background:var(--orange); }
-  .reset{ display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:var(--txt2);
-          background:var(--card2); border:none; border-radius:20px; padding:6px 12px; cursor:pointer; font-family:inherit; }
+  .reset{ display:flex; align-items:center; gap:8px; font-size:21px; font-weight:600; color:var(--txt2);
+          background:var(--card2); border:none; border-radius:26px; padding:12px 22px; cursor:pointer; font-family:inherit; }
   .reset:active{ transform:scale(.94); }
-  .srow{ display:flex; align-items:flex-end; gap:8px; margin-top:10px; }
+  .srow{ display:flex; align-items:center; gap:8px; margin-top:10px; }
   .energy{ font-weight:700; font-size:40px; letter-spacing:-.03em; color:var(--orange); line-height:1; }
   .energy small{ font-size:18px; font-weight:600; color:var(--txt2); margin-left:3px; }
-  .ssub{ margin-left:auto; display:flex; gap:22px; text-align:right; }
+  .ssub{ margin-left:auto; display:flex; align-items:center; gap:20px; text-align:right; }
   .ssub .s .sk{ font-size:11.5px; font-weight:500; color:var(--txt3); letter-spacing:.02em; }
-  .ssub .s .sv{ font-size:19px; font-weight:700; color:var(--txt); letter-spacing:-.02em; margin-top:2px;
+  .ssub .s .sv{ font-size:26px; font-weight:700; color:var(--txt); letter-spacing:-.02em; margin-top:2px;
                 font-variant-numeric:tabular-nums; }
 
   /* output capsule */
@@ -159,16 +159,15 @@
   <div class="session">
     <div class="hd">
       <div class="t"><span class="dot"></span>This session</div>
-      <button class="reset" id="reset">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v4h4"/></svg>
-        Reset
-      </button>
     </div>
     <div class="srow">
       <div class="energy" id="eval">6.74<small>Wh</small></div>
       <div class="ssub">
-        <div class="s"><div class="sk">Charge</div><div class="sv" id="qval">1.82 Ah</div></div>
         <div class="s"><div class="sk">Elapsed</div><div class="sv" id="tval">08:14</div></div>
+        <button class="reset" id="reset">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v4h4"/></svg>
+          Reset
+        </button>
       </div>
     </div>
   </div>
@@ -200,7 +199,6 @@
             : `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`; }
   function paintSession(){
     $('eval').innerHTML = (e_mWh/1000).toFixed(2)+'<small>Wh</small>';
-    $('qval').textContent = (q_mAh/1000).toFixed(2)+' Ah';
     $('tval').textContent = fmtT(t_s);
   }
   function render(){

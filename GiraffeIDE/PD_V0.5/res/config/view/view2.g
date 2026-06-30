@@ -237,7 +237,7 @@
         "alpha" : 255,
         "pub" : true
       },
-      "init_img" : "nav_profiles.png",
+      "init_img" : "nav-profiles.png",
       "rotate_pt" : { }
     }
   }, {

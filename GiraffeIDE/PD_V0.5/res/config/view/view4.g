@@ -54,7 +54,7 @@
         "alpha" : 255,
         "pub" : true
       },
-      "init_img" : "nav_settings.png",
+      "init_img" : "nav-settings.png",
       "rotate_pt" : { }
     }
   }, {
