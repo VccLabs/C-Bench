@@ -334,10 +334,11 @@ static void applyControl(uint16_t addr, uint16_t val)
     g_set.autoArm = (val != 0); // auto-arm output after apply
     saveSettings();
     break;
-  case 0x0033: // panel entered view4 -> push stored settings back for display
+  case 0x0033: // panel entered view4 / HMI ready -> push stored settings back for display
     writeReg(0x0031, g_set.bootLastUsed);
     writeReg(0x0032, g_set.autoArm);
     writeReg(0x0039, g_set.theme);
+    writeReg(0x0016, outputOn ? 1 : 0); /* real output state -> view1 toggle reflects arm on boot */
     break;
   case 0x0039: // theme from panel (0=dark,1=light)
     if (g_set.theme != (uint8_t)(val ? 1 : 0))
