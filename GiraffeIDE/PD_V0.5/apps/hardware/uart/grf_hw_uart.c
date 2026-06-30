@@ -37,6 +37,32 @@ static u8 g_prof_n = 0;
 #define BTN_USE 90  /* label84 - Use/apply button */
 #define SEL_BOX 84  /* <- set to the selbox outline control's ID */
 
+/* ───────── THEME COLOR TABLE ─────────
+ * g_dark holds the 0x0039 reg value: 0 = dark, 1 = light.
+ * That doubles as the column index into THEME[role][0=dark | 1=light]. */
+enum {
+    TC_BG, TC_SURF, TC_SURF2, TC_TRACK, TC_TXT, TC_TXT2, TC_TXT3,
+    TC_GREEN, TC_RED, TC_ORANGE, TC_BLUE, TC_N
+};
+static const u32 THEME[TC_N][2] = {
+    /*               dark                          light                       */
+    /* TC_BG     */ { GRF_COLOR_GET(0x00,0x00,0x00), GRF_COLOR_GET(0xF2,0xF2,0xF7) },
+    /* TC_SURF   */ { GRF_COLOR_GET(0x1C,0x1C,0x1E), GRF_COLOR_GET(0xFF,0xFF,0xFF) },
+    /* TC_SURF2  */ { GRF_COLOR_GET(0x2C,0x2C,0x2E), GRF_COLOR_GET(0xE5,0xE5,0xEA) },
+    /* TC_TRACK  */ { GRF_COLOR_GET(0x44,0x44,0x46), GRF_COLOR_GET(0xC7,0xC7,0xCC) },
+    /* TC_TXT    */ { GRF_COLOR_GET(0xFF,0xFF,0xFF), GRF_COLOR_GET(0x00,0x00,0x00) },
+    /* TC_TXT2   */ { GRF_COLOR_GET(0x8E,0x8E,0x93), GRF_COLOR_GET(0x6C,0x6C,0x70) },
+    /* TC_TXT3   */ { GRF_COLOR_GET(0x47,0x47,0x47), GRF_COLOR_GET(0xC7,0xC7,0xCC) },
+    /* TC_GREEN  */ { GRF_COLOR_GET(0x30,0xD1,0x58), GRF_COLOR_GET(0x34,0xC7,0x59) },
+    /* TC_RED    */ { GRF_COLOR_GET(0xFF,0x45,0x3A), GRF_COLOR_GET(0xFF,0x3B,0x30) },
+    /* TC_ORANGE */ { GRF_COLOR_GET(0xFF,0x9F,0x0A), GRF_COLOR_GET(0xFF,0x95,0x00) },
+    /* TC_BLUE   */ { GRF_COLOR_GET(0x0A,0x84,0xFF), GRF_COLOR_GET(0x00,0x7A,0xFF) },
+};
+static u8 g_dark = 0;
+#define TCOL(role) (THEME[(role)][g_dark])          /* current color for a role */
+#define THEME_BG(ctrl, role)  grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
+#define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
+
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
 enum
 {
@@ -94,13 +120,28 @@ static void highlight_row(u8 i, u8 on)
     }
 }
 
+static u8   g_use_en = 0;                 /* shadow: 1 = selected/orange, 0 = "Select a rail" */
+static char g_use_txt[40] = "Select a rail";
+static void use_btn_paint(void)           /* paint Use button from shadow + theme */
+{
+    if (g_prof_n == 0)                    /* no source -> hide the button entirely */
+    {
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, BTN_USE), 1);
+        return;
+    }
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, BTN_USE), 0);
+    grf_label_set_txt(GCL(GRF_VIEW2_ID, BTN_USE), g_use_txt);
+    /* selected: fixed orange (same both themes). idle: themed surface/text. */
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, BTN_USE),
+                                g_use_en ? GRF_COLOR_GET(0xFF, 0x9F, 0x0A) : TCOL(TC_SURF2), 0);
+    grf_label_set_txt_color(GCL(GRF_VIEW2_ID, BTN_USE),
+                            g_use_en ? GRF_COLOR_GET(0x23, 0x13, 0x00) : TCOL(TC_TXT2));
+}
 static void use_btn_set(u8 enabled, const char *txt)
 {
-    grf_label_set_txt(GCL(GRF_VIEW2_ID, BTN_USE), txt);
-    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, BTN_USE),
-                                enabled ? GRF_COLOR_GET(0xFF, 0x9F, 0x0A) : GRF_COLOR_GET(0x2C, 0x2C, 0x2E), 0);
-    grf_label_set_txt_color(GCL(GRF_VIEW2_ID, BTN_USE),
-                            enabled ? GRF_COLOR_GET(0x23, 0x13, 0x00) : GRF_COLOR_GET(0x8E, 0x8E, 0x93));
+    g_use_en = enabled;
+    snprintf(g_use_txt, sizeof(g_use_txt), "%s", txt);
+    use_btn_paint();
 }
 
 static void adj_labels(u16 mv, u16 ma)
@@ -264,31 +305,6 @@ void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
     grf_reg_com_send(0x0025, 1);
 }
 
-/* ───────── THEME COLOR TABLE ─────────
- * g_dark holds the 0x0039 reg value: 0 = dark, 1 = light.
- * That doubles as the column index into THEME[role][0=dark | 1=light]. */
-enum {
-	TC_BG, TC_SURF, TC_SURF2, TC_TRACK, TC_TXT, TC_TXT2,
-	    TC_GREEN, TC_RED, TC_ORANGE, TC_BLUE, TC_N
-};
-static const u32 THEME[TC_N][2] = {
-    /*               dark                          light                       */
-    /* TC_BG     */ { GRF_COLOR_GET(0x00,0x00,0x00), GRF_COLOR_GET(0xF2,0xF2,0xF7) },
-    /* TC_SURF   */ { GRF_COLOR_GET(0x1C,0x1C,0x1E), GRF_COLOR_GET(0xFF,0xFF,0xFF) },
-	/* TC_SURF2  */ { GRF_COLOR_GET(0x2C,0x2C,0x2E), GRF_COLOR_GET(0xE5,0xE5,0xEA) },
-	/* TC_TRACK  */ { GRF_COLOR_GET(0x44,0x44,0x46), GRF_COLOR_GET(0xC7,0xC7,0xCC) },
-    /* TC_TXT    */ { GRF_COLOR_GET(0xFF,0xFF,0xFF), GRF_COLOR_GET(0x00,0x00,0x00) },
-    /* TC_TXT2   */ { GRF_COLOR_GET(0x8E,0x8E,0x93), GRF_COLOR_GET(0x6C,0x6C,0x70) },
-    /* TC_GREEN  */ { GRF_COLOR_GET(0x30,0xD1,0x58), GRF_COLOR_GET(0x34,0xC7,0x59) },
-    /* TC_RED    */ { GRF_COLOR_GET(0xFF,0x45,0x3A), GRF_COLOR_GET(0xFF,0x3B,0x30) },
-    /* TC_ORANGE */ { GRF_COLOR_GET(0xFF,0x9F,0x0A), GRF_COLOR_GET(0xFF,0x95,0x00) },
-    /* TC_BLUE   */ { GRF_COLOR_GET(0x0A,0x84,0xFF), GRF_COLOR_GET(0x00,0x7A,0xFF) },
-};
-static u8 g_dark = 0;
-#define TCOL(role) (THEME[(role)][g_dark])          /* current color for a role */
-#define THEME_BG(ctrl, role)  grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
-#define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
-
 /* ── view1 (Monitor) themed control IDs ── */
 #define V1_VVAL    1   /* label0  — voltage value      txt */
 #define V1_LBL25  29   /* label25 —                    txt */
@@ -333,11 +349,30 @@ static void theme_apply_view1(void)
                         g_dark ? "nav-monitor-light.png"  : "nav-monitor.png");
     }
 
+/* ── view2 (Profiles) themed control IDs ── */
+#define V2_BRAND  91   /* label85 — "C-Bench"     txt  */
+#define V2_SUB    94   /* label87 — "· Profiles"  txt2 */
+#define V2_TITLE  97   /* label90 — "Profiles"    txt  */
+/* status line label91 (id 98) reuses LBL_STAT */
+
+static void theme_apply_view2(void)
+{
+    grf_view_set_bgcolor(GRF_VIEW2_ID, TCOL(TC_BG));   /* screen bg */
+    THEME_TXT(GCL(GRF_VIEW2_ID, V2_BRAND), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW2_ID, V2_SUB),   TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW2_ID, V2_TITLE), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW2_ID, LBL_STAT), TC_TXT2);
+        THEME_TXT(GCL(GRF_VIEW2_ID, LBL_EMPTY1), TC_TXT3);
+        THEME_TXT(GCL(GRF_VIEW2_ID, LBL_EMPTY2), TC_TXT3);
+        use_btn_paint();   /* re-apply Use button idle colors / visibility for theme */
+    }
 static void theme_apply(void)               /* repaint all themed views from g_dark */
 {
-    theme_apply_view1();
-}
-void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
+	theme_apply_view1();
+	    theme_apply_view2();
+	}
+	void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
+	void view2_apply_theme(void) { theme_apply(); }   /* view2 entry: repaint from shadow */
 void view1_toggle_theme(void)               /* user tap: flip + apply + persist */
 {
     g_dark ^= 1;
@@ -522,7 +557,7 @@ void view2_apply_status(void) /* label91: source summary or empty-state prompt *
     else
     {
         grf_label_set_txt(GCL(GRF_VIEW2_ID, LBL_STAT),
-            "Connect a USB-C source to the input port to see its power profiles");
+            "Connect a USB-C source to the other type-C port to see its power profiles");
     }
 }
 

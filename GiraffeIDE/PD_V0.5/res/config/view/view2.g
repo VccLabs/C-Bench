@@ -415,7 +415,7 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Plug in a C source in the other Type-C port, PDO's will appear here",
+      "txt" : "Connect a USB-C source to the other type-C port to see its power profiles",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {

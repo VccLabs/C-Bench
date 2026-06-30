@@ -979,8 +979,9 @@ void view2_init(void)
 void view2_entry(void)
 {
 	view2_reset_panel();   /* clear "." placeholders, hide panel, reset Use btn */
-	view2_apply_status();  /* restore source summary / empty prompt after view reset */
-}
+		view2_apply_status();  /* restore source summary / empty prompt after view reset */
+		view2_apply_theme();   /* restore dark/light colors after view reset */
+	}
 
 void view2_exit(void)
 {
