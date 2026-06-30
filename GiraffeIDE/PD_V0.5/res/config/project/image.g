@@ -46,4 +46,20 @@
   "imageId" : 16,
   "imagePath" : "nav-settings.png",
   "child" : [ ]
+}, {
+  "imageId" : 6,
+  "imagePath" : "nav-battery-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 8,
+  "imagePath" : "nav-monitor-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 9,
+  "imagePath" : "nav-profiles-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 10,
+  "imagePath" : "nav-settings-light.png",
+  "child" : [ ]
 } ]

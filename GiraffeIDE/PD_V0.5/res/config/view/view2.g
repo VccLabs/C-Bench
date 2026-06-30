@@ -178,46 +178,6 @@
       } ]
     }
   }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
-        "name" : "label85",
-        "id" : 91,
-        "pt" : { },
-        "size" : {
-          "width" : 186,
-          "height" : 81
-        },
-        "t_mode" : 1,
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true
-      },
-      "auto_hight" : 1,
-      "animspeed" : 50,
-      "align_e" : 34,
-      "txt" : "Monitor",
-      "styles" : [ {
-        "name" : "style",
-        "body_t" : {
-          "padding" : {
-            "top" : 15,
-            "bottom" : 2147483647,
-            "left" : 6,
-            "right" : 2147483647,
-            "inner" : 2147483647
-          }
-        },
-        "txt_t" : {
-          "color" : 16752394,
-          "font_lib" : "Inter_24pt-ExtraBold.ttf",
-          "font_size" : 15
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
     "CLASSNAME" : "image",
     "theme" : "youth",
     "type" : 19,
@@ -331,6 +291,137 @@
         "name" : "style",
         "txt_t" : {
           "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label85",
+        "id" : 91,
+        "pt" : {
+          "x" : 13,
+          "y" : 24
+        },
+        "size" : {
+          "width" : 111,
+          "height" : 34
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW2_LABEL85_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "C-Bench",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 18
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label87",
+        "id" : 94,
+        "pt" : {
+          "x" : 90,
+          "y" : 24
+        },
+        "size" : {
+          "width" : 111,
+          "height" : 33
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW2_LABEL87_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : " .  Profiles",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 9276819,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label90",
+        "id" : 97,
+        "pt" : {
+          "x" : 39,
+          "y" : 78
+        },
+        "size" : {
+          "width" : 186,
+          "height" : 55
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW2_LABEL90_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Profiles",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 33
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label91",
+        "id" : 98,
+        "pt" : {
+          "x" : 39,
+          "y" : 122
+        },
+        "size" : {
+          "width" : 302,
+          "height" : 44
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW2_LABEL91_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Plug in a C source in the other Type-C port, PDO's will appear here",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 9276819,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 12
         },
         "img_t" : { }
       } ]
@@ -3355,7 +3446,6 @@
     "v_name" : "view2",
     "v_id" : 2,
     "bg_scale" : 255,
-    "bg_color" : 4278190080,
-    "bg_image" : "view2.png"
+    "bg_color" : 4278190080
   }
 }

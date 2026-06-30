@@ -15,6 +15,7 @@ int ppsIdx = -1;
 volatile uint16_t reqMV = PPS_TARGET_MV; // reg 0x0020 (next milestone)
 volatile uint16_t limMA = PPS_LIMIT_MA;  // reg 0x0021 (next milestone)
 volatile bool outputOn = false;          // reg 0x0022 - default OFF for safety
+static uint16_t g_arcTgtMV = 0;          // latest measured mV, fed to the arc easer
 volatile int pendingSel = -1;            // reg 0x0023 list position, applied in loop()
 
 // ---- persisted settings (flash via EEPROM emulation) ----
@@ -586,7 +587,7 @@ void loop()
 
   // Telemetry: fast, smooth refresh
   static uint32_t tTel = 0;
-  if (now - tTel >= 500) // 2 Hz
+if (now - tTel >= 500) // 2 Hz
   {
     tTel = now;
     float fmV = ina260.readBusVoltage();
@@ -600,7 +601,8 @@ void loop()
     uint16_t mV = (uint16_t)fmV;
     uint16_t mA = (uint16_t)fmA;
     uint32_t mW = (uint32_t)fmW;
-    writeReg(0x0010, mV);
+writeReg(0x0010, mV);
+    g_arcTgtMV = mV;                       /* feed the analog arc easer */
     writeReg(0x0011, mA);
     writeReg(0x0012, (uint16_t)(mW / 100));
     writeReg(0x0016, outputOn ? 1 : 0);  /* real output state for the view1 toggle */
@@ -609,6 +611,22 @@ void loop()
     activeProfileInfo(&apType, &apMV);
     writeReg(0x0019, apType); /* active profile type (0=none) */
     writeReg(0x001A, apMV);   /* active profile setpoint mV   */
+  }
+
+  // Analog arc easing: ramp the ring toward the measured voltage, pushed faster
+  // than telemetry so it settles like a needle (reg 0x001B). Numeric V stays instant.
+  static uint32_t tArc = 0;
+  static float    arcShown = 0.0f;        // arc units = mV/100 (0..280)
+  static uint16_t lastArc  = 0xFFFF;
+  if (now - tArc >= 40)                    // 25 Hz
+  {
+    tArc = now;
+    float target = g_arcTgtMV / 100.0f;
+    arcShown += (target - arcShown) * 0.22f;   // approach rate: higher = snappier
+    float d = target - arcShown; if (d < 0) d = -d;
+    if (d < 0.5f) arcShown = target;           // snap within 0.05 V
+    uint16_t a = (uint16_t)(arcShown + 0.5f);
+    if (a != lastArc) { lastArc = a; writeReg(0x001B, a); }  // push only on change
   }
   // Fast source-attach watch: kill VOUT ASAP after a contract appears
   static uint32_t tAtt = 0;

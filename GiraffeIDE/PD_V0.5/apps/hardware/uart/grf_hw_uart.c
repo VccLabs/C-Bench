@@ -135,6 +135,7 @@ static void ap_paint(void)
 static u8 g_panel_up = 0;
 static u8 g_arm_pending = 0; /* set on apply, consumed in view1_entry */
 static u8 g_out_on = 0;      /* shadow of real output state (RP reg 0x0016) */
+static u16 g_arc = 0;        /* shadow of eased arc value (RP reg 0x001B) */
 static u8 g_applied = 0xFF;  /* last-applied list position, re-highlighted on return */
 
 static void adj_panel(u8 show)
@@ -240,8 +241,9 @@ static void view1_set_output_btn(u8 on) /* drive output label from real state */
 
 void view1_sync_armed(void) /* called from view1_entry */
 {
-    g_arm_pending = 0;              /* no longer drives the visual */
-    view1_set_output_btn(g_out_on); /* reflect the real state instead */
+	g_arm_pending = 0;              /* no longer drives the visual */
+	    view1_set_output_btn(g_out_on); /* reflect the real state instead */
+	    grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), g_arc); /* restore eased arc after view reset */
 }
 
 void view1_toggle_output(void) /* label7 click: request opposite of real state */
@@ -517,11 +519,14 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
 
     switch (addr)
     {
-    case 0x0010: /* voltage mV */
-        snprintf(buf, sizeof(buf), "%u.%02u", data[0] / 1000, (data[0] % 1000) / 10);
-        grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
-        grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), data[0] / 100); /* 0..280 = 0..28.0V */
-        break;
+    case 0x0010: /* voltage mV (numeric label only; arc eased via 0x001B) */
+            snprintf(buf, sizeof(buf), "%u.%02u", data[0] / 1000, (data[0] % 1000) / 10);
+            grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
+            break;
+    case 0x001B: /* eased arc value (0..280) from RP analog ramp */
+            g_arc = data[0];
+            grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), g_arc);
+            break;
     case 0x0011: /* current mA */
         snprintf(buf, sizeof(buf), "%u.%03u A", data[0] / 1000, data[0] % 1000);
         grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
