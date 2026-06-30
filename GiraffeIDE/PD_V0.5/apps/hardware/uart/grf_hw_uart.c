@@ -26,6 +26,7 @@ static u8 g_prof_n = 0;
 
 #define LBL_EMPTY1 80 /* label78 - "No profiles..." view2*/
 #define LBL_EMPTY2 81 /* label79 - subtitle view2*/
+#define LBL_STAT   98 /* label91 - source summary / empty prompt view2 */
 
 /* view2 adjust panel + Use button (PPS/AVS fine-adjust) */
 #define ADJ_CONT 82 /* container1            */
@@ -502,6 +503,29 @@ static void fill_row(u8 i, prof_t *p)
     show_row(i, 1);
 }
 
+void view2_apply_status(void) /* label91: source summary or empty-state prompt */
+{
+    if (g_prof_n)
+    {
+        u32 maxmw = 0;
+        for (u8 i = 0; i < g_prof_n; i++)
+        {
+            u32 mw = (u32)g_prof[i].vmax * g_prof[i].imax / 1000; /* mV*mA/1000 = mW */
+            if (mw > maxmw) maxmw = mw;
+        }
+        u16 w = (u16)((maxmw + 500) / 1000);
+        char sb[48];
+        snprintf(sb, sizeof(sb), "%u W USB-C \xC2\xB7 %u profile%s",
+                 w, g_prof_n, (g_prof_n == 1) ? "" : "s");
+        grf_label_set_txt(GCL(GRF_VIEW2_ID, LBL_STAT), sb);
+    }
+    else
+    {
+        grf_label_set_txt(GCL(GRF_VIEW2_ID, LBL_STAT),
+            "Connect a USB-C source to the input port to see its power profiles");
+    }
+}
+
 void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
 {
     char buf[16];
@@ -603,7 +627,8 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
             fill_row(i, &g_prof[i]);
         }
         for (u8 i = g_prof_n; i < MAX_PROF; i++)
-            show_row(i, 0); /* hide unused rows */
+                    show_row(i, 0); /* hide unused rows */
+                view2_apply_status(); /* refresh label91 from the new list */
         for (u8 i = 0; i < g_prof_n; i++)
             grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
         if (g_prof_n == 0)
