@@ -881,6 +881,70 @@
       "txt" : "Label"
     }
   }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label25",
+        "id" : 29,
+        "pt" : {
+          "x" : 13,
+          "y" : 24
+        },
+        "size" : {
+          "width" : 111,
+          "height" : 34
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "C-Bench",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 18
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label26",
+        "id" : 30,
+        "pt" : {
+          "x" : 90,
+          "y" : 24
+        },
+        "size" : {
+          "width" : 111,
+          "height" : 33
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW1_LABEL26_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : " .  Monitor",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 9276819,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
     "CLASSNAME" : "image",
     "theme" : "youth",
     "type" : 19,
@@ -955,7 +1019,6 @@
     "v_name" : "view1",
     "v_id" : 1,
     "bg_scale" : 255,
-    "bg_color" : 4278519047,
-    "bg_image" : "view1.png"
+    "bg_color" : 4278519047
   }
 }

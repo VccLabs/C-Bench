@@ -321,6 +321,26 @@ static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)   /* theme toggle
 	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
 }
 
+
+static void label26_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label25_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view1_cc.h"
 void view1_init(void)
 {

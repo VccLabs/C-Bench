@@ -261,17 +261,40 @@ void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
     grf_reg_com_send(0x0025, 1);
 }
 
+/* ───────── THEME COLOR TABLE ─────────
+ * g_dark holds the 0x0039 reg value: 0 = dark, 1 = light.
+ * That doubles as the column index into THEME[role][0=dark | 1=light]. */
+enum {
+    TC_BG, TC_SURF, TC_SURF2, TC_TXT, TC_TXT2,
+    TC_GREEN, TC_RED, TC_ORANGE, TC_BLUE, TC_N
+};
+static const u32 THEME[TC_N][2] = {
+    /*               dark                          light                       */
+    /* TC_BG     */ { GRF_COLOR_GET(0x00,0x00,0x00), GRF_COLOR_GET(0xF2,0xF2,0xF7) },
+    /* TC_SURF   */ { GRF_COLOR_GET(0x1C,0x1C,0x1E), GRF_COLOR_GET(0xFF,0xFF,0xFF) },
+    /* TC_SURF2  */ { GRF_COLOR_GET(0x2C,0x2C,0x2E), GRF_COLOR_GET(0xE5,0xE5,0xEA) },
+    /* TC_TXT    */ { GRF_COLOR_GET(0xFF,0xFF,0xFF), GRF_COLOR_GET(0x00,0x00,0x00) },
+    /* TC_TXT2   */ { GRF_COLOR_GET(0x8E,0x8E,0x93), GRF_COLOR_GET(0x6C,0x6C,0x70) },
+    /* TC_GREEN  */ { GRF_COLOR_GET(0x30,0xD1,0x58), GRF_COLOR_GET(0x34,0xC7,0x59) },
+    /* TC_RED    */ { GRF_COLOR_GET(0xFF,0x45,0x3A), GRF_COLOR_GET(0xFF,0x3B,0x30) },
+    /* TC_ORANGE */ { GRF_COLOR_GET(0xFF,0x9F,0x0A), GRF_COLOR_GET(0xFF,0x95,0x00) },
+    /* TC_BLUE   */ { GRF_COLOR_GET(0x0A,0x84,0xFF), GRF_COLOR_GET(0x00,0x7A,0xFF) },
+};
+static u8 g_dark = 0;
+#define TCOL(role) (THEME[(role)][g_dark])          /* current color for a role */
+#define THEME_BG(ctrl, role)  grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
+#define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
+
 #define LBL_T1 19  /* label16 */
 #define LBL_T2 20  /* label17 */
 #define LBL_T3  2  /* label1  */
-static u8 g_dark = 0;
 static void theme_apply(void)               /* paint themed controls from g_dark */
 {
-    u32 c = g_dark ? GRF_COLOR_GET(0xFF,0xFF,0xFF)
-                   : GRF_COLOR_GET(0x1C,0x1C,0x1E);
-    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T1), c, 0);
-    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T2), c, 0);
-    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW1_ID, LBL_T3), c, 0);
+    /* TEST set (view1 cards) — now uses the real SURFACE role.
+     * Replaced per-view by theme_apply_viewN() as we extend coverage. */
+    THEME_BG(GCL(GRF_VIEW1_ID, LBL_T1), TC_SURF);
+    THEME_BG(GCL(GRF_VIEW1_ID, LBL_T2), TC_SURF);
+    THEME_BG(GCL(GRF_VIEW1_ID, LBL_T3), TC_SURF);
 }
 void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
 void view1_toggle_theme(void)               /* user tap: flip + apply + persist */

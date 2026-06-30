@@ -361,6 +361,30 @@ labels per view jumping to the other three pages via
 are **instant** (no slide). Handlers bind by numeric Control ID in `viewX_cc.h`,
 which does **not** always match the IDE's label name — map by ID, not symbol.
 
+### Theme color table
+
+Dark/light theming lives panel-side in `grf_hw_uart.c` as a `THEME[role][col]`
+table, indexed by role and by `g_dark` (which holds the `0x0039` reg value:
+`0`=dark, `1`=light — so it doubles as the column index `0=dark | 1=light`).
+Apply via the `THEME_BG(ctrl, role)` / `THEME_TXT(ctrl, role)` helpers (bg = part 0
+fill, txt = label glyphs). Surfaces + text only — there is **no runtime border
+setter** (see gotchas). Accents are iOS system colors that shift slightly per mode.
+
+| Role        | Dark      | Light     | Used for                                   |
+| ----------- | --------- | --------- | ------------------------------------------ |
+| `TC_BG`     | `#000000` | `#F2F2F7` | screen / view background                   |
+| `TC_SURF`   | `#1C1C1E` | `#FFFFFF` | cards / panels                             |
+| `TC_SURF2`  | `#2C2C2E` | `#E5E5EA` | nested chips, slider track, segmented bg   |
+| `TC_TXT`    | `#FFFFFF` | `#000000` | primary values / text                      |
+| `TC_TXT2`   | `#8E8E93` | `#6C6C70` | units, captions, muted labels              |
+| `TC_GREEN`  | `#30D158` | `#34C759` | output-on / positive                       |
+| `TC_RED`    | `#FF453A` | `#FF3B30` | output-off / alert                         |
+| `TC_ORANGE` | `#FF9F0A` | `#FF9500` | selection / Use accent                     |
+| `TC_BLUE`   | `#0A84FF` | `#007AFF` | info accent (spare)                        |
+
+`theme_apply()` repaints from the shadow; per-view `theme_apply_viewN()` functions
+(wired into each `viewN` entry) extend coverage to every themed control.
+
 ---
 
 ## Firmware behavior (RP `src/main.cpp`)
