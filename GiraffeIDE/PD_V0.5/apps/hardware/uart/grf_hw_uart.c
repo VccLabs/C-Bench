@@ -63,6 +63,8 @@ static u8 g_dark = 0;
 #define TCOL(role) (THEME[(role)][g_dark])          /* current color for a role */
 #define THEME_BG(ctrl, role)  grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
+/* selected-row card fill: orangy dark in dark mode, orangy white in light mode */
+#define SEL_TINT (g_dark ? GRF_COLOR_GET(0x3A, 0x2A, 0x10) : GRF_COLOR_GET(0xFF, 0xEC, 0xD1))
 
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
 enum
@@ -106,7 +108,7 @@ static void highlight_row(u8 i, u8 on)
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), on ? 0 : 1);
     /* background chip: orange tint when selected, default card when not */
     grf_ctrl_style_set_bg_color(bg,
-                                    on ? GRF_COLOR_GET(0x3A, 0x2A, 0x10) : TCOL(TC_SURF), 0);
+                                        on ? SEL_TINT : TCOL(TC_SURF), 0);
     /* #ff9f0a border: move the single outline box over the selected row */
     if (on)
     {
@@ -377,8 +379,8 @@ static void view2_paint_cards(void)   /* single row-color authority: render + en
 {
     for (u8 i = 0; i < MAX_PROF; i++)
     {
-        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]),
-            (i == g_sel) ? GRF_COLOR_GET(0x3A, 0x2A, 0x10) : TCOL(TC_SURF), 0);
+    	grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]),
+    	            (i == g_sel) ? SEL_TINT : TCOL(TC_SURF), 0);
         if (i >= g_prof_n) continue;
         grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_VOLT]),  TCOL(TC_TXT));                /* range "5.0-11.0 V" */
         grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_META]),  TCOL(TC_TXT2));               /* "adjustable rail" */
