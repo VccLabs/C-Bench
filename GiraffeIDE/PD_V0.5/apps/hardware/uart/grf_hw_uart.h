@@ -19,6 +19,7 @@ void view2_reset_panel(void);
 void view2_apply_status(void);         /* view2 entry: refresh source/empty status line */
 void view2_apply_theme(void);          /* view2 entry: re-apply saved theme */
 void view4_set_boot_state(u8 last_used); /* view4: 0=Off,1=Last used -> reg 0x0031 */
+void view4_set_theme(u8 light);          /* view4: 0=Dark,1=Light -> reg 0x0039 */
 void view4_set_autoarm(u8 on);           /* view4: 0/1 -> reg 0x0032 */
 void view4_set_bright(u8 pct);           /* view4: brightness 10..100 % -> reg 0x0030 */
 void view4_request_settings(void);       /* view4 entry: ask RP to push 0x0031/0x0032 */

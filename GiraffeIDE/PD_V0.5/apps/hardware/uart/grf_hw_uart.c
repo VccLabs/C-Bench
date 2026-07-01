@@ -66,6 +66,7 @@ static u8 g_dark = 0;
 /* selected-row card fill: orangy dark in dark mode, orangy white in light mode */
 #define SEL_TINT (g_dark ? GRF_COLOR_GET(0xFF, 0xEC, 0xD1) : GRF_COLOR_GET(0x3A, 0x2A, 0x10))
 static void boot_state_paint(u8 last_used);  /* fwd decl: used by theme_apply_view4 */
+static void theme_state_paint(void);         /* fwd decl: used by theme_apply_view4 */
 static u8 g_v4_boot = 0;                      /* shadow of reg 0x0031 (0=Off, 1=Last used) */
 extern u8 g_v4_boot;                          /* fwd: boot-state shadow (defined below) */
 
@@ -423,6 +424,13 @@ static void theme_apply_view2(void)
 #define V4_IMG_SML  21  /* image1  — brightness small icon  img swap */
 #define V4_IMG_FUL  22  /* image2  — brightness full icon   img swap */
 #define V4_NAV      14  /* image0  — nav bar image          img swap */
+#define V4_APPEAR   28  /* label21 — "Appearance"     txt   */
+#define V4_APPSUB   29  /* label22 — "Dark or light"  txt2  */
+#define V4_TH_DARK  33  /* label26 — "Dark"  option text    */
+#define V4_TH_LIGHT 34  /* label27 — "Light" option text    */
+#define V4_CH_DARK  31  /* label24 — "Dark"  chip           */
+#define V4_CH_LIGHT 32  /* label25 — "Light" chip           */
+#define V4_TH_SEG   30  /* label23 — theme segment bg  surf2 */
 /* slider0 (V4_BRIGHT_SLD id19) track reuses TC_SURF2 */
 
 static void theme_apply_view4(void)
@@ -451,8 +459,15 @@ static void theme_apply_view4(void)
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL10_ID), TC_SURF2);           /* segmented bg  ID12 */
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), TC_SURF2);           /* chip "Off"    ID26 */
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), TC_SURF2);           /* chip "Last"   ID27 */
-    boot_state_paint(g_v4_boot);   /* text colors (TC_TXT/grey) + chip show-hide */
-}
+        THEME_TXT(GCL(GRF_VIEW4_ID, V4_APPEAR),   TC_TXT);
+        THEME_TXT(GCL(GRF_VIEW4_ID, V4_APPSUB),   TC_TXT2);
+        THEME_BG (GCL(GRF_VIEW4_ID, V4_TH_SEG),   TC_SURF2);              /* theme segment bg */
+            THEME_BG (GCL(GRF_VIEW4_ID, V4_CH_DARK),  TC_SURF2);              /* theme chips */
+            THEME_BG (GCL(GRF_VIEW4_ID, V4_CH_LIGHT), TC_SURF2);
+        boot_state_paint(g_v4_boot);   /* text colors (TC_TXT/grey) + chip show-hide */
+        theme_state_paint();           /* Dark/Light texts + chip show-hide */
+    }
+
 static void theme_apply(void)               /* repaint all themed views from g_dark */
 {
 	theme_apply_view1();
@@ -534,6 +549,26 @@ static void boot_state_paint(u8 last_used) /* 0 = Off white, 1 = Last used white
     /* selection chip: show behind the active option, hide the other */
     grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), last_used ? 1 : 0);       /* chip "Off"       ID26 */
     grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), last_used ? 0 : 1);       /* chip "Last used" ID27 */
+}
+
+static void theme_state_paint(void) /* g_dark: 0=Dark selected, 1=Light selected */
+{
+    grf_color_t on  = TCOL(TC_TXT);                     /* selected   = primary */
+    grf_color_t off = GRF_COLOR_GET(0x98, 0x98, 0x9F);  /* unselected = grey    */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, V4_TH_DARK),  g_dark ? off : on); /* "Dark"  ID33 */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, V4_TH_LIGHT), g_dark ? on : off); /* "Light" ID34 */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, V4_CH_DARK),  g_dark ? 1 : 0);        /* chip Dark  ID31 */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, V4_CH_LIGHT), g_dark ? 0 : 1);        /* chip Light ID32 */
+}
+
+void view4_set_theme(u8 light) /* user tap: set absolute theme + apply + persist */
+{
+    if (g_dark == light)
+        return;                 /* already in this mode */
+    g_dark = light ? 1 : 0;
+    theme_apply();              /* repaints all views incl. theme_state_paint */
+    grf_reg_set(0x0039, g_dark);
+    grf_reg_com_send(0x0039, 1);
 }
 
 void view4_set_boot_state(u8 last_used) /* user tap: paint + send */

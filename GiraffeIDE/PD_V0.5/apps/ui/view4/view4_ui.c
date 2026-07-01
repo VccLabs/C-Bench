@@ -286,43 +286,27 @@ static void label23_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label27_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label27_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Appearance: "Light" (ID34) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view4_set_theme(1);
 }
 
 
-static void label26_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label26_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Appearance: "Dark" (ID33) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view4_set_theme(0);
 }
 
 
-static void label25_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label25_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Appearance: "Light" chip (ID32) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view4_set_theme(1);
 }
 
 
-static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Appearance: "Dark" chip (ID31) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view4_set_theme(0);
 }
 
 #include "../../../libs/appscc/view4_cc.h"
