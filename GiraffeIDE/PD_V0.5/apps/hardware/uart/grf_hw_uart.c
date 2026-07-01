@@ -64,7 +64,7 @@ static u8 g_dark = 0;
 #define THEME_BG(ctrl, role)  grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
 /* selected-row card fill: orangy dark in dark mode, orangy white in light mode */
-#define SEL_TINT (g_dark ? GRF_COLOR_GET(0x3A, 0x2A, 0x10) : GRF_COLOR_GET(0xFF, 0xEC, 0xD1))
+#define SEL_TINT (g_dark ? GRF_COLOR_GET(0xFF, 0xEC, 0xD1) : GRF_COLOR_GET(0x3A, 0x2A, 0x10))
 
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
 enum
