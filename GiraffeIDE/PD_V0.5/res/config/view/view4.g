@@ -784,6 +784,9 @@
             "inner" : -3
           }
         },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
         "img_t" : { }
       }, {
         "style_part" : 196608,
@@ -988,7 +991,7 @@
         "alpha" : 255,
         "pub" : true
       },
-      "init_img" : "Brightness symbol_small.png",
+      "init_img" : "Brightness-symbol-small-dark.png",
       "rotate_pt" : { }
     }
   }, {

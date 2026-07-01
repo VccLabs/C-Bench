@@ -419,6 +419,10 @@ static void theme_apply_view2(void)
 #define V4_HDR_DISP 3   /* label1  — "DISPLAY"        txt2  */
 #define V4_DISPCARD 18  /* label14 — display section bg surf */
 #define V4_PCT      23  /* label16 — brightness %     txt2  */
+#define V4_SW       13  /* sw0     — auto-arm switch  bg=surf2 */
+#define V4_IMG_SML  21  /* image1  — brightness small icon  img swap */
+#define V4_IMG_FUL  22  /* image2  — brightness full icon   img swap */
+#define V4_NAV      14  /* image0  — nav bar image          img swap */
 /* slider0 (V4_BRIGHT_SLD id19) track reuses TC_SURF2 */
 
 static void theme_apply_view4(void)
@@ -436,7 +440,14 @@ static void theme_apply_view4(void)
     THEME_BG (GCL(GRF_VIEW4_ID, V4_DISPCARD), TC_SURF);
     THEME_TXT(GCL(GRF_VIEW4_ID, V4_PCT),      TC_TXT2);
     THEME_BG (GCL(GRF_VIEW4_ID, 19), TC_SURF2);   /* slider0 id19 track (bar main part) */
-    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL6_ID),  TC_SURF);            /* major card    ID8  */
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, V4_SW), TCOL(TC_SURF2), 0); /* switch bg fill (part MAIN=0) */
+        grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_SML),
+                            g_dark ? "Brightness-symbol-small-light.png" : "Brightness-symbol-small-dark.png");
+            grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_FUL),
+                            g_dark ? "Brightness-symbol-full-light.png"  : "Brightness-symbol-full-dark.png");
+            grf_img_set_src(GCL(GRF_VIEW4_ID, V4_NAV),
+                            g_dark ? "nav-settings-light.png" : "nav-settings.png");
+            THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL6_ID),  TC_SURF);            /* major card    ID8  */
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL10_ID), TC_SURF2);           /* segmented bg  ID12 */
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), TC_SURF2);           /* chip "Off"    ID26 */
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), TC_SURF2);           /* chip "Last"   ID27 */

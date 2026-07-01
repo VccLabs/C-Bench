@@ -15,14 +15,6 @@
   "imagePath" : "view4.png",
   "child" : [ ]
 }, {
-  "imageId" : 7,
-  "imagePath" : "Brightness symbol_full.png",
-  "child" : [ ]
-}, {
-  "imageId" : 12,
-  "imagePath" : "Brightness symbol_small.png",
-  "child" : [ ]
-}, {
   "imageId" : 4,
   "imagePath" : "arrow-dark.png",
   "child" : [ ]
@@ -61,5 +53,21 @@
 }, {
   "imageId" : 10,
   "imagePath" : "nav-settings-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 17,
+  "imagePath" : "Brightness-symbol-full-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 18,
+  "imagePath" : "Brightness-symbol-full-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 19,
+  "imagePath" : "Brightness-symbol-small-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 20,
+  "imagePath" : "Brightness-symbol-small-light.png",
   "child" : [ ]
 } ]
