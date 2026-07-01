@@ -264,6 +264,7 @@ void view4_init(void)
 void view4_entry(void)
 {
 	view4_apply_settings();   /* paint Off/Last-used + switch from last-known settings */
+		view4_apply_theme();      /* restore dark/light colors after view reset */
 	grf_ctrl_set_ext_click_area(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), 12);  /* "Off"  bigger hit area */
 	grf_ctrl_set_ext_click_area(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), 12);  /* "Last used"           */
 		view4_request_settings();   /* pull saved Off/Last-used + auto-arm from RP */

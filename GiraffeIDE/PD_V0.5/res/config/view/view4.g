@@ -160,7 +160,7 @@
         "name" : "label17",
         "id" : 24,
         "pt" : {
-          "x" : 90,
+          "x" : 95,
           "y" : 24
         },
         "size" : {
@@ -174,7 +174,7 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : " .  Profiles",
+      "txt" : " .  Settings",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -534,7 +534,8 @@
           }
         },
         "txt_t" : {
-          "color" : 2894894
+          "color" : 2894894,
+          "opa" : 2147483647
         },
         "img_t" : { }
       } ]
@@ -569,8 +570,8 @@
           "radius" : 8,
           "opa" : 255,
           "shadow" : {
-            "color" : 1710618,
-            "width" : 30
+            "color" : 4934475,
+            "width" : 12
           }
         },
         "txt_t" : {
@@ -610,8 +611,8 @@
           "radius" : 8,
           "opa" : 255,
           "shadow" : {
-            "color" : 1710618,
-            "width" : 30
+            "color" : 4934475,
+            "width" : 12
           }
         },
         "txt_t" : {
@@ -917,6 +918,10 @@
           "border" : {
             "color" : 65535
           },
+          "shadow" : {
+            "color" : 4934475,
+            "width" : 12
+          },
           "padding" : {
             "top" : 3,
             "bottom" : 3,
@@ -1049,7 +1054,6 @@
     "v_name" : "view4",
     "v_id" : 4,
     "bg_scale" : 255,
-    "bg_color" : 4294967295,
-    "bg_image" : "view4.png"
+    "bg_color" : 4278190080
   }
 }

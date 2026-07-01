@@ -65,6 +65,9 @@ static u8 g_dark = 0;
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
 /* selected-row card fill: orangy dark in dark mode, orangy white in light mode */
 #define SEL_TINT (g_dark ? GRF_COLOR_GET(0xFF, 0xEC, 0xD1) : GRF_COLOR_GET(0x3A, 0x2A, 0x10))
+static void boot_state_paint(u8 last_used);  /* fwd decl: used by theme_apply_view4 */
+static u8 g_v4_boot = 0;                      /* shadow of reg 0x0031 (0=Off, 1=Last used) */
+extern u8 g_v4_boot;                          /* fwd: boot-state shadow (defined below) */
 
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
 enum
@@ -404,13 +407,50 @@ static void theme_apply_view2(void)
     grf_img_set_src(GCL(GRF_VIEW2_ID, V2_NAV),
     g_dark ? "nav-profiles-light.png" : "nav-profiles.png");
 }
+/* ── view4 (Settings) themed control IDs ── */
+#define V4_BRAND   25   /* label18 — "C-Bench"        txt   */
+#define V4_SUB     24   /* label17 — "· Settings"     txt2  */
+#define V4_HDR_OUT  2   /* label0  — "OUTPUT"         txt2  */
+#define V4_BOOTLBL  4   /* label2  — "Boot output state" txt */
+#define V4_BOOTSUB  6   /* label4  — subtitle         txt2  */
+#define V4_SEP      9   /* label7  — separator line   surf2 */
+#define V4_AALBL    5   /* label3  — "Auto-arm output" txt  */
+#define V4_AASUB    7   /* label5  — subtitle         txt2  */
+#define V4_HDR_DISP 3   /* label1  — "DISPLAY"        txt2  */
+#define V4_DISPCARD 18  /* label14 — display section bg surf */
+#define V4_PCT      23  /* label16 — brightness %     txt2  */
+/* slider0 (V4_BRIGHT_SLD id19) track reuses TC_SURF2 */
+
+static void theme_apply_view4(void)
+{
+    grf_view_set_bgcolor(GRF_VIEW4_ID, TCOL(TC_BG));                    /* screen bg */
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BRAND),    TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_SUB),      TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_HDR_OUT),  TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BOOTLBL),  TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BOOTSUB),  TC_TXT2);
+    THEME_BG (GCL(GRF_VIEW4_ID, V4_SEP),      TC_SURF2);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_AALBL),    TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_AASUB),    TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_HDR_DISP), TC_TXT2);
+    THEME_BG (GCL(GRF_VIEW4_ID, V4_DISPCARD), TC_SURF);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_PCT),      TC_TXT2);
+    THEME_BG (GCL(GRF_VIEW4_ID, 19), TC_SURF2);   /* slider0 id19 track (bar main part) */
+    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL6_ID),  TC_SURF);            /* major card    ID8  */
+    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL10_ID), TC_SURF2);           /* segmented bg  ID12 */
+    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), TC_SURF2);           /* chip "Off"    ID26 */
+    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), TC_SURF2);           /* chip "Last"   ID27 */
+    boot_state_paint(g_v4_boot);   /* text colors (TC_TXT/grey) + chip show-hide */
+}
 static void theme_apply(void)               /* repaint all themed views from g_dark */
 {
 	theme_apply_view1();
 	    theme_apply_view2();
+	    theme_apply_view4();
 	}
 	void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
 	void view2_apply_theme(void) { theme_apply(); }   /* view2 entry: repaint from shadow */
+	void view4_apply_theme(void) { theme_apply(); }   /* view4 entry: repaint from shadow */
 void view1_toggle_theme(void)               /* user tap: flip + apply + persist */
 {
     g_dark ^= 1;
@@ -434,7 +474,6 @@ void view2_reset_panel(void)
 }
 
 /* ---- view4 (Settings) ---- */
-static u8 g_v4_boot = 0;    /* shadow of reg 0x0031 (0=Off, 1=Last used) */
 static u8 g_v4_autoarm = 0; /* shadow of reg 0x0032 (0/1)                */
 
 #define V4_BRIGHT_SLD 19      /* slider0 - brightness 10..100 % */
@@ -477,10 +516,13 @@ static void elapsed_paint(u16 s) /* MM:SS, rolls to H:MM:SS past 1h */
 
 static void boot_state_paint(u8 last_used) /* 0 = Off white, 1 = Last used white */
 {
-    grf_color_t on = GRF_COLOR_GET(0xFF, 0xFF, 0xFF);                                  /* selected   = white */
-    grf_color_t off = GRF_COLOR_GET(0x98, 0x98, 0x9F);                                 /* unselected = grey  */
+    grf_color_t on  = TCOL(TC_TXT);                                                    /* selected   = primary */
+    grf_color_t off = GRF_COLOR_GET(0x98, 0x98, 0x9F);                                 /* unselected = grey    */
     grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), last_used ? off : on); /* "Off"       ID10 */
     grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), last_used ? on : off); /* "Last used" ID11 */
+    /* selection chip: show behind the active option, hide the other */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), last_used ? 1 : 0);       /* chip "Off"       ID26 */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), last_used ? 0 : 1);       /* chip "Last used" ID27 */
 }
 
 void view4_set_boot_state(u8 last_used) /* user tap: paint + send */
