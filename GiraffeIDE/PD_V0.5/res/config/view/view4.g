@@ -838,7 +838,7 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 18,
-          "opa" : 255
+          "opa" : 90
         },
         "txt_t" : {
           "opa" : 2147483647
@@ -857,18 +857,18 @@
         "parent_id" : 1,
         "ctrl_type" : 7,
         "pt" : {
-          "x" : 85,
-          "y" : 279
+          "x" : 82,
+          "y" : 287
         },
         "size" : {
           "width" : 545,
-          "height" : 23
+          "height" : 9
         },
         "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,
-        "click_area" : 20,
+        "click_area" : 30,
         "controlIDEnum" : "VIEW4_SLIDER0_ID"
       },
       "maxValue" : 1000,
@@ -879,8 +879,7 @@
           "main_color" : 3881787,
           "radius" : -1,
           "border" : {
-            "color" : 1842206,
-            "width" : 8
+            "color" : 1842206
           },
           "padding" : {
             "top" : 2147483647,
@@ -901,8 +900,7 @@
           "main_color" : 16752394,
           "radius" : -1,
           "border" : {
-            "color" : 1842206,
-            "width" : 8
+            "color" : 1842206
           },
           "padding" : {
             "inner" : 2147483647
@@ -919,18 +917,18 @@
           "main_color" : 16777215,
           "grad_color" : 16758082,
           "border" : {
-            "color" : 65535
+            "color" : 65280
           },
           "shadow" : {
             "color" : 4934475,
             "width" : 12
           },
           "padding" : {
-            "top" : 3,
-            "bottom" : 3,
-            "left" : 3,
-            "right" : 3,
-            "inner" : 3
+            "top" : 8,
+            "bottom" : 8,
+            "left" : 8,
+            "right" : 8,
+            "inner" : 8
           }
         },
         "img_t" : { }
@@ -981,7 +979,7 @@
         "ctrl_type" : 19,
         "pt" : {
           "x" : 45,
-          "y" : 283
+          "y" : 285
         },
         "size" : {
           "width" : 15,
@@ -1045,6 +1043,285 @@
       "txt" : "80%",
       "styles" : [ {
         "name" : "style",
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label21",
+        "id" : 28,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 37,
+          "y" : 334
+        },
+        "size" : {
+          "width" : 166,
+          "height" : 33
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL21_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Appearance",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 17
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label22",
+        "id" : 29,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 36,
+          "y" : 356
+        },
+        "size" : {
+          "width" : 158,
+          "height" : 28
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL22_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Dark or light theme",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 14
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label23",
+        "id" : 30,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 542,
+          "y" : 340
+        },
+        "size" : {
+          "width" : 135,
+          "height" : 38
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL23_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : 10,
+          "opa" : 255,
+          "padding" : {
+            "top" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 2894894,
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label24",
+        "id" : 31,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 548,
+          "y" : 346
+        },
+        "size" : {
+          "width" : 56,
+          "height" : 26
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL24_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : 8,
+          "opa" : 255,
+          "shadow" : {
+            "color" : 4934475,
+            "width" : 12
+          }
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label25",
+        "id" : 32,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 614,
+          "y" : 346
+        },
+        "size" : {
+          "width" : 56,
+          "height" : 26
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL25_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : 8,
+          "opa" : 255,
+          "shadow" : {
+            "color" : 4934475,
+            "width" : 12
+          }
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label26",
+        "id" : 33,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 507,
+          "y" : 330
+        },
+        "size" : {
+          "width" : 101,
+          "height" : 70
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL26_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 35,
+      "txt" : "Dark",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : -5,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 15,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label27",
+        "id" : 34,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 609,
+          "y" : 330
+        },
+        "size" : {
+          "width" : 101,
+          "height" : 70
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL27_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Light",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : -5,
+            "bottom" : 2147483647,
+            "left" : 15,
+            "right" : -3,
+            "inner" : 2147483647
+          }
+        },
         "txt_t" : {
           "color" : 10000543,
           "font_lib" : "Inter_24pt-ExtraBold.ttf"

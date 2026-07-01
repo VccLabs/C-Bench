@@ -70,4 +70,8 @@
   "imageId" : 20,
   "imagePath" : "Brightness-symbol-small-light.png",
   "child" : [ ]
+}, {
+  "imageId" : 7,
+  "imagePath" : "Artboard.png",
+  "child" : [ ]
 } ]
