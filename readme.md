@@ -205,21 +205,22 @@ and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
 
 **RP → HMI — telemetry / state** (pushed at 2 Hz; output state also on change):
 
-| Reg      | Value                                               | Units    |
-| -------- | --------------------------------------------------- | -------- |
-| `0x0010` | Output voltage                                      | mV       |
-| `0x0011` | Output current                                      | mA       |
-| `0x0012` | Output power                                        | 0.1 W    |
-| `0x0013` | Session energy — **low 16 bits** of a 32-bit value  | mWh      |
-| `0x0014` | Session energy — **high 16 bits**                   | mWh      |
-| `0x0015` | Session charge (pushed; no panel label yet)         | mAh      |
-| `0x0016` | Real output state (drives the view1 toggle)         | 0/1      |
-| `0x0017` | Active list position for highlight; `0xFFFF` = none | index    |
-| `0x0018` | Session elapsed time                                | s        |
-| `0x0019` | Active profile type: 0 none, 1 Fixed, 2 PPS, 3 AVS, 4 EPR | enum |
-| `0x001A` | Active profile setpoint voltage                     | mV       |
-| `0x003A` | Lifetime energy odometer — **high 16 bits** of cWh  | 0.01 Wh  |
-| `0x003B` | Lifetime energy odometer — **low 16 bits** of cWh   | 0.01 Wh  |
+| Reg      | Value                                                     | Units         |
+| -------- | --------------------------------------------------------- | ------------- |
+| `0x0010` | Output voltage                                            | mV            |
+| `0x0011` | Output current                                            | mA            |
+| `0x0012` | Output power                                              | 0.1 W         |
+| `0x0013` | Session energy — **low 16 bits** of a 32-bit value        | mWh           |
+| `0x0014` | Session energy — **high 16 bits**                         | mWh           |
+| `0x0015` | Session charge (pushed; no panel label yet)               | mAh           |
+| `0x0016` | Real output state (drives the view1 toggle)               | 0/1           |
+| `0x0017` | Active list position for highlight; `0xFFFF` = none       | index         |
+| `0x0018` | Session elapsed time                                      | s             |
+| `0x0019` | Active profile type: 0 none, 1 Fixed, 2 PPS, 3 AVS, 4 EPR | enum          |
+| `0x001A` | Active profile setpoint voltage                           | mV            |
+| `0x001B` | Eased arc value (analog ring ramp) — see note             | 0–280 (0.1 V) |
+| `0x003A` | Lifetime energy odometer — **high 16 bits** of cWh        | 0.01 Wh       |
+| `0x003B` | Lifetime energy odometer — **low 16 bits** of cWh         | 0.01 Wh       |
 
 **32-bit values over a 16-bit bus:** session energy (`0x0013/0x0014`) and the
 lifetime odometer (`0x003A/0x003B`) are 32-bit, split high/low across two
@@ -228,6 +229,11 @@ registers. Registers arrive **one at a time**, so the panel keeps a 32-bit shado
 Units were chosen to fit `u16` halves where single-register: session/charge use
 mWh/mAh, the odometer uses cWh. Session energy is shown as `X.XXX` Wh (mWh
 resolution) on `label3` (id 4); elapsed as `M:SS` / `H:MM:SS` on `label22` (id 26).
+
+**Analog arc (`0x001B`):** the RP eases a displayed ring value toward the measured
+voltage and pushes it at ~25 Hz **on change** (not 2 Hz), so the ring settles like a
+needle while the numeric voltage (`0x0010`) stays instant. Panel keeps a `g_arc`
+shadow and re-applies it on view1 entry (`view1_sync_armed`).
 
 **RP → HMI — profile list** (resent only on change; empty pushed while no source):
 
@@ -251,19 +257,19 @@ what made 5 A rails (e.g. 20 V @ 5 A) silently stay on the previous contract.
 
 **HMI → RP — control:**
 
-| Reg      | Value                                           | Units | Status |
-| -------- | ----------------------------------------------- | ----- | ------ |
-| `0x0020` | Requested voltage (PPS/AVS)                     | mV    | done   |
-| `0x0021` | Current limit (PPS/AVS)                         | mA    | done   |
-| `0x0022` | Output enable                                   | 0/1   | done   |
-| `0x0023` | Selected profile position                       | index | done   |
-| `0x0024` | Refresh-list request                            | 1     | done   |
-| `0x0025` | Session trip reset (zeros energy/charge/elapsed)| 1     | done   |
-| `0x0030` | Display brightness                              | 10–100% | done |
-| `0x0031` | Boot output state (0 Off / 1 Last used)         | 0/1   | done   |
-| `0x0032` | Auto-arm output after apply                     | 0/1   | done   |
-| `0x0033` | Settings-sync request (view4 entry / HMI ready) | 1     | done   |
-| `0x0039` | Theme (0 dark / 1 light)                        | 0/1   | done   |
+| Reg      | Value                                            | Units   | Status |
+| -------- | ------------------------------------------------ | ------- | ------ |
+| `0x0020` | Requested voltage (PPS/AVS)                      | mV      | done   |
+| `0x0021` | Current limit (PPS/AVS)                          | mA      | done   |
+| `0x0022` | Output enable                                    | 0/1     | done   |
+| `0x0023` | Selected profile position                        | index   | done   |
+| `0x0024` | Refresh-list request                             | 1       | done   |
+| `0x0025` | Session trip reset (zeros energy/charge/elapsed) | 1       | done   |
+| `0x0030` | Display brightness                               | 10–100% | done   |
+| `0x0031` | Boot output state (0 Off / 1 Last used)          | 0/1     | done   |
+| `0x0032` | Auto-arm output after apply                      | 0/1     | done   |
+| `0x0033` | Settings-sync request (view4 entry / HMI ready)  | 1       | done   |
+| `0x0039` | Theme (0 dark / 1 light)                         | 0/1     | done   |
 
 `0x0024` is sent by the panel on **every view2 entry** (`view2_reset_panel`); the
 RP forces a fresh PDO re-read and re-pushes the list, so the list is always
@@ -366,24 +372,41 @@ which does **not** always match the IDE's label name — map by ID, not symbol.
 Dark/light theming lives panel-side in `grf_hw_uart.c` as a `THEME[role][col]`
 table, indexed by role and by `g_dark` (which holds the `0x0039` reg value:
 `0`=dark, `1`=light — so it doubles as the column index `0=dark | 1=light`).
-Apply via the `THEME_BG(ctrl, role)` / `THEME_TXT(ctrl, role)` helpers (bg = part 0
-fill, txt = label glyphs). Surfaces + text only — there is **no runtime border
-setter** (see gotchas). Accents are iOS system colors that shift slightly per mode.
+Apply via `TCOL(role)` (raw color) or the `THEME_BG(ctrl, role)` / `THEME_TXT(ctrl,
+role)` helpers (bg = part 0 fill, txt = label glyphs). The table lives near the top
+of `grf_hw_uart.c` (above `use_btn_set`) so runtime callers can use `TCOL`.
+Two non-fill cases: the **arc track** is a line, set with
+`grf_arc_set_dis(arc, 0, {color,width,opa,rounded})` (part 0 = bg line, part 1 = fg,
+width 27 / radius 12); **image assets** are theme-swapped with `grf_img_set_src`
+(e.g. `nav-monitor.png` ↔ `nav-monitor-light.png`, `arrow-dark.png` ↔
+`arrow-light.png`). Surfaces + text only — there is **no runtime border setter**
+(see gotchas). Accents are iOS system colors that shift slightly per mode.
 
-| Role        | Dark      | Light     | Used for                                   |
-| ----------- | --------- | --------- | ------------------------------------------ |
-| `TC_BG`     | `#000000` | `#F2F2F7` | screen / view background                   |
-| `TC_SURF`   | `#1C1C1E` | `#FFFFFF` | cards / panels                             |
-| `TC_SURF2`  | `#2C2C2E` | `#E5E5EA` | nested chips, slider track, segmented bg   |
-| `TC_TXT`    | `#FFFFFF` | `#000000` | primary values / text                      |
-| `TC_TXT2`   | `#8E8E93` | `#6C6C70` | units, captions, muted labels              |
-| `TC_GREEN`  | `#30D158` | `#34C759` | output-on / positive                       |
-| `TC_RED`    | `#FF453A` | `#FF3B30` | output-off / alert                         |
-| `TC_ORANGE` | `#FF9F0A` | `#FF9500` | selection / Use accent                     |
-| `TC_BLUE`   | `#0A84FF` | `#007AFF` | info accent (spare)                        |
+| Role        | Dark      | Light     | Used for                                 |
+| ----------- | --------- | --------- | ---------------------------------------- |
+| `TC_BG`     | `#000000` | `#F2F2F7` | screen / view background                 |
+| `TC_SURF`   | `#1C1C1E` | `#FFFFFF` | cards / panels                           |
+| `TC_SURF2`  | `#2C2C2E` | `#E5E5EA` | nested chips, slider track, segmented bg |
+| `TC_TRACK`  | `#444446` | `#C7C7CC` | arc track (line stroke, not a fill)      |
+| `TC_TXT`    | `#FFFFFF` | `#000000` | primary values / text                    |
+| `TC_TXT2`   | `#8E8E93` | `#6C6C70` | units, captions, muted labels            |
+| `TC_TXT3`   | `#474747` | `#C7C7CC` | empty-state / tertiary text              |
+| `TC_GREEN`  | `#30D158` | `#34C759` | output-on / positive                     |
+| `TC_RED`    | `#FF453A` | `#FF3B30` | output-off / alert                       |
+| `TC_ORANGE` | `#FF9F0A` | `#FF9500` | selection / Use accent                   |
+| `TC_BLUE`   | `#0A84FF` | `#007AFF` | info accent (spare)                      |
+| `TC_CHIP`   | `#2C2C2E` | `#FFFFFF` | FIX badge (dark chip, white in light)    |
 
-`theme_apply()` repaints from the shadow; per-view `theme_apply_viewN()` functions
-(wired into each `viewN` entry) extend coverage to every themed control.
+`theme_apply()` repaints from the shadow and dispatches to per-view
+`theme_apply_viewN()` (wired into each `viewN_apply_theme` entry). **view1** (Monitor)
+and **view2** (Profiles) are fully themed. On view2, `view2_paint_cards()` is the
+single row-color authority — called on render (`0x0101`), entry, and toggle — and
+covers: card bg (selection-aware, orange tint stays), per-row column text
+(current = `#64D2FF`, check = `#FF9F0A`, both fixed; voltage = `TC_TXT`;
+"adjustable rail" meta = `TC_TXT2`), and badges (PPS/AVS/EPR fixed accents, FIX =
+`TC_CHIP`). The Use button (`BTN_USE`) hides when no source, shows a themed idle
+"Select a rail", and turns orange when selected. Status line `label91` (`LBL_STAT`)
+shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_status`).
 
 ---
 
@@ -561,6 +584,9 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] Monitor: **active profile** label (0x0019 type + 0x001A mV).
 - [x] INA read validation + `dt` cap so the energy integrator can't run away.
 - [x] **Theme persistence** plumbing (reg 0x0039, RP-backed, re-applied on entry).
+- [x] **Dark/light theme** extended across view1 + view2 (roles, image swaps, cards).
+- [x] **Analog arc easing** (RP ramps toward measured V, reg 0x001B ~25 Hz on change).
+- [ ] Extend theme to **view3 / view4** and any remaining view2 elements.
 - [~] **Dark/light theme — IN PROGRESS.** Proven on a TEST set (view1 `label16`/
       `label17`/`label1`, ids 19/20/2) + toggle `label24` (id 28). **Next: extend to
       all objects across all 4 views.** See the "Theme" notes in Firmware behavior.
