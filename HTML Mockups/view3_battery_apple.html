@@ -1,0 +1,232 @@
+<!--
+  C-Bench — Battery (view3) — APPLE-STYLE
+  720x720. iOS system colors + Inter. Matches Settings (view4) house style.
+  Data model (all from real hardware):
+    Charge state  <- CHG_STATE dual-polarity decode (Charging / Charged / No battery)
+    SoC %         <- MAX17048 fuel gauge (0x36)      [needs a telemetry reg]
+    Cell voltage  <- MAX17048                          [needs a telemetry reg]
+    Charge current<- INA260 output bus                 (already measured)
+    Delivered mAh <- session charge  reg 0x0015        (already pushed)
+  Hero SoC ring reuses view1 arc language. No charge-rate control: MCP73831 is a
+  fixed linear charger — nothing programmable, so view3 is a monitor.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C-Bench — Battery (Apple style)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#FF9F0A; --cyan:#64D2FF; --purple:#BF5AF2; --green:#30D158; --red:#FF453A;
+  }
+  [data-theme="dark"]{
+    --bg:#000000; --screenbg:#000000;
+    --card:#1C1C1E; --card2:#2C2C2E;
+    --txt:#FFFFFF; --txt2:rgba(235,235,245,.60); --txt3:rgba(235,235,245,.30);
+    --track:#2C2C2E; --ringtrack:#2C2C2E; --tabbar:rgba(20,20,22,.9); --sep:rgba(255,255,255,.07);
+    --bezel-a:#26262A; --bezel-b:#0A0A0C;
+    --cell:#0C0C0E; --cell-txt:#F5F5F7; --cell-edge:rgba(255,255,255,.06);
+  }
+  [data-theme="light"]{
+    --bg:#F2F2F7; --screenbg:#F2F2F7;
+    --card:#FFFFFF; --card2:#FFFFFF;
+    --txt:#000000; --txt2:rgba(60,60,67,.60); --txt3:rgba(60,60,67,.30);
+    --track:#E5E5EA; --ringtrack:#E5E5EA; --tabbar:rgba(249,249,251,.92); --sep:rgba(60,60,67,.12);
+    --bezel-a:#D7DEE6; --bezel-b:#B7C2CE;
+    --orange:#FF9500; --cyan:#32ADE6; --purple:#AF52DE; --green:#34C759; --red:#FF3B30;
+    --cell:#1C1C1E; --cell-txt:#F5F5F7; --cell-edge:rgba(0,0,0,.18);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ background:#050507; font-family:'Inter',-apple-system,system-ui,sans-serif;
+        display:flex; flex-direction:column; align-items:center; gap:14px; padding:24px 12px 40px; overflow-x:hidden; }
+  .cap{ color:#5a6571; font-size:12px; letter-spacing:.04em; text-align:center; }
+  .cap b{ color:#9aa6b2; }
+  .stage{ width:100%; display:flex; justify-content:center; }
+  .fit{ width:720px; height:720px; transform-origin:top center; }
+
+  .device{ width:720px; height:720px; background:linear-gradient(160deg,var(--bezel-a),var(--bezel-b));
+           border-radius:40px; padding:18px; box-shadow:0 40px 90px -24px #000, inset 0 1px 0 rgba(255,255,255,.18); transition:background .35s; }
+  .screen{ width:100%; height:100%; background:var(--screenbg); border-radius:22px; overflow:hidden;
+           position:relative; display:flex; flex-direction:column; transition:background .35s; }
+
+  /* top bar */
+  .top{ display:flex; align-items:center; justify-content:space-between; padding:22px 28px 4px; }
+  .top .brand{ font-weight:700; font-size:17px; letter-spacing:-.01em; color:var(--txt); }
+  .top .brand span{ color:var(--txt2); font-weight:500; }
+  .tbtn{ width:38px; height:38px; border-radius:50%; border:none; background:var(--card);
+         color:var(--txt); font-size:17px; cursor:pointer; display:grid; place-items:center; }
+  .tbtn:active{ transform:scale(.92); }
+
+  .body{ flex:1; overflow-y:auto; padding:6px 22px 6px; }
+  .body::-webkit-scrollbar{ display:none; }
+  .sechead{ font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+            color:var(--txt2); margin:14px 6px 8px; }
+  .group{ background:var(--card); border-radius:18px; overflow:hidden; }
+  .row{ display:flex; align-items:center; gap:14px; padding:16px 18px; min-height:60px; }
+  .row + .row{ border-top:1px solid var(--sep); }
+  .row .lbl{ font-size:16px; font-weight:600; color:var(--txt); }
+  .row .sub{ font-size:12.5px; font-weight:500; color:var(--txt2); margin-top:2px; }
+  .row .val{ margin-left:auto; font-size:16px; font-weight:700; color:var(--txt);
+             font-variant-numeric:tabular-nums; }
+  .row .val .u{ font-size:13px; font-weight:600; color:var(--txt2); margin-left:3px; }
+  .row .val.cyan{ color:var(--cyan); }
+
+  /* ---- hero: SoC ring + state ---- */
+  .hero{ background:var(--card); border-radius:18px; padding:26px 18px 22px;
+         display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .ring{ position:relative; width:250px; height:250px; }
+  .ring svg{ transform:rotate(-90deg); }
+  .ring .track{ stroke:var(--ringtrack); }
+  .ring .prog{ stroke:var(--green); transition:stroke-dashoffset .5s ease, stroke .3s; }
+  .ring .center{ position:absolute; inset:0; display:grid; place-content:center; text-align:center; }
+  .ring .pct{ font-size:76px; font-weight:700; letter-spacing:-2px; line-height:1; color:var(--txt);
+              font-variant-numeric:tabular-nums; }
+  .ring .pct .s{ font-size:32px; font-weight:600; color:var(--txt2); margin-left:2px; }
+  .ring .cell{ font-size:16px; font-weight:600; color:var(--txt2); margin-top:8px; }
+
+  .state{ display:inline-flex; align-items:center; gap:9px; padding:8px 16px 8px 12px;
+          border-radius:20px; background:var(--track); font-size:15px; font-weight:600; color:var(--txt2);
+          margin-top:16px; }
+  .state .dot{ width:11px; height:11px; border-radius:50%; background:var(--txt2); }
+  [data-state="charging"] .state{ color:var(--green); }
+  [data-state="charging"] .state .dot{ background:var(--green); animation:pulse 1.4s ease-in-out infinite; }
+  [data-state="charging"] .ring .prog{ stroke:var(--green); }
+  [data-state="charged"]  .state{ color:var(--green); }
+  [data-state="charged"]  .state .dot{ background:var(--green); }
+  [data-state="charged"]  .ring .prog{ stroke:var(--green); }
+  [data-state="none"]     .ring .prog{ stroke:var(--ringtrack); }
+  @keyframes pulse{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.35;transform:scale(.8)} }
+
+  /* delivered cells (odometer-style, reused from Settings) */
+  .odowrap{ padding:18px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .odolabel{ font-size:13px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--txt2); }
+  .odo{ display:flex; gap:4px; align-items:center; }
+  .digit{ width:40px; height:58px; background:var(--cell); border-radius:7px;
+          display:grid; place-items:center; font-weight:700; font-size:34px; color:var(--cell-txt);
+          font-variant-numeric:tabular-nums;
+          box-shadow:inset 0 2px 5px rgba(0,0,0,.55), inset 0 -1px 0 var(--cell-edge);
+          position:relative; overflow:hidden; }
+  .digit::after{ content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(0,0,0,.55); }
+  .odounit{ font-size:30px; font-weight:700; color:var(--txt2); margin-left:6px; align-self:center; }
+  .odonote{ font-size:12.5px; font-weight:500; color:var(--txt3); }
+
+  /* tab bar */
+  .tabs{ display:flex; padding:8px 0 14px; background:var(--tabbar); backdrop-filter:blur(20px);
+         border-top:1px solid var(--sep); }
+  .tab{ flex:1; border:none; background:transparent; cursor:pointer; padding:6px 0;
+        display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--txt3); }
+  .tab .tl{ font-size:11px; font-weight:500; letter-spacing:.01em; }
+  .tab.on{ color:var(--orange); }
+  svg.ic{ display:block; }
+
+  /* empty state for no-battery */
+  [data-state="none"] .ring .pct{ color:var(--txt3); }
+  [data-state="none"] .row.livehide{ opacity:.4; }
+</style>
+
+<div class="cap"><b>Battery / view3</b> · Apple-style · SoC ring + 3-state charge decode · monitor only</div>
+
+<div class="stage"><div class="fit" id="fit">
+<div class="device"><div class="screen" id="screen" data-theme="dark" data-state="charging">
+
+  <div class="top">
+    <div class="brand">C-Bench <span>· Battery</span></div>
+    <button class="tbtn" id="theme">☾</button>
+  </div>
+
+  <div class="body">
+
+    <div class="hero">
+      <div class="ring">
+        <svg width="250" height="250" viewBox="0 0 250 250">
+          <circle class="track" cx="125" cy="125" r="108" fill="none" stroke-width="20" stroke-linecap="round"/>
+          <circle class="prog"  cx="125" cy="125" r="108" fill="none" stroke-width="20" stroke-linecap="round"
+                  id="prog" stroke-dasharray="678"/>
+        </svg>
+        <div class="center">
+          <div class="pct" id="pct">70<span class="s">%</span></div>
+          <div class="cell" id="cell">3.86 V</div>
+        </div>
+      </div>
+      <div class="state"><span class="dot"></span><span id="stateTxt">Charging</span></div>
+    </div>
+
+    <div class="sechead">Now</div>
+    <div class="group">
+      <div class="row livehide">
+        <div><div class="lbl">Charge current</div><div class="sub">Into the cell, measured</div></div>
+        <div class="val cyan" id="vCur">0.48<span class="u">A</span></div>
+      </div>
+      <div class="row livehide">
+        <div><div class="lbl">Cell voltage</div><div class="sub">Fuel gauge</div></div>
+        <div class="val" id="vVolt">3.86<span class="u">V</span></div>
+      </div>
+    </div>
+
+    <div class="sechead">This session</div>
+    <div class="group">
+      <div class="odowrap">
+        <div class="odolabel">Charge delivered</div>
+        <div class="odo" id="odo">
+          <div class="digit">0</div><div class="digit">3</div><div class="digit">1</div><div class="digit">2</div>
+          <div class="odounit">mAh</div>
+        </div>
+        <div class="odonote">Resets with the session trip on Monitor</div>
+      </div>
+    </div>
+
+    <div style="height:6px"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 1.5"/></svg><span class="tl">Monitor</span></button>
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="8" x2="19" y2="8"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="5" y1="16" x2="13" y2="16"/></svg><span class="tl">Profiles</span></button>
+    <button class="tab on"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="15" height="9" rx="2.5"/><line x1="21" y1="11" x2="21" y2="14"/></svg><span class="tl">Battery</span></button>
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.5 5.5l2 2M16.5 16.5l2 2M18.5 5.5l-2 2M7.5 16.5l-2 2"/></svg><span class="tl">Settings</span></button>
+  </div>
+
+</div></div>
+</div></div>
+
+<div class="cap">SoC/cell V need 2 new telemetry regs · current from INA260 · delivered from reg 0x0015 · charge state from CHG_STATE decode</div>
+
+<!-- preview state switcher (not part of panel) -->
+<div class="cap" style="display:flex;gap:8px;justify-content:center">
+  <button onclick="setState('charging')" style="padding:6px 12px;border:0;border-radius:8px;background:#111;color:#fff;cursor:pointer">Charging</button>
+  <button onclick="setState('charged')" style="padding:6px 12px;border:0;border-radius:8px;background:#111;color:#fff;cursor:pointer">Charged</button>
+  <button onclick="setState('none')" style="padding:6px 12px;border:0;border-radius:8px;background:#111;color:#fff;cursor:pointer">No battery</button>
+</div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  const screen=$('screen');
+  const C=2*Math.PI*108;                     // ≈ 678
+  $('prog').setAttribute('stroke-dasharray', C.toFixed(1));
+
+  function setSoc(p){
+    $('pct').innerHTML = (p==null?'—':p)+'<span class="s">%</span>';
+    $('prog').setAttribute('stroke-dashoffset', (C*(1-(p||0)/100)).toFixed(1));
+  }
+  setSoc(70);
+
+  /* theme */
+  function setTheme(light){ screen.dataset.theme=light?'light':'dark'; $('theme').textContent=light?'☀':'☾'; }
+  $('theme').onclick=()=> setTheme(screen.dataset.theme==='dark');
+
+  /* state presets */
+  const labels={charging:'Charging',charged:'Charged',none:'No battery'};
+  function setState(s){
+    screen.dataset.state=s;
+    $('stateTxt').textContent=labels[s];
+    if(s==='none'){ setSoc(null); $('cell').textContent='Insert a cell'; $('vCur').innerHTML='—'; $('vVolt').innerHTML='—'; }
+    else if(s==='charged'){ setSoc(100); $('cell').textContent='4.20 V'; $('vCur').innerHTML='0.00<span class="u">A</span>'; $('vVolt').innerHTML='4.20<span class="u">V</span>'; }
+    else { setSoc(70); $('cell').textContent='3.86 V'; $('vCur').innerHTML='0.48<span class="u">A</span>'; $('vVolt').innerHTML='3.86<span class="u">V</span>'; }
+  }
+
+  /* responsive fit */
+  function fit(){ const avail=Math.min(window.innerWidth-24,760), s=Math.min(1,avail/720);
+    const f=$('fit'); f.style.transform=`scale(${s})`; f.parentElement.style.height=(720*s)+'px'; }
+  addEventListener('resize',fit); fit();
+</script>

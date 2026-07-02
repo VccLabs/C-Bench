@@ -3,18 +3,6 @@
   "imagePath" : "desktop.ini",
   "child" : [ ]
 }, {
-  "imageId" : 2,
-  "imagePath" : "view1.png",
-  "child" : [ ]
-}, {
-  "imageId" : 5,
-  "imagePath" : "view2.png",
-  "child" : [ ]
-}, {
-  "imageId" : 11,
-  "imagePath" : "view4.png",
-  "child" : [ ]
-}, {
   "imageId" : 4,
   "imagePath" : "arrow-dark.png",
   "child" : [ ]
@@ -71,7 +59,7 @@
   "imagePath" : "Brightness-symbol-small-light.png",
   "child" : [ ]
 }, {
-  "imageId" : 7,
-  "imagePath" : "Artboard.png",
+  "imageId" : 12,
+  "imagePath" : "view3.png",
   "child" : [ ]
 } ]
