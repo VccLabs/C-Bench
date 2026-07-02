@@ -626,7 +626,9 @@ void loop()
       float soc = maxlipo.cellPercent();                           /* 0..100 */
       bool present = (vcell > 2.5f);                               /* below ~2.5V = no/empty cell on this rail */
       writeReg(0x001C, present ? (uint16_t)(vcell * 1000.0f) : 0); /* cell mV, 0 = none */
-      writeReg(0x001D, present ? (uint16_t)(soc + 0.5f) : 0xFFFF); /* SoC %, 0xFFFF = none */
+      uint16_t socPct = (uint16_t)(soc + 0.5f);
+      if (socPct > 100) socPct = 100;                                    /* gauge can read >100 pre-compensation */
+      writeReg(0x001D, present ? socPct : 0xFFFF);                       /* SoC %, 0xFFFF = none */
     }
     else
     {
