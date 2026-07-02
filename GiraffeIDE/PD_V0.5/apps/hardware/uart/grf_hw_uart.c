@@ -736,9 +736,25 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         ap_paint();
         break;
     case 0x001A: /* active profile setpoint mV */
-        g_ap_mV = data[0];
-        ap_paint();
-        break;
+            g_ap_mV = data[0];
+            ap_paint();
+            break;
+        case 0x001C: /* battery cell voltage mV (0 = no battery) */
+        {
+            char b[12];
+            if (data[0] == 0) snprintf(b, sizeof(b), "-.- V");
+            else snprintf(b, sizeof(b), "%u.%02u V", data[0] / 1000, (data[0] % 1000) / 10);
+            grf_label_set_txt(GCL(GRF_VIEW3_ID, 11), b);   /* label8 id11 */
+            break;
+        }
+        case 0x001D: /* battery SoC % (0xFFFF = no battery) */
+        {
+            char b[8];
+            if (data[0] == 0xFFFF) snprintf(b, sizeof(b), "-.-");
+            else snprintf(b, sizeof(b), "%u", data[0]);
+            grf_label_set_txt(GCL(GRF_VIEW3_ID, 9), b);    /* label6 id9 */
+            break;
+        }
     case 0x0016: /* real output state from RP -> drive toggle */
         g_out_on = data[0];
         view1_set_output_btn(g_out_on);
