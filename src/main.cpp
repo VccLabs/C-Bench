@@ -2,10 +2,13 @@
 #include <Wire.h>
 #include <AP33772S.h>
 #include <Adafruit_INA260.h>
+#include <Adafruit_MAX1704X.h>
 #include <EEPROM.h>
 
-AP33772S usbpd;         // defaults to Wire (I2C0)
-Adafruit_INA260 ina260; // output-bus monitor @ 0x40
+AP33772S usbpd;             // defaults to Wire (I2C0)
+Adafruit_INA260 ina260;     // output-bus monitor @ 0x40
+Adafruit_MAX17048 maxlipo;  // battery fuel gauge @ 0x36
+static bool battOk = false; // fuel gauge present
 
 const int PPS_TARGET_MV = 9000; // request 9 V
 const int PPS_LIMIT_MA = 2000;  // 2 A limit
@@ -455,6 +458,10 @@ void setup()
       delay(100);
   }
 
+  battOk = maxlipo.begin(&Wire); // fuel gauge optional; absent = no battery UI
+  if (!battOk)
+    Serial.println("MAX17048 not found (no battery gauge)");
+
   ppsIdx = usbpd.getPPSIndex();
   Serial.print("PPS index: ");
   Serial.println(ppsIdx);
@@ -587,7 +594,7 @@ void loop()
 
   // Telemetry: fast, smooth refresh
   static uint32_t tTel = 0;
-if (now - tTel >= 500) // 2 Hz
+  if (now - tTel >= 500) // 2 Hz
   {
     tTel = now;
     float fmV = ina260.readBusVoltage();
@@ -601,8 +608,8 @@ if (now - tTel >= 500) // 2 Hz
     uint16_t mV = (uint16_t)fmV;
     uint16_t mA = (uint16_t)fmA;
     uint32_t mW = (uint32_t)fmW;
-writeReg(0x0010, mV);
-    g_arcTgtMV = mV;                       /* feed the analog arc easer */
+    writeReg(0x0010, mV);
+    g_arcTgtMV = mV; /* feed the analog arc easer */
     writeReg(0x0011, mA);
     writeReg(0x0012, (uint16_t)(mW / 100));
     writeReg(0x0016, outputOn ? 1 : 0);  /* real output state for the view1 toggle */
@@ -611,22 +618,44 @@ writeReg(0x0010, mV);
     activeProfileInfo(&apType, &apMV);
     writeReg(0x0019, apType); /* active profile type (0=none) */
     writeReg(0x001A, apMV);   /* active profile setpoint mV   */
+
+    /* battery fuel gauge (MAX17048). No cell -> sentinels so panel shows "-.-". */
+    if (battOk)
+    {
+      float vcell = maxlipo.cellVoltage();                         /* volts */
+      float soc = maxlipo.cellPercent();                           /* 0..100 */
+      bool present = (vcell > 2.5f);                               /* below ~2.5V = no/empty cell on this rail */
+      writeReg(0x001C, present ? (uint16_t)(vcell * 1000.0f) : 0); /* cell mV, 0 = none */
+      writeReg(0x001D, present ? (uint16_t)(soc + 0.5f) : 0xFFFF); /* SoC %, 0xFFFF = none */
+    }
+    else
+    {
+      writeReg(0x001C, 0);
+      writeReg(0x001D, 0xFFFF);
+    }
   }
 
   // Analog arc easing: ramp the ring toward the measured voltage, pushed faster
   // than telemetry so it settles like a needle (reg 0x001B). Numeric V stays instant.
   static uint32_t tArc = 0;
-  static float    arcShown = 0.0f;        // arc units = mV/100 (0..280)
-  static uint16_t lastArc  = 0xFFFF;
-  if (now - tArc >= 40)                    // 25 Hz
+  static float arcShown = 0.0f; // arc units = mV/100 (0..280)
+  static uint16_t lastArc = 0xFFFF;
+  if (now - tArc >= 40) // 25 Hz
   {
     tArc = now;
     float target = g_arcTgtMV / 100.0f;
-    arcShown += (target - arcShown) * 0.22f;   // approach rate: higher = snappier
-    float d = target - arcShown; if (d < 0) d = -d;
-    if (d < 0.5f) arcShown = target;           // snap within 0.05 V
+    arcShown += (target - arcShown) * 0.22f; // approach rate: higher = snappier
+    float d = target - arcShown;
+    if (d < 0)
+      d = -d;
+    if (d < 0.5f)
+      arcShown = target; // snap within 0.05 V
     uint16_t a = (uint16_t)(arcShown + 0.5f);
-    if (a != lastArc) { lastArc = a; writeReg(0x001B, a); }  // push only on change
+    if (a != lastArc)
+    {
+      lastArc = a;
+      writeReg(0x001B, a);
+    } // push only on change
   }
   // Fast source-attach watch: kill VOUT ASAP after a contract appears
   static uint32_t tAtt = 0;
