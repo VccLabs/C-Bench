@@ -679,7 +679,10 @@ void loop()
     uint16_t vcellmv = battOk ? (uint16_t)(maxlipo.cellVoltage() * 1000.0f) : 0;
     bool present = battOk && batteryPresent(vcellmv, chg);
     static bool g_prevPresent = false;
-    if (present && !g_prevPresent) maxlipo.quickStart(); /* fresh SoC on connect */
+    static uint32_t g_qsAt = 0;              /* 0 = none pending */
+    if (present && !g_prevPresent) g_qsAt = now + 2500; /* arm QS ~2.5s after connect */
+    if (!present) g_qsAt = 0;                /* cancel if removed */
+    if (g_qsAt && now >= g_qsAt) { maxlipo.quickStart(); g_qsAt = 0; }
     g_prevPresent = present;
     writeReg(0x001E, present ? chg : 0);             /* 0=none, 1=charging, 2=complete */
     if (present)
