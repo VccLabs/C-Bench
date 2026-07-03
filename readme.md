@@ -156,6 +156,18 @@ lets the MCU both **bias** the STAT node and **read** it safely.
 | STAT   | CTL=LOW read | CTL=HIGH read | Pattern | Meaning                    |
 | ------ | ------------ | ------------- | ------- | -------------------------- |
 | High-Z | 0            | 1             | `01`    | High-Z (no battery / done) |
+<!-- OPEN PROBLEM (battery presence):
+  - MAX17048 CELL is tied to +BATT (charger output). With NO battery, CELL floats
+    to the charger float rail (~4.16 V) so the gauge reports ~100% — voltage/SoC
+    alone CANNOT distinguish "full battery" vs "no battery".
+  - Observed: with no battery the decode did NOT return `01` (High-Z); it read
+    `11`/`00` instead, so the state enum alone also can't flag "no battery" yet.
+  - `readChargeState()` currently: CTL LOW→read, CTL HIGH→read; 11=charging,
+    00=complete, else=none. Charging (11) is reliable; no-battery detection is NOT.
+  - `maxlipo.quickStart()` is called at boot to avoid bad cold SoC estimates.
+  - TODO: settle CTL longer (RC on 10k nodes), verify IO6/IO7 pin mapping on the
+    RP2354A core, and add a robust presence gate (likely decode + current + a
+    voltage/settle heuristic). Schematics to be provided in a fresh session. -->
 | LOW    | 1            | 1             | `11`    | Charging                   |
 | HIGH   | 0            | 0             | `00`    | Charge complete            |
 
@@ -219,6 +231,9 @@ and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
 | `0x0019` | Active profile type: 0 none, 1 Fixed, 2 PPS, 3 AVS, 4 EPR | enum          |
 | `0x001A` | Active profile setpoint voltage                           | mV            |
 | `0x001B` | Eased arc value (analog ring ramp) — see note             | 0–280 (0.1 V) |
+| `0x001C` | Battery cell voltage (MAX17048); `0` = no battery         | mV            |
+| `0x001D` | Battery SoC (MAX17048), clamped 0–100; `0xFFFF` = no batt  | %             |
+| `0x001E` | Charge state: 0 no battery, 1 charging, 2 complete         | enum          |
 | `0x003A` | Lifetime energy odometer — **high 16 bits** of cWh        | 0.01 Wh       |
 | `0x003B` | Lifetime energy odometer — **low 16 bits** of cWh         | 0.01 Wh       |
 
@@ -344,7 +359,20 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
  - The active-rail **highlight survives a boot restore**: the RP pushes the
     active position on `0x0017` just before the list on every view2 entry, so the
     restored rail highlights even though the panel didn't apply it itself.
-- **view3 — Battery:** scaffolded; content planned.
+- **view3 — Battery:** implemented as a **monitor** (MCP73831 is a fixed linear
+  charger — nothing programmable). Elements:
+  - SoC % `label6` (id 9) and cell voltage `label8` (id 11), fed by `0x001D` /
+    `0x001C`; both show `-.-` on the no-battery sentinels.
+  - Charge-state text `label0` (id 2) — "Charging" / "Charged" / "No battery" —
+    and status dot `label1` (id 3): `TC_GREEN` when charging/charged, `TC_SURF2`
+    when none. Both driven by `0x001E`. (Dot breathing animation must be an
+    IDE-side animation — `grf_animation_set` is a no-op on this build.)
+  - SoC arc `arc0` (id 15): SoC scaled 0–100 → 0–628 (full at 628) via
+    `grf_arc_set_value`.
+  - Nav labels: `label10` (id 13)→Monitor, `label11` (id 14)→Profiles,
+    `label9` (id 12)→Settings, via `grf_view_set_dis_view_anim(..., ANIM_NONE)`.
+  - **Not yet reliable:** battery-presence detection (see OPEN PROBLEM under the
+    charge-state decode). Theming of view3 (`theme_apply_view3`) not yet added.
 - **view4 — Settings:** boot output state (segmented Off / Last used) and auto-arm
   output (switch), wired to `0x0031`/`0x0032`. Controls are painted from a
   panel-side shadow on entry (`view4_apply_settings`), kept in sync by RP pushes.
@@ -354,8 +382,23 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     persists it (debounced) and echoes it back on boot/sync. A guard
     (`g_bright_guard`) suppresses the slider's `VALUE_CHANGED` echo when the value
     is set programmatically.
-  - Appearance (theme) currently lives as a TEST toggle on view1; lifetime-energy
-    odometer is pushed (`0x003A/0x003B`) but **not yet displayed** here.
+  - **Appearance selector (done):** in-Settings Dark/Light chooser mirroring the
+    boot-state pattern. "Dark" `label26` (id 33) / "Light" `label27` (id 34) texts
+    with chips `label24` (id 31) / `label25` (id 32) shown behind the active option;
+    segment bg `label23` (id 30). `theme_state_paint()` colors the texts
+    (`TC_TXT` selected / grey unselected) and shows/hides chips from `g_dark`.
+    Handlers call `view4_set_theme(0|1)` → sets `g_dark`, `theme_apply()`, persists
+    `0x0039`. The **view1 TEST toggle** (`label24` id 28 → `view1_toggle_theme`) is
+    kept for debugging; both stay in sync via `theme_apply()`.
+  - **view4 is now fully themed** (`theme_apply_view4`): screen bg, brand/`· Settings`,
+    OUTPUT/DISPLAY section headers, boot-state card + segmented bg + chips + texts,
+    separator, auto-arm switch **bg fill** (`grf_ctrl_style_set_bg_color(sw, TC_SURF2, 0)`
+    — part MAIN=0; the `GRF_SW_PART_*` enum is **not** in this panel's headers, use the
+    literal), display card, brightness % , slider track (`part 0`), brightness icons
+    `image1`/`image2` (dark/light asset swap), nav `image0` swap, and the Appearance
+    block above. Slider **borders** can't be set at runtime (no border setter shipped);
+    they were zeroed in the IDE.
+  - Lifetime-energy odometer is pushed (`0x003A/0x003B`) but **not yet displayed**.
 
 Row data lives in a `ROW_ID[13][6]` table in `grf_hw_uart.c` mapping each row's
 six Control IDs; `fill_row()` / `show_row()` / `highlight_row()` / selection all
@@ -398,8 +441,11 @@ width 27 / radius 12); **image assets** are theme-swapped with `grf_img_set_src`
 | `TC_CHIP`   | `#2C2C2E` | `#FFFFFF` | FIX badge (dark chip, white in light)    |
 
 `theme_apply()` repaints from the shadow and dispatches to per-view
-`theme_apply_viewN()` (wired into each `viewN_apply_theme` entry). **view1** (Monitor)
-and **view2** (Profiles) are fully themed. On view2, `view2_paint_cards()` is the
+`theme_apply_viewN()` (wired into each `viewN_apply_theme` entry). **view1** (Monitor),
+**view2** (Profiles), and **view4** (Settings) are fully themed; **view3** (Battery)
+theming is **not yet added**. Selected-row tint uses `SEL_TINT` (orangy `#3A2A10`
+dark / `#FFECD1` light) — note the ternary keys on `g_dark` where `1`=light. On
+view2, `view2_paint_cards()` is the
 single row-color authority — called on render (`0x0101`), entry, and toggle — and
 covers: card bg (selection-aware, orange tint stays), per-row column text
 (current = `#64D2FF`, check = `#FF9F0A`, both fixed; voltage = `TC_TXT`;
@@ -473,7 +519,19 @@ shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_sta
   styling is done in firmware; the selection border is a separate `selbox`
   container moved over the active row (there is **no runtime border setter**).
 - **`grf_animation_set` is effectively non-functional** here (slide-up panel was
-  abandoned; the adjust panel uses instant `grf_ctrl_set_hidden`).
+  abandoned; the adjust panel uses instant `grf_ctrl_set_hidden`). By extension the
+  view3 status-dot "breathing" must be an IDE-side animation, not firmware.
+- **No border setters ship in this panel's headers.** Both
+  `grf_ctrl_style_set_border_color` and `..._width` are in the manual but **not
+  declared** in the SDK headers (compile error / implicit-decl). Set borders in the
+  IDE (e.g. slider borders zeroed there) — they cannot follow the theme at runtime.
+- **`GRF_SW_PART_*` / `GRF_BAR_PART_*` enums are not in the headers** either. Use the
+  literal `part` values: switch/slider bg fill = `grf_ctrl_style_set_bg_color(ctrl,
+  color, 0)` (part MAIN = 0).
+- **Forward-declare + define order:** functions/vars used by an earlier function
+  (e.g. `theme_apply_view4` calling `boot_state_paint` / `theme_state_paint`, or
+  referencing `g_v4_boot`) need a forward decl / hoisted definition above the caller,
+  or you hit implicit-declaration / undefined-reference errors.
 - **Rolling Transfer** (scroll-chain to parent) must be enabled on the row
   background controls for the list to scroll while rows are tappable — and it
   **resets when those controls are edited in the IDE**, so re-check after IDE

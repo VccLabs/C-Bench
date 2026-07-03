@@ -259,6 +259,7 @@ static uint8_t readChargeState()
   digitalWrite(PIN_CTL, HIGH);
   delayMicroseconds(50);
   uint8_t hi = digitalRead(PIN_CHG_STATE);
+  Serial.printf("CTL=LOW read=%u  CTL=HIGH read=%u\n", lo, hi);
   if (lo == 1 && hi == 1)
     return 1; // 11 = charging
   if (lo == 0 && hi == 0)
@@ -484,6 +485,8 @@ void setup()
   if (!battOk)
     Serial.println("MAX17048 not found (no battery gauge)");
 
+  if (battOk)
+    maxlipo.quickStart(); // force fresh SoC estimate (avoids 100%/6% cold reads)
   ppsIdx = usbpd.getPPSIndex();
   Serial.print("PPS index: ");
   Serial.println(ppsIdx);
