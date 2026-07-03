@@ -283,7 +283,7 @@
         "end_angle" : 629
       },
       "range_t" : {
-        "maxvalue" : 280
+        "maxvalue" : 628
       },
       "arc_t_main" : {
         "color" : 4281084974,
@@ -317,7 +317,7 @@
         "id" : 9,
         "parent_id" : 4,
         "pt" : {
-          "x" : 245,
+          "x" : 270,
           "y" : 87
         },
         "size" : {
@@ -329,8 +329,8 @@
         "pub" : true
       },
       "animspeed" : 50,
-      "align_e" : 35,
-      "txt" : "70",
+      "align_e" : 34,
+      "txt" : "100",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -350,12 +350,12 @@
         "id" : 10,
         "parent_id" : 4,
         "pt" : {
-          "x" : 400,
-          "y" : 136
+          "x" : 415,
+          "y" : 145
         },
         "size" : {
-          "width" : 56,
-          "height" : 63
+          "width" : 50,
+          "height" : 50
         },
         "scrollbar_t" : { },
         "alpha" : 255,
@@ -370,7 +370,7 @@
         "txt_t" : {
           "color" : 10000543,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
-          "font_size" : 38
+          "font_size" : 28
         },
         "img_t" : { }
       } ]

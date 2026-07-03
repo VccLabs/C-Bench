@@ -156,18 +156,19 @@ lets the MCU both **bias** the STAT node and **read** it safely.
 | STAT   | CTL=LOW read | CTL=HIGH read | Pattern | Meaning                    |
 | ------ | ------------ | ------------- | ------- | -------------------------- |
 | High-Z | 0            | 1             | `01`    | High-Z (no battery / done) |
-<!-- OPEN PROBLEM (battery presence):
-  - MAX17048 CELL is tied to +BATT (charger output). With NO battery, CELL floats
-    to the charger float rail (~4.16 V) so the gauge reports ~100% — voltage/SoC
-    alone CANNOT distinguish "full battery" vs "no battery".
-  - Observed: with no battery the decode did NOT return `01` (High-Z); it read
-    `11`/`00` instead, so the state enum alone also can't flag "no battery" yet.
-  - `readChargeState()` currently: CTL LOW→read, CTL HIGH→read; 11=charging,
-    00=complete, else=none. Charging (11) is reliable; no-battery detection is NOT.
-  - `maxlipo.quickStart()` is called at boot to avoid bad cold SoC estimates.
-  - TODO: settle CTL longer (RC on 10k nodes), verify IO6/IO7 pin mapping on the
-    RP2354A core, and add a robust presence gate (likely decode + current + a
-    voltage/settle heuristic). Schematics to be provided in a fresh session. -->
+<!-- RESOLVED (battery presence + SoC):
+  - Root cause: MAX17048 CELL tied to +BATT. With NO battery the charger charges
+    only the VBAT caps (C33/C34) -> terminates -> caps sag -> re-charge, so cell mV
+    SAWTOOTHS and charge-state FLAPS `00`<->`11`. High-Z (`01`) never appears while
+    VDD is powered, so neither voltage level nor the state enum can gate presence.
+  - Presence gate (`batteryPresent()` in main.cpp): ~10 s window @ 2 Hz; present iff
+    cell-mV span <=30 mV AND state flaps <2. A real cell is ~DC + stable; no cell
+    sawtooths/flaps. Works reliably (latches ~10-15 s after connect).
+  - SoC: MAX17048 ModelGauge is UNUSABLE with CELL on +BATT (reported 100/11/15%,
+    never converged). `quickStart()` removed entirely. SoC now computed from
+    `cellVoltage()` via a piecewise Li-ion curve (`socFromVoltage()`); voltage read
+    itself is trustworthy. Sags under load / rises on charge (no coulomb counting)
+    but stable and honest. Tune the curve to the cell if needed. -->
 | LOW    | 1            | 1             | `11`    | Charging                   |
 | HIGH   | 0            | 0             | `00`    | Charge complete            |
 
