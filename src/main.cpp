@@ -678,6 +678,9 @@ void loop()
     uint8_t chg = readChargeState();
     uint16_t vcellmv = battOk ? (uint16_t)(maxlipo.cellVoltage() * 1000.0f) : 0;
     bool present = battOk && batteryPresent(vcellmv, chg);
+    static bool g_prevPresent = false;
+    if (present && !g_prevPresent) maxlipo.quickStart(); /* fresh SoC on connect */
+    g_prevPresent = present;
     writeReg(0x001E, present ? chg : 0);             /* 0=none, 1=charging, 2=complete */
     if (present)
     {
