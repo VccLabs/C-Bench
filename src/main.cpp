@@ -280,6 +280,20 @@ static bool batteryPresent(uint16_t cellmv, uint8_t chg)
   return (hi - lo) <= 30 && flaps < 2;       // steady mV + steady state = cell
 }
 
+// SoC from resting Li-ion voltage (MAX17048 ModelGauge unusable: CELL on +BATT).
+// Piecewise-linear over a typical single-cell discharge curve.
+static uint8_t socFromVoltage(uint16_t mv)
+{
+  const uint16_t v[] = {3300, 3500, 3600, 3700, 3750, 3800, 3900, 4000, 4100, 4200};
+  const uint8_t  p[] = {   0,    5,   15,   40,   55,   65,   80,   90,   97,  100};
+  if (mv <= v[0]) return 0;
+  if (mv >= v[9]) return 100;
+  for (uint8_t i = 1; i < 10; i++)
+    if (mv < v[i])
+      return p[i-1] + (uint32_t)(mv - v[i-1]) * (p[i] - p[i-1]) / (v[i] - v[i-1]);
+  return 100;
+}
+
 // Read CHG_STATE at both CTL polarities -> 0=no battery, 1=charging, 2=complete
 static uint8_t readChargeState()
 {
@@ -681,10 +695,7 @@ void loop()
     if (present)
     {
       float vcell = vcellmv / 1000.0f;
-      float soc = maxlipo.cellPercent();
-      uint16_t socPct = (uint16_t)(soc + 0.5f);
-      if (socPct > 100)
-        socPct = 100;
+      uint16_t socPct = socFromVoltage(vcellmv);
       writeReg(0x001C, (uint16_t)(vcell * 1000.0f)); /* cell mV */
       writeReg(0x001D, socPct);                      /* SoC % */
     }
