@@ -250,6 +250,36 @@ static void activeProfileInfo(uint16_t *type, uint16_t *mV)
   *mV = (s.type == 1 || s.type == 2) ? reqMV : s.vmin; // PPS/AVS: requested; else PDO voltage
 }
 
+// Battery presence via DYNAMICS, not level/state:
+//  - no cell: +BATT caps sawtooth (cell mV wanders) and charge-state flaps 00<->11
+//  - real cell: cell mV is ~DC (<~mV/s) and state is stable for minutes
+// Window ~10 s @ 2 Hz. Present iff cell mV span small AND state not flapping.
+#define BATT_WIN 20  // samples (~10 s at 2 Hz)
+static uint16_t g_bmv[BATT_WIN];
+static uint8_t  g_bst[BATT_WIN];
+static uint8_t  g_bi = 0, g_bn = 0;
+
+static bool batteryPresent(uint16_t cellmv, uint8_t chg)
+{
+  g_bmv[g_bi] = cellmv;
+  g_bst[g_bi] = chg;
+  g_bi = (g_bi + 1) % BATT_WIN;
+  if (g_bn < BATT_WIN) g_bn++;
+  if (g_bn < BATT_WIN) return false;         // need a full window first
+
+  uint16_t lo = 0xFFFF, hi = 0;
+  uint8_t flaps = 0;
+  for (uint8_t k = 0; k < BATT_WIN; k++)
+  {
+    if (g_bmv[k] < lo) lo = g_bmv[k];
+    if (g_bmv[k] > hi) hi = g_bmv[k];
+  }
+  for (uint8_t k = 1; k < BATT_WIN; k++)
+    if (g_bst[k] != g_bst[(k + BATT_WIN - 1) % BATT_WIN]) flaps++;
+
+  return (hi - lo) <= 30 && flaps < 2;       // steady mV + steady state = cell
+}
+
 // Read CHG_STATE at both CTL polarities -> 0=no battery, 1=charging, 2=complete
 static uint8_t readChargeState()
 {
@@ -644,13 +674,14 @@ void loop()
     writeReg(0x0019, apType); /* active profile type (0=none) */
     writeReg(0x001A, apMV);   /* active profile setpoint mV   */
 
-    /* charge state gates battery presence (High-Z + not charging = no cell) */
+/* presence from dynamics: caps sawtooth + state flaps when no cell present */
     uint8_t chg = readChargeState();
-    bool present = battOk && (chg == 1 || chg == 2); /* charging or complete = cell present */
-    writeReg(0x001E, chg);                           /* 0=none, 1=charging, 2=complete */
+    uint16_t vcellmv = battOk ? (uint16_t)(maxlipo.cellVoltage() * 1000.0f) : 0;
+    bool present = battOk && batteryPresent(vcellmv, chg);
+    writeReg(0x001E, present ? chg : 0);             /* 0=none, 1=charging, 2=complete */
     if (present)
     {
-      float vcell = maxlipo.cellVoltage();
+      float vcell = vcellmv / 1000.0f;
       float soc = maxlipo.cellPercent();
       uint16_t socPct = (uint16_t)(soc + 0.5f);
       if (socPct > 100)
