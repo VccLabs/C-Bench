@@ -33,13 +33,13 @@
       },
       "arc_t_main" : {
         "color" : 4281084974,
-        "width" : 27,
+        "width" : 18,
         "opa" : 255,
         "rounded" : 12
       },
       "arc_t_inc" : {
         "color" : 4294942474,
-        "width" : 27,
+        "width" : 18,
         "opa" : 255,
         "rounded" : 12
       },

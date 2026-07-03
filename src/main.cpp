@@ -14,6 +14,9 @@ const int PPS_TARGET_MV = 9000; // request 9 V
 const int PPS_LIMIT_MA = 2000;  // 2 A limit
 int ppsIdx = -1;
 
+#define PIN_CHG_STATE 6 // IO6: charger STAT read-back
+#define PIN_CTL 7       // IO7: STAT node bias control
+
 // ---- HMI control state (panel -> RP) ----
 volatile uint16_t reqMV = PPS_TARGET_MV; // reg 0x0020 (next milestone)
 volatile uint16_t limMA = PPS_LIMIT_MA;  // reg 0x0021 (next milestone)
@@ -247,6 +250,22 @@ static void activeProfileInfo(uint16_t *type, uint16_t *mV)
   *mV = (s.type == 1 || s.type == 2) ? reqMV : s.vmin; // PPS/AVS: requested; else PDO voltage
 }
 
+// Read CHG_STATE at both CTL polarities -> 0=no battery, 1=charging, 2=complete
+static uint8_t readChargeState()
+{
+  digitalWrite(PIN_CTL, LOW);
+  delayMicroseconds(50);
+  uint8_t lo = digitalRead(PIN_CHG_STATE);
+  digitalWrite(PIN_CTL, HIGH);
+  delayMicroseconds(50);
+  uint8_t hi = digitalRead(PIN_CHG_STATE);
+  if (lo == 1 && hi == 1)
+    return 1; // 11 = charging
+  if (lo == 0 && hi == 0)
+    return 2; // 00 = complete
+  return 0;   // 01 = High-Z (no battery / done)
+}
+
 static void pushSession()
 {
   uint32_t mWh = (uint32_t)(g_sessE_uWh / 1000ULL); // µWh -> mWh (0.001 Wh)
@@ -443,6 +462,9 @@ void setup()
   Wire.setSCL(21); // IO21
   Wire.begin();
 
+  pinMode(PIN_CHG_STATE, INPUT);
+  pinMode(PIN_CTL, OUTPUT);
+
   HMI.begin(115200); // screen link
 
   delay(1000);   // let charger negotiation settle (lib recommends >500ms)
@@ -619,21 +641,24 @@ void loop()
     writeReg(0x0019, apType); /* active profile type (0=none) */
     writeReg(0x001A, apMV);   /* active profile setpoint mV   */
 
-    /* battery fuel gauge (MAX17048). No cell -> sentinels so panel shows "-.-". */
-    if (battOk)
+    /* charge state gates battery presence (High-Z + not charging = no cell) */
+    uint8_t chg = readChargeState();
+    bool present = battOk && (chg == 1 || chg == 2); /* charging or complete = cell present */
+    writeReg(0x001E, chg);                           /* 0=none, 1=charging, 2=complete */
+    if (present)
     {
-      float vcell = maxlipo.cellVoltage();                         /* volts */
-      float soc = maxlipo.cellPercent();                           /* 0..100 */
-      bool present = (vcell > 2.5f);                               /* below ~2.5V = no/empty cell on this rail */
-      writeReg(0x001C, present ? (uint16_t)(vcell * 1000.0f) : 0); /* cell mV, 0 = none */
+      float vcell = maxlipo.cellVoltage();
+      float soc = maxlipo.cellPercent();
       uint16_t socPct = (uint16_t)(soc + 0.5f);
-      if (socPct > 100) socPct = 100;                                    /* gauge can read >100 pre-compensation */
-      writeReg(0x001D, present ? socPct : 0xFFFF);                       /* SoC %, 0xFFFF = none */
+      if (socPct > 100)
+        socPct = 100;
+      writeReg(0x001C, (uint16_t)(vcell * 1000.0f)); /* cell mV */
+      writeReg(0x001D, socPct);                      /* SoC % */
     }
     else
     {
-      writeReg(0x001C, 0);
-      writeReg(0x001D, 0xFFFF);
+      writeReg(0x001C, 0);      /* -> panel "-.-" */
+      writeReg(0x001D, 0xFFFF); /* -> panel "-.-" */
     }
   }
 

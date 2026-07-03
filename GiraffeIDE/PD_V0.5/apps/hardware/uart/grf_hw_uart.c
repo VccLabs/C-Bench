@@ -748,13 +748,15 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
             break;
         }
         case 0x001D: /* battery SoC % (0xFFFF = no battery) */
-        {
-            char b[8];
-            if (data[0] == 0xFFFF) snprintf(b, sizeof(b), "-.-");
-            else snprintf(b, sizeof(b), "%u", data[0]);
-            grf_label_set_txt(GCL(GRF_VIEW3_ID, 9), b);    /* label6 id9 */
-            break;
-        }
+            {
+                char b[8];
+                u16 arc = (data[0] == 0xFFFF) ? 0 : (u16)((u32)data[0] * 628 / 100);
+                if (data[0] == 0xFFFF) snprintf(b, sizeof(b), "-.-");
+                else snprintf(b, sizeof(b), "%u", data[0]);
+                grf_label_set_txt(GCL(GRF_VIEW3_ID, 9), b);    /* label6 id9 */
+                grf_arc_set_value(GCL(GRF_VIEW3_ID, 15), arc); /* arc0 id15, full=628 */
+                break;
+            }
     case 0x0016: /* real output state from RP -> drive toggle */
         g_out_on = data[0];
         view1_set_output_btn(g_out_on);
@@ -818,6 +820,16 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
                 view2_paint_cards(); /* apply all row column colors after render */
                 break;
     }
+    case 0x001E: /* charge state: 0=no battery, 1=charging, 2=complete */
+        {
+            const char *txt = (data[0] == 1) ? "Charging"
+                            : (data[0] == 2) ? "Charged" : "No battery";
+            grf_label_set_txt(GCL(GRF_VIEW3_ID, 2), txt);   /* label0 id2 */
+            /* dot: green when charging/charged, dark gray when none */
+            grf_ctrl_style_set_bg_color(GCL(GRF_VIEW3_ID, 3),
+                (data[0] == 0) ? TCOL(TC_SURF2) : TCOL(TC_GREEN), 0);  /* label1 id3 */
+            break;
+        }
     }
 }
 
