@@ -156,6 +156,9 @@ lets the MCU both **bias** the STAT node and **read** it safely.
 | STAT   | CTL=LOW read | CTL=HIGH read | Pattern | Meaning                    |
 | ------ | ------------ | ------------- | ------- | -------------------------- |
 | High-Z | 0            | 1             | `01`    | High-Z (no battery / done) |
+| LOW    | 1            | 1             | `11`    | Charging                   |
+| HIGH   | 0            | 0             | `00`    | Charge complete            |
+
 <!-- RESOLVED (battery presence + SoC):
   - Root cause: MAX17048 CELL tied to +BATT. With NO battery the charger charges
     only the VBAT caps (C33/C34) -> terminates -> caps sag -> re-charge, so cell mV
@@ -169,9 +172,7 @@ lets the MCU both **bias** the STAT node and **read** it safely.
     `cellVoltage()` via a piecewise Li-ion curve (`socFromVoltage()`); voltage read
     itself is trustworthy. Sags under load / rises on charge (no coulomb counting)
     but stable and honest. Tune the curve to the cell if needed. -->
-| LOW    | 1            | 1             | `11`    | Charging                   |
-| HIGH   | 0            | 0             | `00`    | Charge complete            |
-
+    
 ---
 
 ## Display / HMI
@@ -233,8 +234,8 @@ and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
 | `0x001A` | Active profile setpoint voltage                           | mV            |
 | `0x001B` | Eased arc value (analog ring ramp) — see note             | 0–280 (0.1 V) |
 | `0x001C` | Battery cell voltage (MAX17048); `0` = no battery         | mV            |
-| `0x001D` | Battery SoC (MAX17048), clamped 0–100; `0xFFFF` = no batt  | %             |
-| `0x001E` | Charge state: 0 no battery, 1 charging, 2 complete         | enum          |
+| `0x001D` | Battery SoC (MAX17048), clamped 0–100; `0xFFFF` = no batt | %             |
+| `0x001E` | Charge state: 0 no battery, 1 charging, 2 complete        | enum          |
 | `0x003A` | Lifetime energy odometer — **high 16 bits** of cWh        | 0.01 Wh       |
 | `0x003B` | Lifetime energy odometer — **low 16 bits** of cWh         | 0.01 Wh       |
 
