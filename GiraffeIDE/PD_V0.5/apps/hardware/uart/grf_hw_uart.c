@@ -383,7 +383,9 @@ static void theme_apply_view1(void)
     grf_img_set_src(GCL(GRF_VIEW1_ID, V1_NAV),
                     g_dark ? "nav-monitor-light.png" : "nav-monitor.png");
     grf_img_set_src(GCL(GRF_VIEW1_ID, 31),
-                    g_dark ? "theme-light.png" : "theme-dark.png");
+                        g_dark ? "theme-light.png" : "theme-dark.png");
+        grf_img_set_src(GCL(GRF_VIEW1_ID, 28),
+                        g_dark ? "logo-light.png" : "logo-dark.png");
 }
 
 /* ── view2 (Profiles) themed control IDs ── */
@@ -447,7 +449,9 @@ static void theme_apply_view2(void)
     grf_img_set_src(GCL(GRF_VIEW2_ID, V2_NAV),
                     g_dark ? "nav-profiles-light.png" : "nav-profiles.png");
     grf_img_set_src(GCL(GRF_VIEW2_ID, 99),
-                    g_dark ? "theme-light.png" : "theme-dark.png");
+                        g_dark ? "theme-light.png" : "theme-dark.png");
+        grf_img_set_src(GCL(GRF_VIEW2_ID, 97),
+                        g_dark ? "logo-light.png" : "logo-dark.png");
 }
 
 /* ── view3 (Battery) themed control IDs ── */
@@ -477,7 +481,9 @@ static void theme_apply_view3(void)
     grf_img_set_src(GCL(GRF_VIEW3_ID, V3_NAV),
                     g_dark ? "nav-battery-light.png" : "nav-battery.png");
     grf_img_set_src(GCL(GRF_VIEW3_ID, 5),
-                    g_dark ? "theme-light.png" : "theme-dark.png");
+                        g_dark ? "theme-light.png" : "theme-dark.png");
+        grf_img_set_src(GCL(GRF_VIEW3_ID, 16),
+                        g_dark ? "logo-light.png" : "logo-dark.png");
 }
 
 /* ── view4 (Settings) themed control IDs ── */
@@ -528,7 +534,9 @@ static void theme_apply_view4(void)
     grf_img_set_src(GCL(GRF_VIEW4_ID, V4_NAV),
                     g_dark ? "nav-settings-light.png" : "nav-settings.png");
     grf_img_set_src(GCL(GRF_VIEW4_ID, 35),
-                                g_dark ? "theme-light.png" : "theme-dark.png");
+                                    g_dark ? "theme-light.png" : "theme-dark.png");
+        grf_img_set_src(GCL(GRF_VIEW4_ID, 36),
+                                    g_dark ? "logo-light.png" : "logo-dark.png");
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL6_ID), TC_SURF);   /* major card    ID8  */
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL10_ID), TC_SURF2); /* segmented bg  ID12 */
     THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), TC_SURF2); /* chip "Off"    ID26 */
