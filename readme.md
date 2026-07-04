@@ -164,9 +164,10 @@ lets the MCU both **bias** the STAT node and **read** it safely.
     only the VBAT caps (C33/C34) -> terminates -> caps sag -> re-charge, so cell mV
     SAWTOOTHS and charge-state FLAPS `00`<->`11`. High-Z (`01`) never appears while
     VDD is powered, so neither voltage level nor the state enum can gate presence.
-  - Presence gate (`batteryPresent()` in main.cpp): ~10 s window @ 2 Hz; present iff
-    cell-mV span <=30 mV AND state flaps <2. A real cell is ~DC + stable; no cell
-    sawtooths/flaps. Works reliably (latches ~10-15 s after connect).
+  - Presence gate (`batteryPresent()` in main.cpp): `BATT_WIN=10` samples (~5 s
+    @ 2 Hz); present iff cell-mV span <=30 mV AND state flaps <2. A real cell is
+    ~DC + stable; no cell sawtooths/flaps. Latches ~5 s after connect. Don't drop
+    below 10 samples — shorter windows false-positive (miss the sawtooth).
   - SoC: MAX17048 ModelGauge is UNUSABLE with CELL on +BATT (reported 100/11/15%,
     never converged). `quickStart()` removed entirely. SoC now computed from
     `cellVoltage()` via a piecewise Li-ion curve (`socFromVoltage()`); voltage read
@@ -339,7 +340,7 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     can't be changed, so the overlay supplies the touch feedback); `CLICKED`
     sends `0x0025`.
   - **Active profile** `label18` (id 22), fed by `0x0019`/`0x001A`.
-  - **Theme toggle (TEST)** `label24` (id 28) → `view1_toggle_theme()`; see Theme.
+  - **Theme toggle** `image2` (id 31) → `view1_toggle_theme()`; see Theme.
   - `view1_entry` also sends `0x0033` (HMI ready) and calls `view1_apply_theme()`.
 - **view2 — Profiles:** scrolling `container0` holding a fixed pool of **13 rows**;
   each row = 6 controls (badge / voltage / meta / current / check / background),
@@ -373,8 +374,12 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     `grf_arc_set_value`.
   - Nav labels: `label10` (id 13)→Monitor, `label11` (id 14)→Profiles,
     `label9` (id 12)→Settings, via `grf_view_set_dis_view_anim(..., ANIM_NONE)`.
-  - **Not yet reliable:** battery-presence detection (see OPEN PROBLEM under the
-    charge-state decode). Theming of view3 (`theme_apply_view3`) not yet added.
+  - **Theme toggle** `image2`/id 5 (macro `VIEW3_IMAGE1_ID`) → `view1_toggle_theme()`.
+  - **Themed** via `theme_apply_view3()`, called on entry (`view3_entry` →
+    `view3_apply_theme`) so control colors persist across navigation. Arc track
+    (`TC_TRACK`) themed via `grf_arc_set_dis` part 0; green fg is constant.
+    Charge-state pill `label0` (id 2) bg = `TC_SURF2`. Nav img `nav-battery.png` /
+    `-light`. Presence detection now reliable (see RESOLVED block above).
 - **view4 — Settings:** boot output state (segmented Off / Last used) and auto-arm
   output (switch), wired to `0x0031`/`0x0032`. Controls are painted from a
   panel-side shadow on entry (`view4_apply_settings`), kept in sync by RP pushes.
@@ -390,8 +395,9 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     segment bg `label23` (id 30). `theme_state_paint()` colors the texts
     (`TC_TXT` selected / grey unselected) and shows/hides chips from `g_dark`.
     Handlers call `view4_set_theme(0|1)` → sets `g_dark`, `theme_apply()`, persists
-    `0x0039`. The **view1 TEST toggle** (`label24` id 28 → `view1_toggle_theme`) is
-    kept for debugging; both stay in sync via `theme_apply()`.
+    `0x0039`. Every view also has a **theme-toggle image** (`view1` id 31, `view2`
+    id 99, `view3` id 5, `view4` id 35) → `view1_toggle_theme()`; all stay in sync
+    via `theme_apply()`, and each swaps `theme-dark.png`/`theme-light.png`.
   - **view4 is now fully themed** (`theme_apply_view4`): screen bg, brand/`· Settings`,
     OUTPUT/DISPLAY section headers, boot-state card + segmented bg + chips + texts,
     separator, auto-arm switch **bg fill** (`grf_ctrl_style_set_bg_color(sw, TC_SURF2, 0)`
