@@ -148,9 +148,11 @@ void view3_init(void)
 	grf_view_create(GRF_VIEW3_ID,view_ctrls_fun_t,sizeof(view_ctrls_fun_t)/sizeof(grf_ctrl_fun_t));
 }
 
+extern void view3_apply_theme(void);
+
 void view3_entry(void)
 {
-
+    view3_apply_theme();
 }
 
 void view3_exit(void)
