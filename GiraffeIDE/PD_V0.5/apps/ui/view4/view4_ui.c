@@ -310,13 +310,10 @@ static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Appearance: 
 }
 
 
+extern void view1_toggle_theme(void);
 static void image3_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
 }
 
 #include "../../../libs/appscc/view4_cc.h"

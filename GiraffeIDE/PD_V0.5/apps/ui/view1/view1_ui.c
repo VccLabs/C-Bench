@@ -316,12 +316,6 @@ static void label23_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)   /* theme toggle (ID28) */
-{
-	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
-}
-
-
 static void label26_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
 //	switch (event) {
@@ -344,11 +338,7 @@ static void label25_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void image2_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
 }
 
 #include "../../../libs/appscc/view1_cc.h"

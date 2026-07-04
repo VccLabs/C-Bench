@@ -26,7 +26,7 @@ static u8 g_prof_n = 0;
 
 #define LBL_EMPTY1 80 /* label78 - "No profiles..." view2*/
 #define LBL_EMPTY2 81 /* label79 - subtitle view2*/
-#define LBL_STAT   98 /* label91 - source summary / empty prompt view2 */
+#define LBL_STAT 98   /* label91 - source summary / empty prompt view2 */
 
 /* view2 adjust panel + Use button (PPS/AVS fine-adjust) */
 #define ADJ_CONT 82 /* container1            */
@@ -40,35 +40,47 @@ static u8 g_prof_n = 0;
 /* ───────── THEME COLOR TABLE ─────────
  * g_dark holds the 0x0039 reg value: 0 = dark, 1 = light.
  * That doubles as the column index into THEME[role][0=dark | 1=light]. */
-enum {
-    TC_BG, TC_SURF, TC_SURF2, TC_TRACK, TC_TXT, TC_TXT2, TC_TXT3,
-	TC_GREEN, TC_RED, TC_ORANGE, TC_BLUE, TC_CHIP, TC_N
+enum
+{
+    TC_BG,
+    TC_SURF,
+    TC_SURF2,
+    TC_TRACK,
+    TC_TXT,
+    TC_TXT2,
+    TC_TXT3,
+    TC_GREEN,
+    TC_RED,
+    TC_ORANGE,
+    TC_BLUE,
+    TC_CHIP,
+    TC_N
 };
 static const u32 THEME[TC_N][2] = {
     /*               dark                          light                       */
-    /* TC_BG     */ { GRF_COLOR_GET(0x00,0x00,0x00), GRF_COLOR_GET(0xF2,0xF2,0xF7) },
-    /* TC_SURF   */ { GRF_COLOR_GET(0x1C,0x1C,0x1E), GRF_COLOR_GET(0xFF,0xFF,0xFF) },
-    /* TC_SURF2  */ { GRF_COLOR_GET(0x2C,0x2C,0x2E), GRF_COLOR_GET(0xE5,0xE5,0xEA) },
-    /* TC_TRACK  */ { GRF_COLOR_GET(0x44,0x44,0x46), GRF_COLOR_GET(0xC7,0xC7,0xCC) },
-    /* TC_TXT    */ { GRF_COLOR_GET(0xFF,0xFF,0xFF), GRF_COLOR_GET(0x00,0x00,0x00) },
-    /* TC_TXT2   */ { GRF_COLOR_GET(0x8E,0x8E,0x93), GRF_COLOR_GET(0x6C,0x6C,0x70) },
-    /* TC_TXT3   */ { GRF_COLOR_GET(0x47,0x47,0x47), GRF_COLOR_GET(0xC7,0xC7,0xCC) },
-    /* TC_GREEN  */ { GRF_COLOR_GET(0x30,0xD1,0x58), GRF_COLOR_GET(0x34,0xC7,0x59) },
-    /* TC_RED    */ { GRF_COLOR_GET(0xFF,0x45,0x3A), GRF_COLOR_GET(0xFF,0x3B,0x30) },
-    /* TC_ORANGE */ { GRF_COLOR_GET(0xFF,0x9F,0x0A), GRF_COLOR_GET(0xFF,0x95,0x00) },
-	/* TC_BLUE   */ { GRF_COLOR_GET(0x0A,0x84,0xFF), GRF_COLOR_GET(0x00,0x7A,0xFF) },
-	/* TC_CHIP   */ { GRF_COLOR_GET(0x2C,0x2C,0x2E), GRF_COLOR_GET(0xFF,0xFF,0xFF) },
-	};
+    /* TC_BG     */ {GRF_COLOR_GET(0x00, 0x00, 0x00), GRF_COLOR_GET(0xF2, 0xF2, 0xF7)},
+    /* TC_SURF   */ {GRF_COLOR_GET(0x1C, 0x1C, 0x1E), GRF_COLOR_GET(0xFF, 0xFF, 0xFF)},
+    /* TC_SURF2  */ {GRF_COLOR_GET(0x2C, 0x2C, 0x2E), GRF_COLOR_GET(0xE5, 0xE5, 0xEA)},
+    /* TC_TRACK  */ {GRF_COLOR_GET(0x44, 0x44, 0x46), GRF_COLOR_GET(0xC7, 0xC7, 0xCC)},
+    /* TC_TXT    */ {GRF_COLOR_GET(0xFF, 0xFF, 0xFF), GRF_COLOR_GET(0x00, 0x00, 0x00)},
+    /* TC_TXT2   */ {GRF_COLOR_GET(0x8E, 0x8E, 0x93), GRF_COLOR_GET(0x6C, 0x6C, 0x70)},
+    /* TC_TXT3   */ {GRF_COLOR_GET(0x47, 0x47, 0x47), GRF_COLOR_GET(0xC7, 0xC7, 0xCC)},
+    /* TC_GREEN  */ {GRF_COLOR_GET(0x30, 0xD1, 0x58), GRF_COLOR_GET(0x34, 0xC7, 0x59)},
+    /* TC_RED    */ {GRF_COLOR_GET(0xFF, 0x45, 0x3A), GRF_COLOR_GET(0xFF, 0x3B, 0x30)},
+    /* TC_ORANGE */ {GRF_COLOR_GET(0xFF, 0x9F, 0x0A), GRF_COLOR_GET(0xFF, 0x95, 0x00)},
+    /* TC_BLUE   */ {GRF_COLOR_GET(0x0A, 0x84, 0xFF), GRF_COLOR_GET(0x00, 0x7A, 0xFF)},
+    /* TC_CHIP   */ {GRF_COLOR_GET(0x2C, 0x2C, 0x2E), GRF_COLOR_GET(0xFF, 0xFF, 0xFF)},
+};
 static u8 g_dark = 0;
-#define TCOL(role) (THEME[(role)][g_dark])          /* current color for a role */
-#define THEME_BG(ctrl, role)  grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
+#define TCOL(role) (THEME[(role)][g_dark]) /* current color for a role */
+#define THEME_BG(ctrl, role) grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
 /* selected-row card fill: orangy dark in dark mode, orangy white in light mode */
 #define SEL_TINT (g_dark ? GRF_COLOR_GET(0xFF, 0xEC, 0xD1) : GRF_COLOR_GET(0x3A, 0x2A, 0x10))
-static void boot_state_paint(u8 last_used);  /* fwd decl: used by theme_apply_view4 */
-static void theme_state_paint(void);         /* fwd decl: used by theme_apply_view4 */
-static u8 g_v4_boot = 0;                      /* shadow of reg 0x0031 (0=Off, 1=Last used) */
-extern u8 g_v4_boot;                          /* fwd: boot-state shadow (defined below) */
+static void boot_state_paint(u8 last_used); /* fwd decl: used by theme_apply_view4 */
+static void theme_state_paint(void);        /* fwd decl: used by theme_apply_view4 */
+static u8 g_v4_boot = 0;                    /* shadow of reg 0x0031 (0=Off, 1=Last used) */
+extern u8 g_v4_boot;                        /* fwd: boot-state shadow (defined below) */
 
 /* per-row Control IDs: {badge, volt, meta, curr, check} */
 enum
@@ -112,7 +124,7 @@ static void highlight_row(u8 i, u8 on)
     grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), on ? 0 : 1);
     /* background chip: orange tint when selected, default card when not */
     grf_ctrl_style_set_bg_color(bg,
-                                        on ? SEL_TINT : TCOL(TC_SURF), 0);
+                                on ? SEL_TINT : TCOL(TC_SURF), 0);
     /* #ff9f0a border: move the single outline box over the selected row */
     if (on)
     {
@@ -127,11 +139,11 @@ static void highlight_row(u8 i, u8 on)
     }
 }
 
-static u8   g_use_en = 0;                 /* shadow: 1 = selected/orange, 0 = "Select a rail" */
+static u8 g_use_en = 0; /* shadow: 1 = selected/orange, 0 = "Select a rail" */
 static char g_use_txt[40] = "Select a rail";
-static void use_btn_paint(void)           /* paint Use button from shadow + theme */
+static void use_btn_paint(void) /* paint Use button from shadow + theme */
 {
-    if (g_prof_n == 0)                    /* no source -> hide the button entirely */
+    if (g_prof_n == 0) /* no source -> hide the button entirely */
     {
         grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, BTN_USE), 1);
         return;
@@ -290,9 +302,9 @@ static void view1_set_output_btn(u8 on) /* drive output label from real state */
 
 void view1_sync_armed(void) /* called from view1_entry */
 {
-	g_arm_pending = 0;              /* no longer drives the visual */
-	    view1_set_output_btn(g_out_on); /* reflect the real state instead */
-	    grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), g_arc); /* restore eased arc after view reset */
+    g_arm_pending = 0;                                     /* no longer drives the visual */
+    view1_set_output_btn(g_out_on);                        /* reflect the real state instead */
+    grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), g_arc); /* restore eased arc after view reset */
 }
 
 void view1_toggle_output(void) /* label7 click: request opposite of real state */
@@ -313,24 +325,24 @@ void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
 }
 
 /* ── view1 (Monitor) themed control IDs ── */
-#define V1_VVAL    1   /* label0  — voltage value      txt */
-#define V1_LBL25  29   /* label25 —                    txt */
-#define V1_LBL26  30   /* label26 —                    txt2 */
-#define V1_LBL19  23   /* label19 —                    txt2 */
-#define V1_LBL20  24   /* label20 —                    green */
-#define V1_PROF   22   /* label18 — active profile     txt2 */
-#define V1_CARD1  19   /* label16 — card surface       surf */
-#define V1_CARD2  20   /* label17 — card surface       surf */
-#define V1_CARD3   2   /* label1  — card surface       surf */
-#define V1_RST    16   /* label13 — reset chip         surf2 + txt2 */
-#define V1_ARROW  21   /* image1  — reset arrow icon   img swap */
-#define V1_RSTHL  25   /* label21 — reset press tint   txt (press dir) */
-#define V1_ELAP   26   /* label22 — elapsed value      txt */
-#define V1_NAV    10   /* image0  — nav bar image      img swap */
+#define V1_VVAL 1   /* label0  — voltage value      txt */
+#define V1_LBL25 29 /* label25 —                    txt */
+#define V1_LBL26 30 /* label26 —                    txt2 */
+#define V1_LBL19 23 /* label19 —                    txt2 */
+#define V1_LBL20 24 /* label20 —                    green */
+#define V1_PROF 22  /* label18 — active profile     txt2 */
+#define V1_CARD1 19 /* label16 — card surface       surf */
+#define V1_CARD2 20 /* label17 — card surface       surf */
+#define V1_CARD3 2  /* label1  — card surface       surf */
+#define V1_RST 16   /* label13 — reset chip         surf2 + txt2 */
+#define V1_ARROW 21 /* image1  — reset arrow icon   img swap */
+#define V1_RSTHL 25 /* label21 — reset press tint   txt (press dir) */
+#define V1_ELAP 26  /* label22 — elapsed value      txt */
+#define V1_NAV 10   /* image0  — nav bar image      img swap */
 
 static void theme_apply_view1(void)
 {
-    grf_view_set_bgcolor(GRF_VIEW1_ID, TCOL(TC_BG));        /* screen bg */
+    grf_view_set_bgcolor(GRF_VIEW1_ID, TCOL(TC_BG)); /* screen bg */
     THEME_TXT(GCL(GRF_VIEW1_ID, V1_VVAL), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW1_ID, V1_LBL25), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW1_ID, V1_LBL26), TC_TXT2);
@@ -340,175 +352,192 @@ static void theme_apply_view1(void)
     THEME_BG(GCL(GRF_VIEW1_ID, V1_CARD1), TC_SURF);
     THEME_BG(GCL(GRF_VIEW1_ID, V1_CARD2), TC_SURF);
     THEME_BG(GCL(GRF_VIEW1_ID, V1_CARD3), TC_SURF);
-    {   /* arc voltage ring — track is a line (part 0): color,width,opa,rounded */
-            grf_line_disp_t arc_bg = { TCOL(TC_TRACK), 27, 255, 12 };
-            grf_arc_set_dis(GCL(GRF_VIEW1_ID, ARC_VOLT), 0, arc_bg);
-        }
-        /* session: reset chip + elapsed */
-        THEME_BG (GCL(GRF_VIEW1_ID, V1_RST),   TC_SURF2);
-        THEME_TXT(GCL(GRF_VIEW1_ID, V1_RST),   TC_TXT2);
-        THEME_BG (GCL(GRF_VIEW1_ID, V1_RSTHL), TC_TXT);     /* press-tint color; opacity from IDE */
-        THEME_TXT(GCL(GRF_VIEW1_ID, V1_ELAP),  TC_TXT);
-        /* image swaps (dark vs light asset) */
-        grf_img_set_src(GCL(GRF_VIEW1_ID, V1_ARROW),
-                        g_dark ? "arrow-light.png"        : "arrow-dark.png");
-        grf_img_set_src(GCL(GRF_VIEW1_ID, V1_NAV),
-                        g_dark ? "nav-monitor-light.png"  : "nav-monitor.png");
+    { /* arc voltage ring — track is a line (part 0): color,width,opa,rounded */
+        grf_line_disp_t arc_bg = {TCOL(TC_TRACK), 27, 255, 12};
+        grf_arc_set_dis(GCL(GRF_VIEW1_ID, ARC_VOLT), 0, arc_bg);
     }
+    /* session: reset chip + elapsed */
+    THEME_BG(GCL(GRF_VIEW1_ID, V1_RST), TC_SURF2);
+    THEME_TXT(GCL(GRF_VIEW1_ID, V1_RST), TC_TXT2);
+    THEME_BG(GCL(GRF_VIEW1_ID, V1_RSTHL), TC_TXT); /* press-tint color; opacity from IDE */
+    THEME_TXT(GCL(GRF_VIEW1_ID, V1_ELAP), TC_TXT);
+    /* image swaps (dark vs light asset) */
+    grf_img_set_src(GCL(GRF_VIEW1_ID, V1_ARROW),
+                    g_dark ? "arrow-light.png" : "arrow-dark.png");
+    grf_img_set_src(GCL(GRF_VIEW1_ID, V1_NAV),
+                    g_dark ? "nav-monitor-light.png" : "nav-monitor.png");
+    grf_img_set_src(GCL(GRF_VIEW1_ID, 31),
+                    g_dark ? "theme-light.png" : "theme-dark.png");
+}
 
 /* ── view2 (Profiles) themed control IDs ── */
-#define V2_BRAND  91   /* label85 — "C-Bench"     txt  */
-#define V2_SUB    94   /* label87 — "· Profiles"  txt2 */
-#define V2_TITLE  97   /* label90 — "Profiles"    txt  */
-#define V2_NAV    92   /* image0  — nav bar image  img swap */
+#define V2_BRAND 91 /* label85 — "C-Bench"     txt  */
+#define V2_SUB 94   /* label87 — "· Profiles"  txt2 */
+#define V2_TITLE 97 /* label90 — "Profiles"    txt  */
+#define V2_NAV 92   /* image0  — nav bar image  img swap */
 /* status line label91 (id 98) reuses LBL_STAT */
 
-static void row_badge_colors(u8 i)   /* per-type badge bg/txt */
+static void row_badge_colors(u8 i) /* per-type badge bg/txt */
 {
     grf_ctrl_t *b = GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BADGE]);
     switch (g_prof[i].type)
     {
-    case 1: grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0x64,0xD2,0xFF), 0); /* PPS */
-            grf_label_set_txt_color(b, GRF_COLOR_GET(0x06,0x2A,0x30)); break;
-    case 2: grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0xFF,0x9F,0x0A), 0); /* AVS */
-            grf_label_set_txt_color(b, GRF_COLOR_GET(0x2A,0x18,0x00)); break;
-    case 3: grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0xBF,0x5A,0xF2), 0); /* EPR */
-            grf_label_set_txt_color(b, GRF_COLOR_GET(0x1E,0x0C,0x33)); break;
-    default: grf_ctrl_style_set_bg_color(b, TCOL(TC_CHIP), 0);                /* FIX */
-            grf_label_set_txt_color(b, TCOL(TC_TXT2)); break;
+    case 1:
+        grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0x64, 0xD2, 0xFF), 0); /* PPS */
+        grf_label_set_txt_color(b, GRF_COLOR_GET(0x06, 0x2A, 0x30));
+        break;
+    case 2:
+        grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0xFF, 0x9F, 0x0A), 0); /* AVS */
+        grf_label_set_txt_color(b, GRF_COLOR_GET(0x2A, 0x18, 0x00));
+        break;
+    case 3:
+        grf_ctrl_style_set_bg_color(b, GRF_COLOR_GET(0xBF, 0x5A, 0xF2), 0); /* EPR */
+        grf_label_set_txt_color(b, GRF_COLOR_GET(0x1E, 0x0C, 0x33));
+        break;
+    default:
+        grf_ctrl_style_set_bg_color(b, TCOL(TC_CHIP), 0); /* FIX */
+        grf_label_set_txt_color(b, TCOL(TC_TXT2));
+        break;
     }
 }
 
-static void view2_paint_cards(void)   /* single row-color authority: render + entry + theme */
+static void view2_paint_cards(void) /* single row-color authority: render + entry + theme */
 {
     for (u8 i = 0; i < MAX_PROF; i++)
     {
-    	grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]),
-    	            (i == g_sel) ? SEL_TINT : TCOL(TC_SURF), 0);
-        if (i >= g_prof_n) continue;
-        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_VOLT]),  TCOL(TC_TXT));                /* range "5.0-11.0 V" */
-        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_META]),  TCOL(TC_TXT2));               /* "adjustable rail" */
-        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CURR]),  GRF_COLOR_GET(0x64,0xD2,0xFF)); /* current = blue, both themes */
-        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), GRF_COLOR_GET(0xFF,0x9F,0x0A)); /* check = orange, both themes */
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_BG]),
+                                    (i == g_sel) ? SEL_TINT : TCOL(TC_SURF), 0);
+        if (i >= g_prof_n)
+            continue;
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_VOLT]), TCOL(TC_TXT));                     /* range "5.0-11.0 V" */
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_META]), TCOL(TC_TXT2));                    /* "adjustable rail" */
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CURR]), GRF_COLOR_GET(0x64, 0xD2, 0xFF));  /* current = blue, both themes */
+        grf_label_set_txt_color(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), GRF_COLOR_GET(0xFF, 0x9F, 0x0A)); /* check = orange, both themes */
         row_badge_colors(i);
     }
 }
 
 static void theme_apply_view2(void)
 {
-    grf_view_set_bgcolor(GRF_VIEW2_ID, TCOL(TC_BG));   /* screen bg */
+    grf_view_set_bgcolor(GRF_VIEW2_ID, TCOL(TC_BG)); /* screen bg */
     THEME_TXT(GCL(GRF_VIEW2_ID, V2_BRAND), TC_TXT);
-    THEME_TXT(GCL(GRF_VIEW2_ID, V2_SUB),   TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW2_ID, V2_SUB), TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW2_ID, V2_TITLE), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW2_ID, LBL_STAT), TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW2_ID, LBL_EMPTY1), TC_TXT3);
     THEME_TXT(GCL(GRF_VIEW2_ID, LBL_EMPTY2), TC_TXT3);
-    use_btn_paint();   /* re-apply Use button idle colors / visibility for theme */
+    use_btn_paint();     /* re-apply Use button idle colors / visibility for theme */
     view2_paint_cards(); /* row cards (selection-aware) + FIX badges */
     grf_img_set_src(GCL(GRF_VIEW2_ID, V2_NAV),
-    g_dark ? "nav-profiles-light.png" : "nav-profiles.png");
+                    g_dark ? "nav-profiles-light.png" : "nav-profiles.png");
+    grf_img_set_src(GCL(GRF_VIEW2_ID, 99),
+                    g_dark ? "theme-light.png" : "theme-dark.png");
 }
 
 /* ── view3 (Battery) themed control IDs ── */
-#define V3_BRAND  8    /* label5 — "C-Bench"     txt   */
-#define V3_SUB    7    /* label4 — "· Battery"   txt2  */
-#define V3_CARD   6    /* label2 — bg square      surf  */
-#define V3_STATE  2    /* label0 — charge state   txt2  */
-#define V3_PCT    9    /* label6 — SoC %          txt   */
-#define V3_VOLT   11   /* label8 — cell voltage   txt2  */
-#define V3_ARC    15   /* arc0   — SoC ring       track */
-#define V3_NAV    1    /* image0 — nav bar image  img swap */
+#define V3_BRAND 8 /* label5 — "C-Bench"     txt   */
+#define V3_SUB 7   /* label4 — "· Battery"   txt2  */
+#define V3_CARD 6  /* label2 — bg square      surf  */
+#define V3_STATE 2 /* label0 — charge state   txt2  */
+#define V3_PCT 9   /* label6 — SoC %          txt   */
+#define V3_VOLT 11 /* label8 — cell voltage   txt2  */
+#define V3_ARC 15  /* arc0   — SoC ring       track */
+#define V3_NAV 1   /* image0 — nav bar image  img swap */
 
 static void theme_apply_view3(void)
 {
-    grf_view_set_bgcolor(GRF_VIEW3_ID, TCOL(TC_BG));      /* screen bg */
+    grf_view_set_bgcolor(GRF_VIEW3_ID, TCOL(TC_BG)); /* screen bg */
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_BRAND), TC_TXT);
-    THEME_TXT(GCL(GRF_VIEW3_ID, V3_SUB),   TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW3_ID, V3_SUB), TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_STATE), TC_TXT2);
-        THEME_BG (GCL(GRF_VIEW3_ID, V3_STATE), TC_SURF2);   /* pill bg #2c2c2e */
-    THEME_TXT(GCL(GRF_VIEW3_ID, V3_PCT),   TC_TXT);
-    THEME_TXT(GCL(GRF_VIEW3_ID, V3_VOLT),  TC_TXT2);
-    THEME_BG (GCL(GRF_VIEW3_ID, V3_CARD),  TC_SURF);
-    {   /* SoC arc track (part 0 line): color,width,opa,rounded — width from IDE */
-        grf_line_disp_t arc_bg = { TCOL(TC_TRACK), 27, 255, 12 };
+    THEME_BG(GCL(GRF_VIEW3_ID, V3_STATE), TC_SURF2); /* pill bg #2c2c2e */
+    THEME_TXT(GCL(GRF_VIEW3_ID, V3_PCT), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW3_ID, V3_VOLT), TC_TXT2);
+    THEME_BG(GCL(GRF_VIEW3_ID, V3_CARD), TC_SURF);
+    { /* SoC arc track (part 0 line): color,width,opa,rounded — width from IDE */
+        grf_line_disp_t arc_bg = {TCOL(TC_TRACK), 27, 255, 12};
         grf_arc_set_dis(GCL(GRF_VIEW3_ID, V3_ARC), 0, arc_bg);
     }
     grf_img_set_src(GCL(GRF_VIEW3_ID, V3_NAV),
                     g_dark ? "nav-battery-light.png" : "nav-battery.png");
+    grf_img_set_src(GCL(GRF_VIEW3_ID, 5),
+                    g_dark ? "theme-light.png" : "theme-dark.png");
 }
 
 /* ── view4 (Settings) themed control IDs ── */
-#define V4_BRAND   25   /* label18 — "C-Bench"        txt   */
-#define V4_SUB     24   /* label17 — "· Settings"     txt2  */
-#define V4_HDR_OUT  2   /* label0  — "OUTPUT"         txt2  */
-#define V4_BOOTLBL  4   /* label2  — "Boot output state" txt */
-#define V4_BOOTSUB  6   /* label4  — subtitle         txt2  */
-#define V4_SEP      9   /* label7  — separator line   surf2 */
-#define V4_AALBL    5   /* label3  — "Auto-arm output" txt  */
-#define V4_AASUB    7   /* label5  — subtitle         txt2  */
-#define V4_HDR_DISP 3   /* label1  — "DISPLAY"        txt2  */
-#define V4_DISPCARD 18  /* label14 — display section bg surf */
-#define V4_PCT      23  /* label16 — brightness %     txt2  */
-#define V4_SW       13  /* sw0     — auto-arm switch  bg=surf2 */
-#define V4_IMG_SML  21  /* image1  — brightness small icon  img swap */
-#define V4_IMG_FUL  22  /* image2  — brightness full icon   img swap */
-#define V4_NAV      14  /* image0  — nav bar image          img swap */
-#define V4_APPEAR   28  /* label21 — "Appearance"     txt   */
-#define V4_APPSUB   29  /* label22 — "Dark or light"  txt2  */
-#define V4_TH_DARK  33  /* label26 — "Dark"  option text    */
-#define V4_TH_LIGHT 34  /* label27 — "Light" option text    */
-#define V4_CH_DARK  31  /* label24 — "Dark"  chip           */
-#define V4_CH_LIGHT 32  /* label25 — "Light" chip           */
-#define V4_TH_SEG   30  /* label23 — theme segment bg  surf2 */
+#define V4_BRAND 25    /* label18 — "C-Bench"        txt   */
+#define V4_SUB 24      /* label17 — "· Settings"     txt2  */
+#define V4_HDR_OUT 2   /* label0  — "OUTPUT"         txt2  */
+#define V4_BOOTLBL 4   /* label2  — "Boot output state" txt */
+#define V4_BOOTSUB 6   /* label4  — subtitle         txt2  */
+#define V4_SEP 9       /* label7  — separator line   surf2 */
+#define V4_AALBL 5     /* label3  — "Auto-arm output" txt  */
+#define V4_AASUB 7     /* label5  — subtitle         txt2  */
+#define V4_HDR_DISP 3  /* label1  — "DISPLAY"        txt2  */
+#define V4_DISPCARD 18 /* label14 — display section bg surf */
+#define V4_PCT 23      /* label16 — brightness %     txt2  */
+#define V4_SW 13       /* sw0     — auto-arm switch  bg=surf2 */
+#define V4_IMG_SML 21  /* image1  — brightness small icon  img swap */
+#define V4_IMG_FUL 22  /* image2  — brightness full icon   img swap */
+#define V4_NAV 14      /* image0  — nav bar image          img swap */
+#define V4_APPEAR 28   /* label21 — "Appearance"     txt   */
+#define V4_APPSUB 29   /* label22 — "Dark or light"  txt2  */
+#define V4_TH_DARK 33  /* label26 — "Dark"  option text    */
+#define V4_TH_LIGHT 34 /* label27 — "Light" option text    */
+#define V4_CH_DARK 31  /* label24 — "Dark"  chip           */
+#define V4_CH_LIGHT 32 /* label25 — "Light" chip           */
+#define V4_TH_SEG 30   /* label23 — theme segment bg  surf2 */
 /* slider0 (V4_BRIGHT_SLD id19) track reuses TC_SURF2 */
 
 static void theme_apply_view4(void)
 {
-    grf_view_set_bgcolor(GRF_VIEW4_ID, TCOL(TC_BG));                    /* screen bg */
-    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BRAND),    TC_TXT);
-    THEME_TXT(GCL(GRF_VIEW4_ID, V4_SUB),      TC_TXT2);
-    THEME_TXT(GCL(GRF_VIEW4_ID, V4_HDR_OUT),  TC_TXT2);
-    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BOOTLBL),  TC_TXT);
-    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BOOTSUB),  TC_TXT2);
-    THEME_BG (GCL(GRF_VIEW4_ID, V4_SEP),      TC_SURF2);
-    THEME_TXT(GCL(GRF_VIEW4_ID, V4_AALBL),    TC_TXT);
-    THEME_TXT(GCL(GRF_VIEW4_ID, V4_AASUB),    TC_TXT2);
+    grf_view_set_bgcolor(GRF_VIEW4_ID, TCOL(TC_BG)); /* screen bg */
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BRAND), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_SUB), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_HDR_OUT), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BOOTLBL), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_BOOTSUB), TC_TXT2);
+    THEME_BG(GCL(GRF_VIEW4_ID, V4_SEP), TC_SURF2);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_AALBL), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_AASUB), TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW4_ID, V4_HDR_DISP), TC_TXT2);
-    THEME_BG (GCL(GRF_VIEW4_ID, V4_DISPCARD), TC_SURF);
-    THEME_TXT(GCL(GRF_VIEW4_ID, V4_PCT),      TC_TXT2);
-    THEME_BG (GCL(GRF_VIEW4_ID, 19), TC_SURF2);   /* slider0 id19 track (bar main part) */
+    THEME_BG(GCL(GRF_VIEW4_ID, V4_DISPCARD), TC_SURF);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_PCT), TC_TXT2);
+    THEME_BG(GCL(GRF_VIEW4_ID, 19), TC_SURF2);                                /* slider0 id19 track (bar main part) */
     grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, V4_SW), TCOL(TC_SURF2), 0); /* switch bg fill (part MAIN=0) */
-        grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_SML),
-                            g_dark ? "Brightness-symbol-small-light.png" : "Brightness-symbol-small-dark.png");
-            grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_FUL),
-                            g_dark ? "Brightness-symbol-full-light.png"  : "Brightness-symbol-full-dark.png");
-            grf_img_set_src(GCL(GRF_VIEW4_ID, V4_NAV),
-                            g_dark ? "nav-settings-light.png" : "nav-settings.png");
-            THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL6_ID),  TC_SURF);            /* major card    ID8  */
-    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL10_ID), TC_SURF2);           /* segmented bg  ID12 */
-    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), TC_SURF2);           /* chip "Off"    ID26 */
-    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), TC_SURF2);           /* chip "Last"   ID27 */
-        THEME_TXT(GCL(GRF_VIEW4_ID, V4_APPEAR),   TC_TXT);
-        THEME_TXT(GCL(GRF_VIEW4_ID, V4_APPSUB),   TC_TXT2);
-        THEME_BG (GCL(GRF_VIEW4_ID, V4_TH_SEG),   TC_SURF2);              /* theme segment bg */
-            THEME_BG (GCL(GRF_VIEW4_ID, V4_CH_DARK),  TC_SURF2);              /* theme chips */
-            THEME_BG (GCL(GRF_VIEW4_ID, V4_CH_LIGHT), TC_SURF2);
-        boot_state_paint(g_v4_boot);   /* text colors (TC_TXT/grey) + chip show-hide */
-        theme_state_paint();           /* Dark/Light texts + chip show-hide */
-    }
+    grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_SML),
+                    g_dark ? "Brightness-symbol-small-light.png" : "Brightness-symbol-small-dark.png");
+    grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_FUL),
+                    g_dark ? "Brightness-symbol-full-light.png" : "Brightness-symbol-full-dark.png");
+    grf_img_set_src(GCL(GRF_VIEW4_ID, V4_NAV),
+                    g_dark ? "nav-settings-light.png" : "nav-settings.png");
+    grf_img_set_src(GCL(GRF_VIEW4_ID, 35),
+                                g_dark ? "theme-light.png" : "theme-dark.png");
+    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL6_ID), TC_SURF);   /* major card    ID8  */
+    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL10_ID), TC_SURF2); /* segmented bg  ID12 */
+    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), TC_SURF2); /* chip "Off"    ID26 */
+    THEME_BG(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), TC_SURF2); /* chip "Last"   ID27 */
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_APPEAR), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW4_ID, V4_APPSUB), TC_TXT2);
+    THEME_BG(GCL(GRF_VIEW4_ID, V4_TH_SEG), TC_SURF2);  /* theme segment bg */
+    THEME_BG(GCL(GRF_VIEW4_ID, V4_CH_DARK), TC_SURF2); /* theme chips */
+    THEME_BG(GCL(GRF_VIEW4_ID, V4_CH_LIGHT), TC_SURF2);
+    boot_state_paint(g_v4_boot); /* text colors (TC_TXT/grey) + chip show-hide */
+    theme_state_paint();         /* Dark/Light texts + chip show-hide */
+}
 
-static void theme_apply(void)               /* repaint all themed views from g_dark */
+static void theme_apply(void) /* repaint all themed views from g_dark */
 {
-	theme_apply_view1();
-	    theme_apply_view2();
-	    theme_apply_view3();
-	    theme_apply_view4();
-	}
-	void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
-	void view2_apply_theme(void) { theme_apply(); }   /* view2 entry: repaint from shadow */
-	void view3_apply_theme(void) { theme_apply(); }   /* view3 entry: repaint from shadow */
-	void view4_apply_theme(void) { theme_apply(); }   /* view4 entry: repaint from shadow */
-void view1_toggle_theme(void)               /* user tap: flip + apply + persist */
+    theme_apply_view1();
+    theme_apply_view2();
+    theme_apply_view3();
+    theme_apply_view4();
+}
+void view1_apply_theme(void) { theme_apply(); } /* view1 entry: repaint from shadow */
+void view2_apply_theme(void) { theme_apply(); } /* view2 entry: repaint from shadow */
+void view3_apply_theme(void) { theme_apply(); } /* view3 entry: repaint from shadow */
+void view4_apply_theme(void) { theme_apply(); } /* view4 entry: repaint from shadow */
+void view1_toggle_theme(void)                   /* user tap: flip + apply + persist */
 {
     g_dark ^= 1;
     theme_apply();
@@ -573,31 +602,31 @@ static void elapsed_paint(u16 s) /* MM:SS, rolls to H:MM:SS past 1h */
 
 static void boot_state_paint(u8 last_used) /* 0 = Off white, 1 = Last used white */
 {
-    grf_color_t on  = TCOL(TC_TXT);                                                    /* selected   = primary */
+    grf_color_t on = TCOL(TC_TXT);                                                     /* selected   = primary */
     grf_color_t off = GRF_COLOR_GET(0x98, 0x98, 0x9F);                                 /* unselected = grey    */
     grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), last_used ? off : on); /* "Off"       ID10 */
     grf_label_set_txt_color(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), last_used ? on : off); /* "Last used" ID11 */
     /* selection chip: show behind the active option, hide the other */
-    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), last_used ? 1 : 0);       /* chip "Off"       ID26 */
-    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), last_used ? 0 : 1);       /* chip "Last used" ID27 */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, VIEW4_LABEL19_ID), last_used ? 1 : 0); /* chip "Off"       ID26 */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, VIEW4_LABEL20_ID), last_used ? 0 : 1); /* chip "Last used" ID27 */
 }
 
 static void theme_state_paint(void) /* g_dark: 0=Dark selected, 1=Light selected */
 {
-    grf_color_t on  = TCOL(TC_TXT);                     /* selected   = primary */
-    grf_color_t off = GRF_COLOR_GET(0x98, 0x98, 0x9F);  /* unselected = grey    */
-    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, V4_TH_DARK),  g_dark ? off : on); /* "Dark"  ID33 */
+    grf_color_t on = TCOL(TC_TXT);                                              /* selected   = primary */
+    grf_color_t off = GRF_COLOR_GET(0x98, 0x98, 0x9F);                          /* unselected = grey    */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, V4_TH_DARK), g_dark ? off : on);  /* "Dark"  ID33 */
     grf_label_set_txt_color(GCL(GRF_VIEW4_ID, V4_TH_LIGHT), g_dark ? on : off); /* "Light" ID34 */
-    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, V4_CH_DARK),  g_dark ? 1 : 0);        /* chip Dark  ID31 */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, V4_CH_DARK), g_dark ? 1 : 0);         /* chip Dark  ID31 */
     grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, V4_CH_LIGHT), g_dark ? 0 : 1);        /* chip Light ID32 */
 }
 
 void view4_set_theme(u8 light) /* user tap: set absolute theme + apply + persist */
 {
     if (g_dark == light)
-        return;                 /* already in this mode */
+        return; /* already in this mode */
     g_dark = light ? 1 : 0;
-    theme_apply();              /* repaints all views incl. theme_state_paint */
+    theme_apply(); /* repaints all views incl. theme_state_paint */
     grf_reg_set(0x0039, g_dark);
     grf_reg_com_send(0x0039, 1);
 }
@@ -670,9 +699,9 @@ static void fill_row(u8 i, prof_t *p)
         btx = GRF_COLOR_GET(0x1E, 0x0C, 0x33);
         break;
     default:
-            badge = "FIX";
-            bbg = TCOL(TC_CHIP);
-            btx = TCOL(TC_TXT2);
+        badge = "FIX";
+        bbg = TCOL(TC_CHIP);
+        btx = TCOL(TC_TXT2);
         break;
     }
     u8 range = (p->vmin != p->vmax);
@@ -703,7 +732,8 @@ void view2_apply_status(void) /* label91: source summary or empty-state prompt *
         for (u8 i = 0; i < g_prof_n; i++)
         {
             u32 mw = (u32)g_prof[i].vmax * g_prof[i].imax / 1000; /* mV*mA/1000 = mW */
-            if (mw > maxmw) maxmw = mw;
+            if (mw > maxmw)
+                maxmw = mw;
         }
         u16 w = (u16)((maxmw + 500) / 1000);
         char sb[48];
@@ -714,7 +744,7 @@ void view2_apply_status(void) /* label91: source summary or empty-state prompt *
     else
     {
         grf_label_set_txt(GCL(GRF_VIEW2_ID, LBL_STAT),
-            "Connect a USB-C source to the other type-C port to see its power profiles");
+                          "Connect a USB-C source to the other type-C port to see its power profiles");
     }
 }
 
@@ -736,13 +766,13 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
     switch (addr)
     {
     case 0x0010: /* voltage mV (numeric label only; arc eased via 0x001B) */
-            snprintf(buf, sizeof(buf), "%u.%02u", data[0] / 1000, (data[0] % 1000) / 10);
-            grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
-            break;
+        snprintf(buf, sizeof(buf), "%u.%02u", data[0] / 1000, (data[0] % 1000) / 10);
+        grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
+        break;
     case 0x001B: /* eased arc value (0..280) from RP analog ramp */
-            g_arc = data[0];
-            grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), g_arc);
-            break;
+        g_arc = data[0];
+        grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), g_arc);
+        break;
     case 0x0011: /* current mA */
         snprintf(buf, sizeof(buf), "%u.%03u A", data[0] / 1000, data[0] % 1000);
         grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
@@ -767,27 +797,31 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         ap_paint();
         break;
     case 0x001A: /* active profile setpoint mV */
-            g_ap_mV = data[0];
-            ap_paint();
-            break;
-        case 0x001C: /* battery cell voltage mV (0 = no battery) */
-        {
-            char b[12];
-            if (data[0] == 0) snprintf(b, sizeof(b), "-.- V");
-            else snprintf(b, sizeof(b), "%u.%02u V", data[0] / 1000, (data[0] % 1000) / 10);
-            grf_label_set_txt(GCL(GRF_VIEW3_ID, 11), b);   /* label8 id11 */
-            break;
-        }
-        case 0x001D: /* battery SoC % (0xFFFF = no battery) */
-            {
-                char b[8];
-                u16 arc = (data[0] == 0xFFFF) ? 0 : (u16)((u32)data[0] * 628 / 100);
-                if (data[0] == 0xFFFF) snprintf(b, sizeof(b), "-.-");
-                else snprintf(b, sizeof(b), "%u", data[0]);
-                grf_label_set_txt(GCL(GRF_VIEW3_ID, 9), b);    /* label6 id9 */
-                grf_arc_set_value(GCL(GRF_VIEW3_ID, 15), arc); /* arc0 id15, full=628 */
-                break;
-            }
+        g_ap_mV = data[0];
+        ap_paint();
+        break;
+    case 0x001C: /* battery cell voltage mV (0 = no battery) */
+    {
+        char b[12];
+        if (data[0] == 0)
+            snprintf(b, sizeof(b), "-.- V");
+        else
+            snprintf(b, sizeof(b), "%u.%02u V", data[0] / 1000, (data[0] % 1000) / 10);
+        grf_label_set_txt(GCL(GRF_VIEW3_ID, 11), b); /* label8 id11 */
+        break;
+    }
+    case 0x001D: /* battery SoC % (0xFFFF = no battery) */
+    {
+        char b[8];
+        u16 arc = (data[0] == 0xFFFF) ? 0 : (u16)((u32)data[0] * 628 / 100);
+        if (data[0] == 0xFFFF)
+            snprintf(b, sizeof(b), "-.-");
+        else
+            snprintf(b, sizeof(b), "%u", data[0]);
+        grf_label_set_txt(GCL(GRF_VIEW3_ID, 9), b);    /* label6 id9 */
+        grf_arc_set_value(GCL(GRF_VIEW3_ID, 15), arc); /* arc0 id15, full=628 */
+        break;
+    }
     case 0x0016: /* real output state from RP -> drive toggle */
         g_out_on = data[0];
         view1_set_output_btn(g_out_on);
@@ -814,9 +848,9 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         if (grf_view_get_cur_id(GRF_LAYER_UI) == GRF_VIEW4_ID)
             grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
         break;
-    case 0x0039:  /* theme from RP -> shadow + apply */
-         g_dark = data[0] ? 1 : 0;
-         theme_apply();
+    case 0x0039: /* theme from RP -> shadow + apply */
+        g_dark = data[0] ? 1 : 0;
+        theme_apply();
         break;
     case 0x0101:
     { /* list ready -> render */
@@ -837,30 +871,31 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
             fill_row(i, &g_prof[i]);
         }
         for (u8 i = g_prof_n; i < MAX_PROF; i++)
-                    show_row(i, 0); /* hide unused rows */
-                view2_apply_status(); /* refresh label91 from the new list */
+            show_row(i, 0);   /* hide unused rows */
+        view2_apply_status(); /* refresh label91 from the new list */
         for (u8 i = 0; i < g_prof_n; i++)
             grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
         if (g_prof_n == 0)
             g_applied = 0xFF; /* source gone -> forget selection */
         if (g_applied != 0xFF && g_applied < g_prof_n)
-                {
-                    g_sel = g_applied; /* show active rail */
-                    highlight_row(g_applied, 1);
-                }
-                view2_paint_cards(); /* apply all row column colors after render */
-                break;
+        {
+            g_sel = g_applied; /* show active rail */
+            highlight_row(g_applied, 1);
+        }
+        view2_paint_cards(); /* apply all row column colors after render */
+        break;
     }
     case 0x001E: /* charge state: 0=no battery, 1=charging, 2=complete */
-        {
-            const char *txt = (data[0] == 1) ? "Charging"
-                            : (data[0] == 2) ? "Charged" : "No battery";
-            grf_label_set_txt(GCL(GRF_VIEW3_ID, 2), txt);   /* label0 id2 */
-            /* dot: green when charging/charged, dark gray when none */
-            grf_ctrl_style_set_bg_color(GCL(GRF_VIEW3_ID, 3),
-                (data[0] == 0) ? TCOL(TC_SURF2) : TCOL(TC_GREEN), 0);  /* label1 id3 */
-            break;
-        }
+    {
+        const char *txt = (data[0] == 1)   ? "Charging"
+                          : (data[0] == 2) ? "Charged"
+                                           : "No battery";
+        grf_label_set_txt(GCL(GRF_VIEW3_ID, 2), txt); /* label0 id2 */
+        /* dot: green when charging/charged, dark gray when none */
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW3_ID, 3),
+                                    (data[0] == 0) ? TCOL(TC_SURF2) : TCOL(TC_GREEN), 0); /* label1 id3 */
+        break;
+    }
     }
 }
 

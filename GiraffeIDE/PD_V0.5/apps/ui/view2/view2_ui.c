@@ -971,13 +971,10 @@ static void selbox_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
+extern void view1_toggle_theme(void);
 static void image1_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
 }
 
 #include "../../../libs/appscc/view2_cc.h"
