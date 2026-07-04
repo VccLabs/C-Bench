@@ -254,7 +254,7 @@ static void activeProfileInfo(uint16_t *type, uint16_t *mV)
 //  - no cell: +BATT caps sawtooth (cell mV wanders) and charge-state flaps 00<->11
 //  - real cell: cell mV is ~DC (<~mV/s) and state is stable for minutes
 // Window ~10 s @ 2 Hz. Present iff cell mV span small AND state not flapping.
-#define BATT_WIN 20  // samples (~10 s at 2 Hz)
+#define BATT_WIN 2  // samples (~10 s at 2 Hz)
 static uint16_t g_bmv[BATT_WIN];
 static uint8_t  g_bst[BATT_WIN];
 static uint8_t  g_bi = 0, g_bn = 0;
