@@ -488,6 +488,38 @@
         "img_t" : { }
       } ]
     }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label3",
+        "id" : 5,
+        "parent_id" : 4,
+        "pt" : {
+          "x" : 573,
+          "y" : 441
+        },
+        "size" : {
+          "width" : 141,
+          "height" : 33
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "0.48",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 6607615,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
   } ],
   "view" : {
     "v_name" : "view3",
