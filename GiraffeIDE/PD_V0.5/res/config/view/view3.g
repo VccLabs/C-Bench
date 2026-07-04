@@ -282,6 +282,7 @@
         "start_angle" : 270,
         "end_angle" : 629
       },
+      "arc_value" : 100,
       "range_t" : {
         "maxvalue" : 628
       },
@@ -293,7 +294,7 @@
       },
       "arc_t_inc" : {
         "color" : 4281389400,
-        "width" : 22,
+        "width" : 26,
         "opa" : 255,
         "rounded" : 12
       },
@@ -355,7 +356,7 @@
         },
         "size" : {
           "width" : 50,
-          "height" : 50
+          "height" : 45
         },
         "scrollbar_t" : { },
         "alpha" : 255,
@@ -367,10 +368,15 @@
       "txt" : "%",
       "styles" : [ {
         "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "right" : 10
+          }
+        },
         "txt_t" : {
           "color" : 10000543,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
-          "font_size" : 28
+          "font_size" : 24
         },
         "img_t" : { }
       } ]

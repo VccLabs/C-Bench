@@ -425,6 +425,7 @@ static void theme_apply_view3(void)
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_BRAND), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_SUB),   TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_STATE), TC_TXT2);
+        THEME_BG (GCL(GRF_VIEW3_ID, V3_STATE), TC_SURF2);   /* pill bg #2c2c2e */
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_PCT),   TC_TXT);
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_VOLT),  TC_TXT2);
     THEME_BG (GCL(GRF_VIEW3_ID, V3_CARD),  TC_SURF);
@@ -505,6 +506,7 @@ static void theme_apply(void)               /* repaint all themed views from g_d
 	}
 	void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
 	void view2_apply_theme(void) { theme_apply(); }   /* view2 entry: repaint from shadow */
+	void view3_apply_theme(void) { theme_apply(); }   /* view3 entry: repaint from shadow */
 	void view4_apply_theme(void) { theme_apply(); }   /* view4 entry: repaint from shadow */
 void view1_toggle_theme(void)               /* user tap: flip + apply + persist */
 {
