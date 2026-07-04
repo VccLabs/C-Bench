@@ -67,10 +67,6 @@
   "imagePath" : "theme-light.png",
   "child" : [ ]
 }, {
-  "imageId" : 7,
-  "imagePath" : "boot-logo.png",
-  "child" : [ ]
-}, {
   "imageId" : 11,
   "imagePath" : "logo-dark.png",
   "child" : [ ]
@@ -81,5 +77,33 @@
 }, {
   "imageId" : 22,
   "imagePath" : "logo.png",
+  "child" : [ ]
+}, {
+  "imageId" : 7,
+  "imagePath" : "Artboard.png",
+  "child" : [ ]
+}, {
+  "imageId" : 12,
+  "imagePath" : "lock-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 23,
+  "imagePath" : "lock-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 24,
+  "imagePath" : "acc-black-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 25,
+  "imagePath" : "acc-black-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 26,
+  "imagePath" : "acc-orange-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 27,
+  "imagePath" : "acc-orange-light.png",
   "child" : [ ]
 } ]
