@@ -455,7 +455,7 @@
           "y" : 399
         },
         "size" : {
-          "width" : 120,
+          "width" : 131,
           "height" : 37
         },
         "scrollbar_t" : { },

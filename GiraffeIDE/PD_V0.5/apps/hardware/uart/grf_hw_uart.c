@@ -72,6 +72,22 @@ static const u32 THEME[TC_N][2] = {
     /* TC_CHIP   */ {GRF_COLOR_GET(0x2C, 0x2C, 0x2E), GRF_COLOR_GET(0xFF, 0xFF, 0xFF)},
 };
 static u8 g_dark = 0;
+#define THEME_FILE "D:/theme.bin"
+void theme_load_boot(void)   /* read persisted theme before first paint */
+{
+    grf_fs_file_t *f = grf_fs_open(THEME_FILE, GRF_FS_MODE_RD);
+    if (f)
+    {
+        u8 v = 0;
+        if (grf_fs_read(f, &v, 1) == 1 && v <= 1) g_dark = v;
+        grf_fs_close(f);
+    }
+}
+static void theme_save(void)
+{
+    grf_fs_file_t *f = grf_fs_open(THEME_FILE, GRF_FS_MODE_WR);
+    if (f) { grf_fs_write(f, &g_dark, 1); grf_fs_close(f); }
+}
 #define TCOL(role) (THEME[(role)][g_dark]) /* current color for a role */
 #define THEME_BG(ctrl, role) grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
@@ -539,8 +555,9 @@ void view3_apply_theme(void) { theme_apply(); } /* view3 entry: repaint from sha
 void view4_apply_theme(void) { theme_apply(); } /* view4 entry: repaint from shadow */
 void view1_toggle_theme(void)                   /* user tap: flip + apply + persist */
 {
-    g_dark ^= 1;
-    theme_apply();
+	g_dark ^= 1;
+	    theme_save();
+	    theme_apply();
     grf_reg_set(0x0039, g_dark);
     grf_reg_com_send(0x0039, 1);
 }
@@ -626,6 +643,7 @@ void view4_set_theme(u8 light) /* user tap: set absolute theme + apply + persist
     if (g_dark == light)
         return; /* already in this mode */
     g_dark = light ? 1 : 0;
+        theme_save();
     theme_apply(); /* repaints all views incl. theme_state_paint */
     grf_reg_set(0x0039, g_dark);
     grf_reg_com_send(0x0039, 1);
