@@ -728,6 +728,17 @@ void loop()
       writeReg(0x001B, a);
     } // push only on change
   }
+
+// TEST: lifetime energy ramp 0 -> 2450361 Wh (2450.361 kWh) over 45s @ 4Hz
+  static uint32_t tLife = 0;
+  if (now - tLife >= 250)
+  {
+    tLife = now;
+    uint32_t wh = (now >= 45000) ? 2450361UL : (uint32_t)((uint64_t)now * 2450361ULL / 45000ULL);
+    writeReg(0x003A, (uint16_t)(wh >> 16));
+    writeReg(0x003B, (uint16_t)(wh & 0xFFFF));
+  }
+
   // Fast source-attach watch: kill VOUT ASAP after a contract appears
   static uint32_t tAtt = 0;
   if (now - tAtt >= 150)

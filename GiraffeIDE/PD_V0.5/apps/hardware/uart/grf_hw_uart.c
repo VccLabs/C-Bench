@@ -774,6 +774,7 @@ void view2_apply_status(void) /* label91: source summary or empty-state prompt *
     }
 }
 
+static u16 g_lifeWhHi = 0;
 void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
 {
     char buf[16];
@@ -921,11 +922,27 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         grf_ctrl_style_set_bg_color(GCL(GRF_VIEW3_ID, 3),
                                     (data[0] == 0) ? TCOL(TC_SURF2) : TCOL(TC_GREEN), 0); /* label1 id3 */
         break;
-    }
-    }
-}
+            }
+            case 0x003A: /* lifetime energy Wh, high 16 (test ramp) */
+                g_lifeWhHi = data[0];
+                break;
+            case 0x003B: /* lifetime energy Wh, low 16 -> split 7 digits (XXXX.XXX kWh) */
+            {
+            	u32 wh = ((u32)g_lifeWhHi << 16) | data[0];
+                char d[2] = {0, 0};
+                d[0] = '0' + (wh / 1000000u) % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 49), d);
+                d[0] = '0' + (wh / 100000u)  % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 48), d);
+                d[0] = '0' + (wh / 10000u)   % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 47), d);
+                d[0] = '0' + (wh / 1000u)    % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 45), d);
+                d[0] = '0' + (wh / 100u)     % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 44), d);
+                d[0] = '0' + (wh / 10u)      % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 43), d);
+                d[0] = '0' + (wh)            % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 42), d);
+                break;
+            }
+            }
+        }
 
-#define HEAD_FH 0x5A
+        #define HEAD_FH 0x5A
 #define HEAD_FL 0xA5
 #define REG_LEN 0x800
 static u16 ctrlreg[REG_LEN] = {0};
