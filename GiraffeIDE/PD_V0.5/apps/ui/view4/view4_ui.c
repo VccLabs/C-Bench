@@ -309,6 +309,16 @@ static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Appearance: 
 	if (event == GRF_EVENT_CLICKED) view4_set_theme(0);
 }
 
+
+static void image3_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view4_cc.h"
 void view4_init(void)
 {

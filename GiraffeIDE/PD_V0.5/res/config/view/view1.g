@@ -870,31 +870,6 @@
     "theme" : "youth",
     "property" : {
       "pub_t" : {
-        "name" : "label24",
-        "id" : 28,
-        "pt" : {
-          "x" : 600,
-          "y" : 10
-        },
-        "size" : {
-          "width" : 111,
-          "height" : 101
-        },
-        "t_mode" : 1,
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true
-      },
-      "auto_hight" : 1,
-      "animspeed" : 50,
-      "align_e" : 34,
-      "txt" : "Label"
-    }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
         "name" : "label25",
         "id" : 29,
         "pt" : {
@@ -953,6 +928,31 @@
         },
         "img_t" : { }
       } ]
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image2",
+        "id" : 31,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 638,
+          "y" : 25
+        },
+        "size" : {
+          "width" : 57,
+          "height" : 57
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "click_area" : 25
+      },
+      "init_img" : "theme-dark.png",
+      "rotate_pt" : { }
     }
   }, {
     "CLASSNAME" : "label",

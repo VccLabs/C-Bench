@@ -62,4 +62,12 @@
   "imageId" : 12,
   "imagePath" : "view3.png",
   "child" : [ ]
+}, {
+  "imageId" : 2,
+  "imagePath" : "theme-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 5,
+  "imagePath" : "theme-light.png",
+  "child" : [ ]
 } ]
