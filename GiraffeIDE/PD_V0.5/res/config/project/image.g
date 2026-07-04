@@ -59,15 +59,27 @@
   "imagePath" : "Brightness-symbol-small-light.png",
   "child" : [ ]
 }, {
-  "imageId" : 12,
-  "imagePath" : "view3.png",
-  "child" : [ ]
-}, {
   "imageId" : 2,
   "imagePath" : "theme-dark.png",
   "child" : [ ]
 }, {
   "imageId" : 5,
   "imagePath" : "theme-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 7,
+  "imagePath" : "boot-logo.png",
+  "child" : [ ]
+}, {
+  "imageId" : 11,
+  "imagePath" : "logo-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 21,
+  "imagePath" : "logo-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 22,
+  "imagePath" : "logo.png",
   "child" : [ ]
 } ]

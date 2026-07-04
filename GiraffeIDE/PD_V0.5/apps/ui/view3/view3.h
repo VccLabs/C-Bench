@@ -3,6 +3,7 @@
 
 typedef enum {
 	VIEW3_NULL,
+	VIEW3_IMAGE2_ID = 16,
 	VIEW3_IMAGE0_ID = 1,
 	VIEW3_IMAGE1_ID = 5,
 	VIEW3_ARC0_ID = 15,

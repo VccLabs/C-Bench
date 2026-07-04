@@ -10,7 +10,7 @@
         "id" : 1,
         "ctrl_type" : 2,
         "pt" : {
-          "y" : 80
+          "y" : 120
         },
         "size" : {
           "width" : 720,
@@ -160,8 +160,8 @@
         "name" : "label17",
         "id" : 24,
         "pt" : {
-          "x" : 95,
-          "y" : 26
+          "x" : 85,
+          "y" : 64
         },
         "size" : {
           "width" : 111,
@@ -192,8 +192,8 @@
         "name" : "label18",
         "id" : 25,
         "pt" : {
-          "x" : 13,
-          "y" : 24
+          "x" : 8,
+          "y" : 62
         },
         "size" : {
           "width" : 111,
@@ -242,6 +242,31 @@
         "controlIDEnum" : "VIEW4_IMAGE3_ID"
       },
       "init_img" : "theme-dark.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image4",
+        "id" : 36,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 20,
+          "y" : 20
+        },
+        "size" : {
+          "width" : 143,
+          "height" : 37
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_IMAGE4_ID"
+      },
+      "init_img" : "logo-dark.png",
       "rotate_pt" : { }
     }
   }, {

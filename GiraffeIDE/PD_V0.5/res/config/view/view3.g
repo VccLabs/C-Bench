@@ -64,8 +64,8 @@
         "name" : "label4",
         "id" : 7,
         "pt" : {
-          "x" : 95,
-          "y" : 26
+          "x" : 85,
+          "y" : 64
         },
         "size" : {
           "width" : 111,
@@ -78,7 +78,7 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : " .  Settings",
+      "txt" : " .  Battery",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -96,8 +96,8 @@
         "name" : "label5",
         "id" : 8,
         "pt" : {
-          "x" : 13,
-          "y" : 24
+          "x" : 8,
+          "y" : 62
         },
         "size" : {
           "width" : 111,
@@ -241,6 +241,31 @@
         "controlIDEnum" : "VIEW3_IMAGE1_ID"
       },
       "init_img" : "theme-dark.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image2",
+        "id" : 16,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 20,
+          "y" : 20
+        },
+        "size" : {
+          "width" : 143,
+          "height" : 37
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW3_IMAGE2_ID"
+      },
+      "init_img" : "logo-dark.png",
       "rotate_pt" : { }
     }
   }, {

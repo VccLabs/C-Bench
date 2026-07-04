@@ -316,6 +316,16 @@ static void image3_event(grf_ctrl_t *ctrl, grf_event_e event)
 	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
 }
 
+
+static void image4_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view4_cc.h"
 void view4_init(void)
 {
