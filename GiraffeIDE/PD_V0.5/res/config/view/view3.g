@@ -38,7 +38,7 @@
         },
         "size" : {
           "width" : 716,
-          "height" : 816
+          "height" : 546
         },
         "t_mode" : 1,
         "scrollbar_t" : { },
@@ -226,7 +226,7 @@
         "parent_id" : 4,
         "pt" : {
           "x" : 20,
-          "y" : 8
+          "y" : 86
         },
         "size" : {
           "width" : 675,
@@ -264,7 +264,7 @@
         "ctrl_type" : 5,
         "pt" : {
           "x" : 233,
-          "y" : 43
+          "y" : 123
         },
         "size" : {
           "width" : 250,
@@ -318,7 +318,7 @@
         "parent_id" : 4,
         "pt" : {
           "x" : 270,
-          "y" : 87
+          "y" : 175
         },
         "size" : {
           "width" : 174,
@@ -351,7 +351,7 @@
         "parent_id" : 4,
         "pt" : {
           "x" : 415,
-          "y" : 145
+          "y" : 225
         },
         "size" : {
           "width" : 50,
@@ -385,7 +385,7 @@
         "parent_id" : 4,
         "pt" : {
           "x" : 288,
-          "y" : 194
+          "y" : 274
         },
         "size" : {
           "width" : 139,
@@ -419,7 +419,7 @@
         "parent_id" : 4,
         "pt" : {
           "x" : 297,
-          "y" : 319
+          "y" : 399
         },
         "size" : {
           "width" : 120,
@@ -462,7 +462,7 @@
         "parent_id" : 4,
         "pt" : {
           "x" : 309,
-          "y" : 332
+          "y" : 412
         },
         "size" : {
           "width" : 14,
@@ -488,44 +488,11 @@
         "img_t" : { }
       } ]
     }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
-        "name" : "label3",
-        "id" : 5,
-        "parent_id" : 4,
-        "pt" : {
-          "x" : 573,
-          "y" : 441
-        },
-        "size" : {
-          "width" : 141,
-          "height" : 33
-        },
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true
-      },
-      "animspeed" : 50,
-      "align_e" : 34,
-      "txt" : "0.48",
-      "styles" : [ {
-        "name" : "style",
-        "txt_t" : {
-          "color" : 6607615,
-          "font_lib" : "Inter_24pt-ExtraBold.ttf"
-        },
-        "img_t" : { }
-      } ]
-    }
   } ],
   "view" : {
     "v_name" : "view3",
     "v_id" : 3,
     "bg_scale" : 255,
-    "bg_color" : 4294967295,
-    "bg_image" : "view3.png"
+    "bg_color" : 4278190080
   }
 }

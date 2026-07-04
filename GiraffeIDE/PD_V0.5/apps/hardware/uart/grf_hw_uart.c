@@ -408,6 +408,34 @@ static void theme_apply_view2(void)
     grf_img_set_src(GCL(GRF_VIEW2_ID, V2_NAV),
     g_dark ? "nav-profiles-light.png" : "nav-profiles.png");
 }
+
+/* ── view3 (Battery) themed control IDs ── */
+#define V3_BRAND  8    /* label5 — "C-Bench"     txt   */
+#define V3_SUB    7    /* label4 — "· Battery"   txt2  */
+#define V3_CARD   6    /* label2 — bg square      surf  */
+#define V3_STATE  2    /* label0 — charge state   txt2  */
+#define V3_PCT    9    /* label6 — SoC %          txt   */
+#define V3_VOLT   11   /* label8 — cell voltage   txt2  */
+#define V3_ARC    15   /* arc0   — SoC ring       track */
+#define V3_NAV    1    /* image0 — nav bar image  img swap */
+
+static void theme_apply_view3(void)
+{
+    grf_view_set_bgcolor(GRF_VIEW3_ID, TCOL(TC_BG));      /* screen bg */
+    THEME_TXT(GCL(GRF_VIEW3_ID, V3_BRAND), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW3_ID, V3_SUB),   TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW3_ID, V3_STATE), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW3_ID, V3_PCT),   TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW3_ID, V3_VOLT),  TC_TXT2);
+    THEME_BG (GCL(GRF_VIEW3_ID, V3_CARD),  TC_SURF);
+    {   /* SoC arc track (part 0 line): color,width,opa,rounded — width from IDE */
+        grf_line_disp_t arc_bg = { TCOL(TC_TRACK), 27, 255, 12 };
+        grf_arc_set_dis(GCL(GRF_VIEW3_ID, V3_ARC), 0, arc_bg);
+    }
+    grf_img_set_src(GCL(GRF_VIEW3_ID, V3_NAV),
+                    g_dark ? "nav-battery-light.png" : "nav-battery.png");
+}
+
 /* ── view4 (Settings) themed control IDs ── */
 #define V4_BRAND   25   /* label18 — "C-Bench"        txt   */
 #define V4_SUB     24   /* label17 — "· Settings"     txt2  */
@@ -472,6 +500,7 @@ static void theme_apply(void)               /* repaint all themed views from g_d
 {
 	theme_apply_view1();
 	    theme_apply_view2();
+	    theme_apply_view3();
 	    theme_apply_view4();
 	}
 	void view1_apply_theme(void) { theme_apply(); }   /* view1 entry: repaint from shadow */
