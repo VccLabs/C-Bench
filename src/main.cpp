@@ -402,7 +402,7 @@ static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA, bool goo
     g_lifeSaveT = now_ms;
     persistLifetimeFlash();
   }
-  if (now_ms - g_lifeForceT >= 600000UL) // force-commit every 10 min (bounds power-loss)
+  if (now_ms - g_lifeForceT >= 60000UL) // force-commit every 1 min (TESTING; restore to 600000UL / 10 min)
   {
     g_lifeForceT = now_ms;
     if (g_lifeE_uWh != g_lifeSaved_uWh) lifeWriteFile();

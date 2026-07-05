@@ -237,8 +237,8 @@ and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
 | `0x001C` | Battery cell voltage (MAX17048); `0` = no battery         | mV            |
 | `0x001D` | Battery SoC (MAX17048), clamped 0–100; `0xFFFF` = no batt | %             |
 | `0x001E` | Charge state: 0 no battery, 1 charging, 2 complete        | enum          |
-| `0x003A` | Lifetime energy odometer — **high 16 bits** of cWh        | 0.01 Wh       |
-| `0x003B` | Lifetime energy odometer — **low 16 bits** of cWh         | 0.01 Wh       |
+| `0x003A` | Lifetime energy odometer — **high 16 bits** of Wh         | Wh            |
+| `0x003B` | Lifetime energy odometer — **low 16 bits** of Wh          | Wh            |
 
 **32-bit values over a 16-bit bus:** session energy (`0x0013/0x0014`) and the
 lifetime odometer (`0x003A/0x003B`) are 32-bit, split high/low across two
@@ -312,7 +312,9 @@ energy/charge/elapsed at 2 Hz (`0x0013/0x0014/0x0015/0x0018`). `0x0025` zeros th
 session. The **lifetime odometer** accumulates always in `g_lifeE_uWh` (µWh) and
 is persisted to **LittleFS** (`/life.bin`, full-precision µWh, wear-levelled):
 committed when the delta since last write ≥ **5 Wh**, plus a **10-min force-commit**
-(bounds power-loss), plus on **output-off**. Boot reads the file (migrates once
+(bounds power-loss; temporarily 1 min for testing), plus on **output-off**. The
+`0x0033` sync reply also re-pushes `0x003A/0x003B` so view4's entry-reset digit
+labels repaint. Boot reads the file (migrates once
 from old EEPROM `lifeCWh` if the file is absent). Sent to the HMI odometer as **Wh**
 on `0x003A/0x003B` (shown as `XXXX.XXX` kWh). Requires `board_build.filesystem_size`
 in `platformio.ini` (set to `1m`) — without it the FS is 0 bytes and writes fail.
