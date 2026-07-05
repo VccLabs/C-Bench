@@ -108,6 +108,10 @@
   "child" : [ ]
 }, {
   "imageId" : 28,
-  "imagePath" : "view5.png",
+  "imagePath" : "saved-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 30,
+  "imagePath" : "saved-light.png",
   "child" : [ ]
 } ]
