@@ -16,6 +16,7 @@ int ppsIdx = -1;
 
 #define PIN_CHG_STATE 6 // IO6: charger STAT read-back
 #define PIN_CTL 7       // IO7: STAT node bias control
+#define PIN_PD_INT 25   // IO25: AP33772S INT (active-HIGH, push-pull)
 
 // ---- HMI control state (panel -> RP) ----
 volatile uint16_t reqMV = PPS_TARGET_MV; // reg 0x0020 (next milestone)
@@ -86,9 +87,11 @@ struct Slot
 };
 static Slot g_slots[13];
 static uint8_t g_slotN = 0;
-static int activePdoIdx = -1;             // applied PDO (1-based), -1 = none
-static uint8_t activeType = 0;            // 0 FIX, 1 PPS, 2 AVS, 3 EPR
-static bool g_prevSource = false;         // source-present edge detect
+static int activePdoIdx = -1;         // applied PDO (1-based), -1 = none
+static uint8_t activeType = 0;        // 0 FIX, 1 PPS, 2 AVS, 3 EPR
+static bool g_prevSource = false;     // source-present edge detect
+static volatile bool g_pdInt = false; // AP33772S INT pending (set in ISR)
+static void pdIntISR() { g_pdInt = true; }
 static volatile bool g_outAttach = false; // re-assert output after a (re)attach
 
 // Read source PDOs over I2C and push the real list to the HMI
@@ -254,30 +257,35 @@ static void activeProfileInfo(uint16_t *type, uint16_t *mV)
 //  - no cell: +BATT caps sawtooth (cell mV wanders) and charge-state flaps 00<->11
 //  - real cell: cell mV is ~DC (<~mV/s) and state is stable for minutes
 // Window ~10 s @ 2 Hz. Present iff cell mV span small AND state not flapping.
-#define BATT_WIN 10  // samples (~5 s at 2 Hz)
+#define BATT_WIN 10 // samples (~5 s at 2 Hz)
 static uint16_t g_bmv[BATT_WIN];
-static uint8_t  g_bst[BATT_WIN];
-static uint8_t  g_bi = 0, g_bn = 0;
+static uint8_t g_bst[BATT_WIN];
+static uint8_t g_bi = 0, g_bn = 0;
 
 static bool batteryPresent(uint16_t cellmv, uint8_t chg)
 {
   g_bmv[g_bi] = cellmv;
   g_bst[g_bi] = chg;
   g_bi = (g_bi + 1) % BATT_WIN;
-  if (g_bn < BATT_WIN) g_bn++;
-  if (g_bn < BATT_WIN) return false;         // need a full window first
+  if (g_bn < BATT_WIN)
+    g_bn++;
+  if (g_bn < BATT_WIN)
+    return false; // need a full window first
 
   uint16_t lo = 0xFFFF, hi = 0;
   uint8_t flaps = 0;
   for (uint8_t k = 0; k < BATT_WIN; k++)
   {
-    if (g_bmv[k] < lo) lo = g_bmv[k];
-    if (g_bmv[k] > hi) hi = g_bmv[k];
+    if (g_bmv[k] < lo)
+      lo = g_bmv[k];
+    if (g_bmv[k] > hi)
+      hi = g_bmv[k];
   }
   for (uint8_t k = 1; k < BATT_WIN; k++)
-    if (g_bst[k] != g_bst[(k + BATT_WIN - 1) % BATT_WIN]) flaps++;
+    if (g_bst[k] != g_bst[(k + BATT_WIN - 1) % BATT_WIN])
+      flaps++;
 
-  return (hi - lo) <= 30 && flaps < 2;       // steady mV + steady state = cell
+  return (hi - lo) <= 30 && flaps < 2; // steady mV + steady state = cell
 }
 
 // SoC from resting Li-ion voltage (MAX17048 ModelGauge unusable: CELL on +BATT).
@@ -285,12 +293,14 @@ static bool batteryPresent(uint16_t cellmv, uint8_t chg)
 static uint8_t socFromVoltage(uint16_t mv)
 {
   const uint16_t v[] = {3300, 3500, 3600, 3700, 3750, 3800, 3900, 4000, 4100, 4200};
-  const uint8_t  p[] = {   0,    5,   15,   40,   55,   65,   80,   90,   97,  100};
-  if (mv <= v[0]) return 0;
-  if (mv >= v[9]) return 100;
+  const uint8_t p[] = {0, 5, 15, 40, 55, 65, 80, 90, 97, 100};
+  if (mv <= v[0])
+    return 0;
+  if (mv >= v[9])
+    return 100;
   for (uint8_t i = 1; i < 10; i++)
     if (mv < v[i])
-      return p[i-1] + (uint32_t)(mv - v[i-1]) * (p[i] - p[i-1]) / (v[i] - v[i-1]);
+      return p[i - 1] + (uint32_t)(mv - v[i - 1]) * (p[i] - p[i - 1]) / (v[i] - v[i - 1]);
   return 100;
 }
 
@@ -509,6 +519,8 @@ void setup()
 
   pinMode(PIN_CHG_STATE, INPUT);
   pinMode(PIN_CTL, OUTPUT);
+  pinMode(PIN_PD_INT, INPUT);
+  attachInterrupt(digitalPinToInterrupt(PIN_PD_INT), pdIntISR, RISING);
 
   HMI.begin(115200); // screen link
 
@@ -529,7 +541,6 @@ void setup()
   if (!battOk)
     Serial.println("MAX17048 not found (no battery gauge)");
 
-  
   ppsIdx = usbpd.getPPSIndex();
   Serial.print("PPS index: ");
   Serial.println(ppsIdx);
@@ -687,11 +698,11 @@ void loop()
     writeReg(0x0019, apType); /* active profile type (0=none) */
     writeReg(0x001A, apMV);   /* active profile setpoint mV   */
 
-/* presence from dynamics: caps sawtooth + state flaps when no cell present */
+    /* presence from dynamics: caps sawtooth + state flaps when no cell present */
     uint8_t chg = readChargeState();
     uint16_t vcellmv = battOk ? (uint16_t)(maxlipo.cellVoltage() * 1000.0f) : 0;
     bool present = battOk && batteryPresent(vcellmv, chg);
-    writeReg(0x001E, present ? chg : 0);             /* 0=none, 1=charging, 2=complete */
+    writeReg(0x001E, present ? chg : 0); /* 0=none, 1=charging, 2=complete */
     if (present)
     {
       float vcell = vcellmv / 1000.0f;
@@ -729,7 +740,7 @@ void loop()
     } // push only on change
   }
 
-// TEST: lifetime energy ramp 0 -> 2450361 Wh (2450.361 kWh) over 45s @ 4Hz
+  // TEST: lifetime energy ramp 0 -> 2450361 Wh (2450.361 kWh) over 45s @ 4Hz
   static uint32_t tLife = 0;
   if (now - tLife >= 250)
   {
@@ -739,17 +750,33 @@ void loop()
     writeReg(0x003B, (uint16_t)(wh & 0xFFFF));
   }
 
-  // Fast source-attach watch: kill VOUT ASAP after a contract appears
+// AP33772S INT (active-HIGH): read STATUS 0x01 (auto-clears), decode events
+  if (g_pdInt)
+  {
+    g_pdInt = false;
+    Wire.beginTransmission(0x52);
+    Wire.write(0x01);
+    uint8_t st = 0;
+    if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 1) == 1)
+      st = Wire.read();
+    if (st & 0x07)          // STARTED | READY | NEWPDO -> (re)negotiated
+    {
+      g_outAttach = true;   // re-assert output (default OFF) immediately
+      lastSig = 0xFFFFFFFF; // refresh the PDO list now
+    }
+    // fault bits st&0x78 (UVP/OVP/OCP/OTP) -> HMI surfacing in a later step
+  }
+  // Fallback attach watch (INT backstop): slow poll for detach/missed edges
   static uint32_t tAtt = 0;
-  if (now - tAtt >= 150)
+  if (now - tAtt >= 500)
   {
     tAtt = now;
     Wire.beginTransmission(0x52);
     bool present = (Wire.endTransmission() == 0);
     if (present && !g_prevSource)
     {
-      g_outAttach = true;   // re-assert output (default OFF) immediately
-      lastSig = 0xFFFFFFFF; // and refresh the PDO list now
+      g_outAttach = true;
+      lastSig = 0xFFFFFFFF;
     }
   }
 }
