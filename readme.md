@@ -311,8 +311,7 @@ bring-up — so brightness and theme are restored even before any view is opened
 energy/charge/elapsed at 2 Hz (`0x0013/0x0014/0x0015/0x0018`). `0x0025` zeros the
 session. The **lifetime odometer** accumulates always in `g_lifeE_uWh` (µWh) and
 is persisted to **LittleFS** (`/life.bin`, full-precision µWh, wear-levelled):
-committed when the delta since last write ≥ **5 Wh**, plus a **10-min force-commit**
-(bounds power-loss; temporarily 1 min for testing), plus on **output-off**. The
+committed every **20 s** when the value changed, plus on **output-off**. The
 `0x0033` sync reply also re-pushes `0x003A/0x003B` so view4's entry-reset digit
 labels repaint. Boot reads the file (migrates once
 from old EEPROM `lifeCWh` if the file is absent). Sent to the HMI odometer as **Wh**

@@ -364,12 +364,6 @@ static void lifeWriteFile() // LittleFS wear-levels across sectors; power-loss s
   g_lifeSaved_uWh = g_lifeE_uWh;
 }
 
-static void persistLifetimeFlash() // commit only past a delta threshold
-{
-  const uint64_t THRESH_uWh = 5000000ULL; // 5 Wh
-  if (g_lifeE_uWh - g_lifeSaved_uWh >= THRESH_uWh)
-    lifeWriteFile();
-}
 
 // Integrate measured power/current over real dt; accumulate only while output is on.
 static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA, bool good)
@@ -397,12 +391,7 @@ static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA, bool goo
     g_eRunning = false; // freeze when off
   }
   pushSession();
-  if (now_ms - g_lifeSaveT >= 5000UL) // check often; writes only past threshold
-  {
-    g_lifeSaveT = now_ms;
-    persistLifetimeFlash();
-  }
-  if (now_ms - g_lifeForceT >= 60000UL) // force-commit every 1 min (TESTING; restore to 600000UL / 10 min)
+  if (now_ms - g_lifeForceT >= 20000UL) // commit every 20 s if value changed
   {
     g_lifeForceT = now_ms;
     if (g_lifeE_uWh != g_lifeSaved_uWh) lifeWriteFile();
