@@ -4,15 +4,16 @@
 
 static void keyboard0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-	if (event == GRF_EVENT_READY || event == GRF_EVENT_CANCEL)
-		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1);
-}
 
+}
 
 static void txtbox0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-	if (event == GRF_EVENT_CLICKED)
-		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 0);
+
+		if (event == GRF_EVENT_CLICKED)
+			grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 0);
+		else if (event == GRF_EVENT_DEFOCUSED)   /* ✓ ends focus */
+			grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1);
 }
 
 

@@ -309,8 +309,13 @@ bring-up — so brightness and theme are restored even before any view is opened
 **Session trip meter:** the RP integrates measured power/current over **real `dt`**
 (`micros()`) into `µWh`/`µAh` accumulators while output is on, and pushes session
 energy/charge/elapsed at 2 Hz (`0x0013/0x0014/0x0015/0x0018`). `0x0025` zeros the
-session. The **lifetime odometer** accumulates always, is persisted (debounced:
-every ~60 s while running + on output-off) and echoed on `0x0033`/boot window.
+session. The **lifetime odometer** accumulates always in `g_lifeE_uWh` (µWh) and
+is persisted to **LittleFS** (`/life.bin`, full-precision µWh, wear-levelled):
+committed when the delta since last write ≥ **5 Wh**, plus a **10-min force-commit**
+(bounds power-loss), plus on **output-off**. Boot reads the file (migrates once
+from old EEPROM `lifeCWh` if the file is absent). Sent to the HMI odometer as **Wh**
+on `0x003A/0x003B` (shown as `XXXX.XXX` kWh). Requires `board_build.filesystem_size`
+in `platformio.ini` (set to `1m`) — without it the FS is 0 bytes and writes fail.
 
 **Active profile:** pushed at 2 Hz (`0x0019` type + `0x001A` setpoint mV) so the
 view1 `label18` (id 22) reads e.g. `PPS 9.00 V` / `Fixed 20.00 V`, or `—` when
@@ -478,8 +483,11 @@ shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_sta
   rail only (fixed rails need no keep-alive).
 - **Output toggle (`0x0022`):** acts whenever the HMI changes it; every change is
   also pushed back on `0x0016` so the panel toggle stays truthful.
-- **Source attach:** a rising-edge detector (`g_prevSource` → `g_outAttach`, plus
-  a fast ~150 ms I2C presence poll) re-asserts the output state (default OFF) and
+- **Source attach:** the AP33772S **`INT`** (IO25, active-HIGH, push-pull ~4.85 V
+  via 0.656 divider → ~3.18 V) drives an ISR; on the flag the RP reads **STATUS
+  `0x01`** (auto-clears) and on `STARTED|READY|NEWPDO` re-asserts output + refreshes
+  the PDO list. A slow **500 ms** I2C poll remains as a detach/missed-edge backstop.
+  Re-assert (`g_prevSource` → `g_outAttach`) sets output state (default OFF) and
   calls **`usbpd.begin()` to refresh the library's PDO array** — required so a
   source plugged in *after* boot can actually be requested (the library only
   reads PDOs in `begin()`; a stale array makes `setFixPDO/PPS` silently no-op).
@@ -489,8 +497,9 @@ shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_sta
   flash via the earlephilhower **EEPROM** emulation — `loadSettings()` at boot,
   `saveSettings()` on each change (guarded so only real changes write). Fields:
   boot-output state, auto-arm, last output on/off, last list position, last mV/mA,
-  **brightness** (`0x0030`), **lifetime odometer `lifeCWh`** (`0x003A/0x003B`),
-  **theme** (`0x0039`). Changing the layout bumps the magic and resets settings
+  **brightness** (`0x0030`), **theme** (`0x0039`). (The **lifetime odometer** moved
+  out of EEPROM to LittleFS `/life.bin`; `lifeCWh` remains only as a one-time
+  migration source.) Changing the layout bumps the magic and resets settings
   once. (History: `0xCB02` original → … → `0xCB05` adds theme.)
 - **Energy metering:** in the 2 Hz telemetry block the RP reads INA260 V/I/P and
   integrates into session + lifetime accumulators (`energyAccumulate`). **Reads are
