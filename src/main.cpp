@@ -239,9 +239,11 @@ static void loadSettings()
     g_set.theme = 0;
     saveSettings();
   }
-  LittleFS.begin();
+  bool fsOk = LittleFS.begin();
+  Serial.printf("LittleFS mount: %s\n", fsOk ? "OK" : "FAIL");
   {
     File f = LittleFS.open(LIFE_FILE, "r");
+    Serial.printf("life.bin: %s size=%u\n", f ? "found" : "absent", f ? (unsigned)f.size() : 0);
     if (f && f.size() == sizeof(g_lifeE_uWh))
       f.read((uint8_t *)&g_lifeE_uWh, sizeof(g_lifeE_uWh)); // authoritative
     else
@@ -352,9 +354,13 @@ static void lifeWriteFile() // LittleFS wear-levels across sectors; power-loss s
 {
   File f = LittleFS.open(LIFE_FILE, "w");
   if (!f)
+  {
+    Serial.println("lifeWriteFile: open FAIL");
     return;
-  f.write((const uint8_t *)&g_lifeE_uWh, sizeof(g_lifeE_uWh));
+  }
+  size_t n = f.write((const uint8_t *)&g_lifeE_uWh, sizeof(g_lifeE_uWh));
   f.close();
+  Serial.printf("lifeWriteFile: wrote %u B, %llu uWh\n", (unsigned)n, g_lifeE_uWh);
   g_lifeSaved_uWh = g_lifeE_uWh;
 }
 
