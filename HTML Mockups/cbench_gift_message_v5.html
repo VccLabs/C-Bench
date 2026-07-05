@@ -1,0 +1,152 @@
+<!--
+  C-Bench — Gift Message editor (view5) — APPLE-STYLE
+  720x720. iOS system colors + Inter. Matches Monitor/Settings house style.
+  Native build map (Giraffe):
+    txtbox (multi-line)  <- message input, paired via grf_keyboard_set_txtbox
+    keyboard widget      <- English; read string from txtbox on Save
+    char counter         <- label, updated from txtbox length
+    Save / Cancel        <- imgbtn/labels; Save persists to HMI file (D:/gift.txt)
+    back chevron         <- returns to Settings (view4)
+  Storage: HMI-side only (grf_fs_*). No RP round-trip.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C-Bench — Gift Message (Apple style)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --orange:#FF9F0A; --cyan:#64D2FF; --purple:#BF5AF2; --green:#30D158; --red:#FF453A; --blue:#0A84FF; }
+  [data-theme="dark"]{
+    --bg:#000; --screenbg:#000; --card:#1C1C1E; --card2:#2C2C2E;
+    --txt:#FFF; --txt2:rgba(235,235,245,.60); --txt3:rgba(235,235,245,.30);
+    --track:#2C2C2E; --sep:rgba(255,255,255,.07);
+    --bezel-a:#26262A; --bezel-b:#0A0A0C;
+    --key:#3A3A3C; --keytxt:#FFF; --keyspec:#2C2C2E;
+  }
+  [data-theme="light"]{
+    --bg:#F2F2F7; --screenbg:#F2F2F7; --card:#FFF; --card2:#FFF;
+    --txt:#000; --txt2:rgba(60,60,67,.60); --txt3:rgba(60,60,67,.30);
+    --track:#E5E5EA; --sep:rgba(60,60,67,.12);
+    --bezel-a:#D7DEE6; --bezel-b:#B7C2CE;
+    --orange:#FF9500; --cyan:#32ADE6; --purple:#AF52DE; --green:#34C759; --red:#FF3B30; --blue:#007AFF;
+    --key:#FFF; --keytxt:#000; --keyspec:#ADB3BC;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ background:#050507; font-family:'Inter',-apple-system,system-ui,sans-serif;
+        display:flex; flex-direction:column; align-items:center; gap:14px; padding:24px 12px 40px; overflow-x:hidden; }
+  .cap{ color:#5a6571; font-size:12px; letter-spacing:.04em; text-align:center; }
+  .cap b{ color:#9aa6b2; }
+  .stage{ width:100%; display:flex; justify-content:center; }
+  .fit{ width:720px; height:720px; transform-origin:top center; }
+
+  .device{ width:720px; height:720px; background:linear-gradient(160deg,var(--bezel-a),var(--bezel-b));
+           border-radius:40px; padding:18px; box-shadow:0 40px 90px -24px #000, inset 0 1px 0 rgba(255,255,255,.18); transition:background .35s; }
+  .screen{ width:100%; height:100%; background:var(--screenbg); border-radius:22px; overflow:hidden;
+           position:relative; display:flex; flex-direction:column; transition:background .35s; }
+
+  /* nav bar */
+  .nav{ display:flex; align-items:center; justify-content:space-between; padding:20px 24px 10px; }
+  .nav .side{ display:flex; align-items:center; gap:6px; min-width:96px; }
+  .nav .back{ display:flex; align-items:center; gap:3px; color:var(--blue); font-size:17px; font-weight:500;
+              background:none; border:none; cursor:pointer; font-family:inherit; }
+  .nav .title{ font-size:17px; font-weight:700; color:var(--txt); letter-spacing:-.01em; }
+  .nav .save{ color:var(--blue); font-size:17px; font-weight:700; background:none; border:none; cursor:pointer;
+              font-family:inherit; min-width:96px; text-align:right; }
+
+  /* editor card */
+  .editwrap{ padding:8px 24px 0; }
+  .lbl{ font-size:12.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--txt2);
+        margin:6px 4px 8px; }
+  .txtbox{ background:var(--card); border-radius:18px; padding:18px 18px; min-height:150px; color:var(--txt);
+           font-size:22px; font-weight:500; line-height:1.4; position:relative; }
+  .txtbox.empty{ color:var(--txt3); }
+  .txtbox .caret{ display:inline-block; width:2px; height:26px; background:var(--blue); vertical-align:-5px;
+                  margin-left:1px; animation:blink 1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .meta{ display:flex; justify-content:space-between; align-items:center; margin:10px 6px 0; }
+  .hint{ font-size:13px; color:var(--txt3); font-weight:500; }
+  .count{ font-size:13px; color:var(--txt2); font-weight:600; font-variant-numeric:tabular-nums; }
+
+  /* keyboard */
+  .kb{ margin-top:auto; padding:8px 6px 12px; background:var(--card2); }
+  .krow{ display:flex; justify-content:center; gap:6px; padding:5px 6px; }
+  .key{ flex:1; max-width:58px; height:46px; border-radius:9px; background:var(--key); color:var(--keytxt);
+        display:grid; place-items:center; font-size:19px; font-weight:500; box-shadow:0 1px 0 rgba(0,0,0,.35);
+        cursor:pointer; user-select:none; }
+  .key:active{ transform:translateY(1px); }
+  .key.wide{ max-width:none; flex:1.6; background:var(--keyspec); font-size:14px; font-weight:600; color:var(--txt2); }
+  .key.space{ flex:5; background:var(--key); }
+  .key.ret{ flex:2; background:var(--blue); color:#fff; font-size:14px; font-weight:700; }
+</style>
+
+<div class="cap">C-Bench — <b>Gift Message editor / view5</b> · native txtbox + keyboard · stored on HMI (D:/gift.txt)</div>
+
+<div class="stage"><div class="fit" id="fit">
+<div class="device"><div class="screen" id="screen" data-theme="dark">
+
+  <div class="nav">
+    <div class="side"><button class="back">‹ Settings</button></div>
+    <div class="title">Gift Message</div>
+    <button class="save">Save</button>
+  </div>
+
+  <div class="editwrap">
+    <div class="lbl">Your message</div>
+    <div class="txtbox" id="tb">Happy Birthday, Sam!<br>Hope this powers all your projects. ❤<span class="caret"></span></div>
+    <div class="meta">
+      <span class="hint">Shown on boot when enabled</span>
+      <span class="count" id="cnt">54 / 120</span>
+    </div>
+  </div>
+
+  <div class="kb">
+    <div class="krow" data-r="qwertyuiop"></div>
+    <div class="krow" data-r="asdfghjkl"></div>
+    <div class="krow">
+      <div class="key wide" id="shift">⇧</div>
+      <div class="krow-mid" style="display:contents"></div>
+      <div class="key wide" id="bk">⌫</div>
+    </div>
+    <div class="krow">
+      <div class="key wide" id="num">123</div>
+      <div class="key space">space</div>
+      <div class="key ret">Save</div>
+    </div>
+  </div>
+
+</div></div>
+</div></div>
+
+<div class="cap">Edit page reached from Settings ▸ Gift Message ▸ Edit Message · Save reads txtbox → writes HMI file</div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  // build letter rows
+  document.querySelectorAll('.krow[data-r]').forEach(r=>{
+    r.dataset.r.split('').forEach(c=>{ const k=document.createElement('div'); k.className='key'; k.textContent=c; r.appendChild(k); });
+  });
+  // middle row letters go between shift and backspace
+  const mid='zxcvbnm', midWrap=document.querySelector('.krow-mid');
+  mid.split('').forEach(c=>{ const k=document.createElement('div'); k.className='key'; k.textContent=c; midWrap.appendChild(k); });
+
+  const tb=$('tb'); let shifted=false;
+  function plain(){ return tb.textContent.replace('|',''); }
+  function refresh(){ const n=tb.innerText.replace(/\n/g,'').length; $('cnt').textContent=n+' / 120'; }
+  document.querySelectorAll('.key').forEach(k=>{
+    k.addEventListener('click',()=>{
+      const t=k.textContent;
+      if(k.id==='bk'){ /* demo only */ return; }
+      if(k.id==='shift'){ shifted=!shifted; document.querySelectorAll('.krow[data-r] .key,.krow-mid .key').forEach(x=>x.textContent = shifted? x.textContent.toUpperCase(): x.textContent.toLowerCase()); return; }
+      if(k.id==='num'||k.classList.contains('ret')||k.classList.contains('space')) return;
+    });
+  });
+  // theme toggle by tapping the title (demo)
+  document.querySelector('.title').onclick=()=>{ const s=$('screen'); s.dataset.theme=s.dataset.theme==='dark'?'light':'dark'; };
+  refresh();
+
+  function fit(){ const avail=Math.min(window.innerWidth-24,760), s=Math.min(1,avail/720);
+    const f=$('fit'); f.style.transform=`scale(${s})`; f.parentElement.style.height=(720*s)+'px'; }
+  addEventListener('resize',fit); fit();
+</script>

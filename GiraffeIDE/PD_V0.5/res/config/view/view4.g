@@ -369,7 +369,7 @@
         "controlIDEnum" : "VIEW4_LABEL1_ID"
       },
       "animspeed" : 50,
-      "align_e" : 34,
+      "align_e" : 33,
       "txt" : "DISPLAY",
       "styles" : [ {
         "name" : "style",
@@ -1112,7 +1112,7 @@
         "parent_id" : 1,
         "pt" : {
           "x" : 37,
-          "y" : 334
+          "y" : 721
         },
         "size" : {
           "width" : 166,
@@ -1440,7 +1440,7 @@
         "controlIDEnum" : "VIEW4_LABEL29_ID"
       },
       "animspeed" : 50,
-      "align_e" : 34,
+      "align_e" : 33,
       "txt" : "LIFETIME",
       "styles" : [ {
         "name" : "style",
@@ -2125,6 +2125,425 @@
           "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 42
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label41",
+        "id" : 58,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 22,
+          "y" : 637
+        },
+        "size" : {
+          "width" : 674,
+          "height" : 147
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL41_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1842206,
+          "radius" : 18,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label42",
+        "id" : 59,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 20,
+          "y" : 607
+        },
+        "size" : {
+          "width" : 200,
+          "height" : 32
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL42_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "GIFT MESSAGE",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 9276819,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 15
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "sw",
+    "theme" : "youth",
+    "type" : 8,
+    "property" : {
+      "pub_t" : {
+        "name" : "sw1",
+        "id" : 60,
+        "parent_id" : 1,
+        "ctrl_type" : 8,
+        "pt" : {
+          "x" : 622,
+          "y" : 657
+        },
+        "size" : {
+          "width" : 56,
+          "height" : 36
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "click_area" : 15,
+        "controlIDEnum" : "VIEW4_SW1_ID"
+      },
+      "anim_time" : 120,
+      "styles" : [ {
+        "name" : "bg_style_t",
+        "body_t" : {
+          "main_color" : 2894894,
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "img_t" : { }
+      }, {
+        "style_part" : 131072,
+        "style_state" : 1,
+        "name" : "indic_style_t",
+        "body_t" : {
+          "main_color" : 3199320,
+          "grad_color" : 65344,
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "img_t" : { }
+      }, {
+        "style_part" : 196608,
+        "name" : "knob_off_style_t",
+        "body_t" : {
+          "main_color" : 16777215,
+          "border" : {
+            "width" : 2147483647
+          },
+          "shadow" : {
+            "color" : 8553090,
+            "width" : 9,
+            "type" : 1
+          },
+          "padding" : {
+            "top" : -3,
+            "bottom" : -3,
+            "left" : -3,
+            "right" : -3,
+            "inner" : -3
+          }
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      }, {
+        "style_part" : 196608,
+        "style_state" : 1,
+        "name" : "knob_on_style_t",
+        "body_t" : {
+          "main_color" : 16777215,
+          "shadow" : {
+            "color" : 8553090,
+            "width" : 9,
+            "type" : 1
+          },
+          "padding" : {
+            "top" : -3,
+            "bottom" : -3,
+            "left" : -3,
+            "right" : -3,
+            "inner" : -3
+          }
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label43",
+        "id" : 61,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 22,
+          "y" : 710
+        },
+        "size" : {
+          "width" : 674,
+          "height" : 1
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL43_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Label",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label44",
+        "id" : 62,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 37,
+          "y" : 648
+        },
+        "size" : {
+          "width" : 166,
+          "height" : 33
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL44_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Show on Boot",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label45",
+        "id" : 63,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 37,
+          "y" : 670
+        },
+        "size" : {
+          "width" : 286,
+          "height" : 28
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL45_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Display the message at startup",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 14
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label46",
+        "id" : 64,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 37,
+          "y" : 721
+        },
+        "size" : {
+          "width" : 180,
+          "height" : 33
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL46_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Edit Message",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label47",
+        "id" : 65,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 37,
+          "y" : 744
+        },
+        "size" : {
+          "width" : 408,
+          "height" : 28
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL47_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Personalize your note",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 14
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label48",
+        "id" : 66,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 634,
+          "y" : 725
+        },
+        "size" : {
+          "width" : 36,
+          "height" : 40
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL48_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "›",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 28
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label49",
+        "id" : 67,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 344,
+          "y" : 714
+        },
+        "size" : {
+          "width" : 351,
+          "height" : 71
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "opa" : 2147483647
         },
         "img_t" : { }
       } ]

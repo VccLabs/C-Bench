@@ -53,5 +53,8 @@
   }, {
     "pageId" : 4,
     "pageName" : "view4.g"
+  }, {
+    "pageId" : 5,
+    "pageName" : "view5.g"
   } ]
 }
