@@ -29,7 +29,8 @@ void view5_init(void)
 
 void view5_entry(void)
 {
-
+    grf_keyboard_set_txtbox(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID),
+                            GCL(GRF_VIEW5_ID, VIEW5_TXTBOX0_ID));
 }
 
 void view5_exit(void)
