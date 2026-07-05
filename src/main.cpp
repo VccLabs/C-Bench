@@ -451,6 +451,12 @@ static void applyControl(uint16_t addr, uint16_t val)
     writeReg(0x0032, g_set.autoArm);
     writeReg(0x0039, g_set.theme);
     writeReg(0x0016, outputOn ? 1 : 0); /* real output state -> view1 toggle reflects arm on boot */
+    { /* re-push odometer so view4's entry-reset labels repaint */
+      uint32_t wh = (uint32_t)(g_lifeE_uWh / 1000000ULL);
+      if (wh > 9999999UL) wh = 9999999UL;
+      writeReg(0x003A, (uint16_t)(wh >> 16));
+      writeReg(0x003B, (uint16_t)(wh & 0xFFFF));
+    }
     break;
   case 0x0039: // theme from panel (0=dark,1=light)
     if (g_set.theme != (uint8_t)(val ? 1 : 0))
