@@ -740,14 +740,19 @@ void loop()
     } // push only on change
   }
 
-  // TEST: lifetime energy ramp 0 -> 2450361 Wh (2450.361 kWh) over 45s @ 4Hz
-  static uint32_t tLife = 0;
-  if (now - tLife >= 250)
+  // Lifetime energy -> HMI odometer (Wh, shown as XXXX.XXX kWh). Push on change @2Hz.
+  static uint32_t tLife = 0, lastWh = 0xFFFFFFFF;
+  if (now - tLife >= 500)
   {
     tLife = now;
-    uint32_t wh = (now >= 45000) ? 2450361UL : (uint32_t)((uint64_t)now * 2450361ULL / 45000ULL);
-    writeReg(0x003A, (uint16_t)(wh >> 16));
-    writeReg(0x003B, (uint16_t)(wh & 0xFFFF));
+    uint32_t wh = (uint32_t)(g_lifeE_uWh / 1000000ULL);
+    if (wh > 9999999UL) wh = 9999999UL;      // clamp to 7 digits (9999.999 kWh)
+    if (wh != lastWh)
+    {
+      lastWh = wh;
+      writeReg(0x003A, (uint16_t)(wh >> 16));
+      writeReg(0x003B, (uint16_t)(wh & 0xFFFF));
+    }
   }
 
 // AP33772S INT (active-HIGH): read STATUS 0x01 (auto-clears), decode events
