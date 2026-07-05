@@ -51,6 +51,7 @@ static uint64_t g_sessE_uWh = 0, g_sessQ_uAh = 0, g_lifeE_uWh = 0; // µWh / µA
 static uint32_t g_sessMs = 0, g_eLastUs = 0, g_lifeSaveT = 0;
 #define LIFE_FILE "/life.bin"
 static uint64_t g_lifeSaved_uWh = 0; // last odometer value written to flash
+static uint32_t g_lifeForceT = 0;    // periodic force-commit timer
 static bool g_eRunning = false;
 
 #define HMI Serial2 // UART1: IO8=TX, IO9=RX -> TR660
@@ -394,6 +395,11 @@ static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA, bool goo
   {
     g_lifeSaveT = now_ms;
     persistLifetimeFlash();
+  }
+  if (now_ms - g_lifeForceT >= 600000UL) // force-commit every 10 min (bounds power-loss)
+  {
+    g_lifeForceT = now_ms;
+    if (g_lifeE_uWh != g_lifeSaved_uWh) lifeWriteFile();
   }
 }
 

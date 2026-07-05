@@ -40,7 +40,7 @@
         "name" : "bg_style_t",
         "body_t" : {
           "main_color" : 1842206,
-          "radius" : 24,
+          "radius" : 18,
           "border" : {
             "color" : 689407
           },
@@ -217,10 +217,11 @@
         "name" : "label2",
         "id" : 5,
         "pt" : {
-          "x" : 599
+          "x" : 25,
+          "y" : 290
         },
         "size" : {
-          "width" : 121,
+          "width" : 670,
           "height" : 66
         },
         "t_mode" : 1,
@@ -235,18 +236,21 @@
       "styles" : [ {
         "name" : "style",
         "body_t" : {
+          "main_color" : 689407,
+          "radius" : 18,
+          "opa" : 255,
           "padding" : {
             "top" : 2147483647,
-            "bottom" : 1,
-            "left" : 28,
-            "right" : -1,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
             "inner" : 2147483647
           }
         },
         "txt_t" : {
-          "color" : 689407,
+          "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
-          "font_size" : 17
+          "font_size" : 24
         },
         "img_t" : { }
       } ]
