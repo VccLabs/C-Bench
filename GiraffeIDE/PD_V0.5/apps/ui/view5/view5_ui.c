@@ -4,21 +4,15 @@
 
 static void keyboard0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_READY || event == GRF_EVENT_CANCEL)
+		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1);
 }
 
 
 static void txtbox0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 0);
 }
 
 
@@ -42,13 +36,13 @@ static void label1_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label2_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label2_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Save */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+	{
+		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1);
+		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_IMAGE1_ID), 0);
+	}
 }
 
 
@@ -82,13 +76,10 @@ static void image0_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void image1_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void image1_event(grf_ctrl_t *ctrl, grf_event_e event)   /* saved popup */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_IMAGE1_ID), 1);
 }
 
 #include "../../../libs/appscc/view5_cc.h"
@@ -99,8 +90,10 @@ void view5_init(void)
 
 void view5_entry(void)
 {
-    grf_keyboard_set_txtbox(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID),
-                            GCL(GRF_VIEW5_ID, VIEW5_TXTBOX0_ID));
+	grf_keyboard_set_txtbox(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID),
+	                            GCL(GRF_VIEW5_ID, VIEW5_TXTBOX0_ID));
+	    grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1); /* keyboard hidden at start */
+	    grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_IMAGE1_ID), 1);    /* saved popup hidden */
 }
 
 void view5_exit(void)
