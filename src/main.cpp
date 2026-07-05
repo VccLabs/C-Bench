@@ -4,6 +4,7 @@
 #include <Adafruit_INA260.h>
 #include <Adafruit_MAX1704X.h>
 #include <EEPROM.h>
+#include <LittleFS.h>
 
 AP33772S usbpd;             // defaults to Wire (I2C0)
 Adafruit_INA260 ina260;     // output-bus monitor @ 0x40
@@ -48,6 +49,8 @@ static bool g_brightDirty = false;
 static uint32_t g_brightT = 0;
 static uint64_t g_sessE_uWh = 0, g_sessQ_uAh = 0, g_lifeE_uWh = 0; // µWh / µAh accumulators
 static uint32_t g_sessMs = 0, g_eLastUs = 0, g_lifeSaveT = 0;
+#define LIFE_FILE "/life.bin"
+static uint64_t g_lifeSaved_uWh = 0; // last odometer value written to flash
 static bool g_eRunning = false;
 
 #define HMI Serial2 // UART1: IO8=TX, IO9=RX -> TR660
@@ -235,7 +238,17 @@ static void loadSettings()
     g_set.theme = 0;
     saveSettings();
   }
-  g_lifeE_uWh = (uint64_t)g_set.lifeCWh * 10000ULL;
+  LittleFS.begin();
+  {
+    File f = LittleFS.open(LIFE_FILE, "r");
+    if (f && f.size() == sizeof(g_lifeE_uWh))
+      f.read((uint8_t *)&g_lifeE_uWh, sizeof(g_lifeE_uWh)); // authoritative
+    else
+      g_lifeE_uWh = (uint64_t)g_set.lifeCWh * 10000ULL; // migrate from EEPROM once
+    if (f)
+      f.close();
+    g_lifeSaved_uWh = g_lifeE_uWh;
+  }
   Serial.printf("Settings loaded: magic=%04X boot=%u autoArm=%u\n",
                 g_set.magic, g_set.bootLastUsed, g_set.autoArm);
 }
@@ -332,14 +345,23 @@ static void pushSession()
   writeReg(0x0018, s > 65535 ? 65535 : (uint16_t)s);
 }
 
-static void persistLifetimeFlash() // debounced flash write of the odometer
+
+
+static void lifeWriteFile() // LittleFS wear-levels across sectors; power-loss safe
 {
-  uint32_t cWh = (uint32_t)(g_lifeE_uWh / 10000ULL);
-  if (cWh != g_set.lifeCWh)
-  {
-    g_set.lifeCWh = cWh;
-    saveSettings();
-  }
+  File f = LittleFS.open(LIFE_FILE, "w");
+  if (!f)
+    return;
+  f.write((const uint8_t *)&g_lifeE_uWh, sizeof(g_lifeE_uWh));
+  f.close();
+  g_lifeSaved_uWh = g_lifeE_uWh;
+}
+
+static void persistLifetimeFlash() // commit only past a delta threshold
+{
+  const uint64_t THRESH_uWh = 5000000ULL; // 5 Wh
+  if (g_lifeE_uWh - g_lifeSaved_uWh >= THRESH_uWh)
+    lifeWriteFile();
 }
 
 // Integrate measured power/current over real dt; accumulate only while output is on.
@@ -368,7 +390,7 @@ static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA, bool goo
     g_eRunning = false; // freeze when off
   }
   pushSession();
-  if (now_ms - g_lifeSaveT >= 60000UL)
+  if (now_ms - g_lifeSaveT >= 5000UL) // check often; writes only past threshold
   {
     g_lifeSaveT = now_ms;
     persistLifetimeFlash();
@@ -635,7 +657,7 @@ void loop()
     usbpd.setOutput(outputOn ? 1 : 0);
     writeReg(0x0016, outputOn ? 1 : 0); /* tell the panel immediately */
     if (!outputOn)
-      persistLifetimeFlash();                    /* <-- ADD: commit odometer at end of run */
+      lifeWriteFile();                           /* force-commit odometer at end of run */
     if (g_set.lastOutputOn != (uint8_t)outputOn) // remember for "Last used"
     {
       g_set.lastOutputOn = outputOn;
@@ -746,7 +768,8 @@ void loop()
   {
     tLife = now;
     uint32_t wh = (uint32_t)(g_lifeE_uWh / 1000000ULL);
-    if (wh > 9999999UL) wh = 9999999UL;      // clamp to 7 digits (9999.999 kWh)
+    if (wh > 9999999UL)
+      wh = 9999999UL; // clamp to 7 digits (9999.999 kWh)
     if (wh != lastWh)
     {
       lastWh = wh;
@@ -755,7 +778,7 @@ void loop()
     }
   }
 
-// AP33772S INT (active-HIGH): read STATUS 0x01 (auto-clears), decode events
+  // AP33772S INT (active-HIGH): read STATUS 0x01 (auto-clears), decode events
   if (g_pdInt)
   {
     g_pdInt = false;
@@ -764,7 +787,7 @@ void loop()
     uint8_t st = 0;
     if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 1) == 1)
       st = Wire.read();
-    if (st & 0x07)          // STARTED | READY | NEWPDO -> (re)negotiated
+    if (st & 0x07) // STARTED | READY | NEWPDO -> (re)negotiated
     {
       g_outAttach = true;   // re-assert output (default OFF) immediately
       lastSig = 0xFFFFFFFF; // refresh the PDO list now
