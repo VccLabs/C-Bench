@@ -1,6 +1,26 @@
 #include "../../apps.h"
 
 
+
+static void keyboard0_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void txtbox0_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view5_cc.h"
 void view5_init(void)
 {

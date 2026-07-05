@@ -3,7 +3,7 @@
   "width" : 720,
   "height" : 720,
   "language" : "en",
-  "start_page" : 1,
+  "start_page" : 5,
   "cacheImg" : 20,
   "app_ver" : "1.0.0",
   "comp_time" : "260704182008",
