@@ -593,6 +593,18 @@ shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_sta
 - **INA260 reads can be negative (near no-load) or railed (655 W on glitch).** Casting
   a negative float to unsigned yields garbage. Validate/clamp before display **and**
   before integrating, or an energy integrator runs away.
+- **LittleFS needs an explicit `board_build.filesystem_size`** (e.g. `1m`) in
+  `platformio.ini`; the earlephilhower default is **0 bytes**, so `LittleFS.begin()`
+  mounts nothing and writes fail silently. Also: sub-threshold values (< the 5 Wh
+  commit) live only in RAM and are lost on a bare power cut — only threshold /
+  10-min force / output-off commit them.
+- **Panel-side persistence uses the file system API** (`grf_fs_open/read/write`,
+  `D:/…`), not the manual's `grf_flash_*_Data` (those are **not linked** in this
+  build). Theme is stored in `D:/theme.bin`.
+- **Load persisted theme before `grf_prj_create()`** (in `grf_main`, not
+  `grf_hw_init`) or the first view paints in the default theme for ~1 s then flips.
+- **The TDO boot logo is a static PNG** set via **Tools → Set boot logo** (PNG,
+  ≤768 KB, ≤screen res). No runtime API — it can't follow the theme; pick one.
 
 ## Other
 
