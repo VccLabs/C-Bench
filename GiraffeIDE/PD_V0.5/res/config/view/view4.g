@@ -249,7 +249,7 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 866
+          "height" : 501
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -2601,11 +2601,11 @@
         "parent_id" : 1,
         "pt" : {
           "x" : 634,
-          "y" : 725
+          "y" : 734
         },
         "size" : {
           "width" : 36,
-          "height" : 40
+          "height" : 27
         },
         "scrollbar_t" : {
           "chain_e" : 2
@@ -2630,8 +2630,7 @@
         },
         "txt_t" : {
           "color" : 16777215,
-          "font_lib" : "Inter_24pt-ExtraBold.ttf",
-          "font_size" : 28
+          "font_size" : 22
         },
         "img_t" : { }
       } ]
@@ -2649,7 +2648,7 @@
           "y" : 714
         },
         "size" : {
-          "width" : 351,
+          "width" : 246,
           "height" : 71
         },
         "t_mode" : 1,
