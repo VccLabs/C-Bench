@@ -547,7 +547,8 @@ static void theme_apply_view4(void)
     THEME_BG(GCL(GRF_VIEW4_ID, V4_DISPCARD), TC_SURF);
     THEME_TXT(GCL(GRF_VIEW4_ID, V4_PCT), TC_TXT2);
     THEME_BG(GCL(GRF_VIEW4_ID, 19), TC_SURF2);                                /* slider0 id19 track (bar main part) */
-    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, V4_SW), TCOL(TC_SURF2), 0); /* switch bg fill (part MAIN=0) */
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, V4_SW), TCOL(TC_SURF2), 0); /* sw0 bg fill (part MAIN=0) */
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, 60), TCOL(TC_SURF2), 0);    /* sw1 bg fill (part MAIN=0) */
     grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_SML),
                     g_dark ? "Brightness-symbol-small-light.png" : "Brightness-symbol-small-dark.png");
     grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_FUL),

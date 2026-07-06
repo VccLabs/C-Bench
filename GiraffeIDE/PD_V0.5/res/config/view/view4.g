@@ -249,7 +249,7 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 500
+          "height" : 826
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -2605,7 +2605,7 @@
         },
         "size" : {
           "width" : 36,
-          "height" : 27
+          "height" : 30
         },
         "scrollbar_t" : {
           "chain_e" : 2
@@ -2630,6 +2630,7 @@
         },
         "txt_t" : {
           "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 22
         },
         "img_t" : { }
@@ -2648,7 +2649,7 @@
           "y" : 714
         },
         "size" : {
-          "width" : 300,
+          "width" : 351,
           "height" : 71
         },
         "t_mode" : 1,
