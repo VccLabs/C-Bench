@@ -108,6 +108,7 @@
         "pub" : true
       },
       "popovers" : true,
+      "cn_font_lib" : "Inter_24pt-ExtraBold.ttf",
       "cn_font_size" : 30,
       "styles" : [ {
         "textFlag" : true,
@@ -360,6 +361,33 @@
         "pub" : true
       },
       "init_img" : "saved-dark.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image0",
+        "id" : 8,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 638,
+          "y" : 25
+        },
+        "size" : {
+          "width" : 57,
+          "height" : 57
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "click_area" : 25,
+        "controlIDEnum" : "VIEW5_IMAGE0_ID"
+      },
+      "init_img" : "theme-dark.png",
       "rotate_pt" : { }
     }
   } ],
