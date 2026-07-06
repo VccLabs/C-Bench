@@ -567,7 +567,23 @@ static void theme_apply_view4(void)
     THEME_BG(GCL(GRF_VIEW4_ID, V4_TH_SEG), TC_SURF2);  /* theme segment bg */
     THEME_BG(GCL(GRF_VIEW4_ID, V4_CH_DARK), TC_SURF2); /* theme chips */
     THEME_BG(GCL(GRF_VIEW4_ID, V4_CH_LIGHT), TC_SURF2);
-    boot_state_paint(g_v4_boot); /* text colors (TC_TXT/grey) + chip show-hide */
+    /* Lifetime accumulator card */
+        THEME_BG(GCL(GRF_VIEW4_ID, 37), TC_SURF);   /* label28 card bg            */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 39), TC_TXT2);  /* label30 "TOTAL ENERGY..."  */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 51), TC_TXT2);  /* label40 "Counts up since.."*/
+        THEME_TXT(GCL(GRF_VIEW4_ID, 41), TC_TXT2);  /* label31 "kWh"              */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 38), TC_TXT2);  /* label29 "LIFETIME"         */
+        THEME_BG(GCL(GRF_VIEW4_ID, 68), TC_SURF);   /* label50 divider line       */
+        grf_img_set_src(GCL(GRF_VIEW4_ID, 50), g_dark ? "lock-light.png" : "lock-dark.png"); /* image6 lock */
+        /* Gift message card */
+        THEME_BG(GCL(GRF_VIEW4_ID, 58), TC_SURF);   /* label41 card bg            */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 59), TC_TXT2);  /* label42 "GIFT MESSAGE"     */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 62), TC_TXT2);  /* label44 "Show on Boot"     */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 63), TC_TXT2);  /* label45 "Display the..."   */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 64), TC_TXT);   /* label46 "Edit Message"     */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 65), TC_TXT2);  /* label47 "Personalize..."   */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 66), TC_TXT2);  /* label48 "›"                */
+        boot_state_paint(g_v4_boot); /* text colors (TC_TXT/grey) + chip show-hide */
     theme_state_paint();         /* Dark/Light texts + chip show-hide */
 }
 

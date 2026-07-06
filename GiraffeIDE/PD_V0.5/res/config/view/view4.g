@@ -249,7 +249,7 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 501
+          "height" : 941
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -2629,7 +2629,7 @@
           }
         },
         "txt_t" : {
-          "color" : 16777215,
+          "color" : 10000543,
           "font_size" : 22
         },
         "img_t" : { }
@@ -2648,7 +2648,7 @@
           "y" : 714
         },
         "size" : {
-          "width" : 246,
+          "width" : 300,
           "height" : 71
         },
         "t_mode" : 1,
@@ -2663,6 +2663,46 @@
       "align_e" : 34,
       "styles" : [ {
         "name" : "style",
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label50",
+        "id" : 68,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 119,
+          "y" : 516
+        },
+        "size" : {
+          "width" : 385,
+          "height" : 1
+        },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL50_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Label",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1842206,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
         "txt_t" : {
           "opa" : 2147483647
         },
