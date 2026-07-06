@@ -79,11 +79,7 @@ static void label4_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void image0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
 }
 
 
@@ -99,8 +95,10 @@ void view5_init(void)
 	grf_view_create(GRF_VIEW5_ID,view_ctrls_fun_t,sizeof(view_ctrls_fun_t)/sizeof(grf_ctrl_fun_t));
 }
 
+extern void view5_apply_theme(void);
 void view5_entry(void)
 {
+	view5_apply_theme();
 	grf_keyboard_set_txtbox(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID),
 	                            GCL(GRF_VIEW5_ID, VIEW5_TXTBOX0_ID));
 	grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1); /* keyboard hidden at start */

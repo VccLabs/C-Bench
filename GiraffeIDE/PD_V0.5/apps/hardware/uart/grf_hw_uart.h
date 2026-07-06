@@ -28,6 +28,7 @@ extern u8 g_giften;                      /* gift popup enable flag (panel-local)
 void giften_load_boot(void);             /* read persisted gift-enable at boot   */
 void view4_set_giften(u8 on);            /* view4 sw1: enable/disable gift popup  */
 void view4_apply_theme(void);            /* view4 entry: re-apply saved theme */
+void view5_apply_theme(void);            /* view5 entry: re-apply saved theme */
 void view1_sync_armed(void);
 void view1_toggle_output(void);          /* view1 label7 click -> reg 0x0022 (toggle) */
 void view1_toggle_output(void);          /* view1 label7 click -> reg 0x0022 (toggle) */

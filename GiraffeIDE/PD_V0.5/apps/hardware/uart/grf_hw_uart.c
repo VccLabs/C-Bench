@@ -589,17 +589,35 @@ static void theme_apply_view4(void)
     theme_state_paint();         /* Dark/Light texts + chip show-hide */
 }
 
+static void theme_apply_view5(void)
+{
+    grf_view_set_bgcolor(GRF_VIEW5_ID, TCOL(TC_BG));                     /* screen bg */
+    THEME_BG(GCL(GRF_VIEW5_ID, 1), TC_SURF);                            /* txtbox0 bg */
+    grf_label_set_txt_color(GCL(GRF_VIEW5_ID, 1), TCOL(TC_TXT));        /* txtbox0 text */
+    THEME_BG(GCL(GRF_VIEW5_ID, 5), TC_BLUE);                            /* label2 "Save" bg */
+    grf_label_set_txt_color(GCL(GRF_VIEW5_ID, 5), GRF_COLOR_GET(0xFF, 0xFF, 0xFF)); /* white on blue */
+    THEME_TXT(GCL(GRF_VIEW5_ID, 4), TC_TXT2);                           /* label1 "YOUR MESSAGE" */
+    THEME_TXT(GCL(GRF_VIEW5_ID, 3), TC_TXT3);                           /* label0 "Shown on boot.." */
+    THEME_TXT(GCL(GRF_VIEW5_ID, 7), TC_TXT);                            /* label4 "Gift Message" */
+    THEME_TXT(GCL(GRF_VIEW5_ID, 6), TC_BLUE);                           /* label3 "‹ Settings" */
+    grf_img_set_src(GCL(GRF_VIEW5_ID, 9), g_dark ? "saved-light.png" : "saved-dark.png"); /* image1 popup */
+    grf_img_set_src(GCL(GRF_VIEW5_ID, 8), g_dark ? "theme-light.png" : "theme-dark.png"); /* image0 toggle */
+}
+
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
     theme_apply_view1();
     theme_apply_view2();
     theme_apply_view3();
     theme_apply_view4();
+    theme_apply_view5();
 }
+
 void view1_apply_theme(void) { theme_apply(); } /* view1 entry: repaint from shadow */
 void view2_apply_theme(void) { theme_apply(); } /* view2 entry: repaint from shadow */
 void view3_apply_theme(void) { theme_apply(); } /* view3 entry: repaint from shadow */
 void view4_apply_theme(void) { theme_apply(); } /* view4 entry: repaint from shadow */
+void view5_apply_theme(void) { theme_apply(); } /* view5 entry: repaint from shadow */
 void view1_toggle_theme(void)                   /* user tap: flip + apply + persist */
 {
 	g_dark ^= 1;
