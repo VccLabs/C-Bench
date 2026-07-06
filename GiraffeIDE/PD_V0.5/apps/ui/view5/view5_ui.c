@@ -40,10 +40,21 @@ static void label1_event(grf_ctrl_t *ctrl, grf_event_e event)
 static void label2_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Save */
 {
 	if (event == GRF_EVENT_CLICKED)
-	{
-		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1);
-		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_IMAGE1_ID), 0);
-	}
+		{
+			char *msg = grf_txtbox_get_text(GCL(GRF_VIEW5_ID, VIEW5_TXTBOX0_ID));
+			if (msg)
+			{
+				grf_fs_file_t *f = grf_fs_open("D:/gift.txt", GRF_FS_MODE_WR);
+				if (f)
+				{
+					u32 n = 0; while (msg[n]) n++;
+					grf_fs_write(f, msg, n);
+					grf_fs_close(f);
+				}
+			}
+			grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1);
+			grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_IMAGE1_ID), 0);
+		}
 }
 
 

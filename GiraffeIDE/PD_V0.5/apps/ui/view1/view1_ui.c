@@ -1,5 +1,7 @@
 #include "../../apps.h"
 
+static void view1_hide_boot_msg(void);
+
 static void button0_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
 	// switch (event) {
@@ -354,21 +356,13 @@ static void image3_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void image4_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_hide_boot_msg();
 }
 
 
 static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_hide_boot_msg();
 }
 
 #include "../../../libs/appscc/view1_cc.h"
@@ -377,12 +371,36 @@ void view1_init(void)
 	grf_view_create(GRF_VIEW1_ID, view_ctrls_fun_t,sizeof(view_ctrls_fun_t) / sizeof(grf_ctrl_fun_t));
 }
 
+static u8 g_bootMsgShown = 0;
+static void view1_load_boot_msg(void)
+{
+	static char buf[256];
+	grf_fs_file_t *f = grf_fs_open("D:/gift.txt", GRF_FS_MODE_RD);
+	if (!f) { grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_IMAGE4_ID), 1); return; }
+	s32 n = grf_fs_read(f, buf, sizeof(buf) - 1);
+	grf_fs_close(f);
+	if (n <= 0) { grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_IMAGE4_ID), 1); return; }
+	buf[n] = 0;
+	grf_label_set_txt(GCL(GRF_VIEW1_ID, VIEW1_LABEL24_ID), buf);
+	grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_LABEL24_ID), 0);
+	grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_IMAGE4_ID), 0);
+}
+
+static void view1_hide_boot_msg(void)
+{
+	grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_IMAGE4_ID), 1);
+	grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_LABEL24_ID), 1);
+	/* grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_SCRIM_ID), 1);  // add once scrim ID known */
+}
+
 void view1_entry(void) 
 {
 	view1_sync_armed();
-	view4_request_settings();   /* HMI is up -> pull saved settings into the shadow */
-	view1_apply_theme();
-	view1_reset_press(0);       /* force press-tint overlay hidden on entry (default-visible fix) */
+		view4_request_settings();   /* HMI is up -> pull saved settings into the shadow */
+		view1_apply_theme();
+		view1_reset_press(0);       /* force press-tint overlay hidden on entry (default-visible fix) */
+		if (!g_bootMsgShown) { g_bootMsgShown = 1; view1_load_boot_msg(); }
+		else grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_IMAGE4_ID), 1);
 }
 
 void view1_exit(void)
