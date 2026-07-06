@@ -90,7 +90,35 @@ Max **28 V / 5 A / 140 W** (source-dependent), exposed on multiple connectors:
 > **Note:** MAX17048 `ALRT` is **not connected to the RP** — only pulled up to 5 V.
 
 All RP GPIO (including the ones above) are broken out to the board edge on a
-**2×20 right-angle 2.54 mm male header**.
+**2×20 right-angle 2.54 mm male header** on the **left edge** of the device (pins
+face you when looking at that edge). Full breakout — Row 1 (top) / Row 2 (bottom),
+pin-pairs 1→20:
+
+| #   | Row 1 | note                    | Row 2 | note           |
+| --- | ----- | ----------------------- | ----- | -------------- |
+| 1   | GND   |                         | GND   |                |
+| 2   | IO0   |                         | IO1   |                |
+| 3   | IO2   | INA260 ALERT            | IO3   | MAX17048 QSTRT |
+| 4   | IO4   |                         | IO5   |                |
+| 5   | IO6   | STAT_3.3V               | IO7   | CTL            |
+| 6   | IO8   | → HMI Tx                | IO9   | → HMI Rx       |
+| 7   | IO10  |                         | IO11  |                |
+| 8   | IO12  |                         | IO13  |                |
+| 9   | IO14  |                         | IO15  |                |
+| 10  | IO16  |                         | IO17  |                |
+| 11  | IO18  |                         | IO19  |                |
+| 12  | IO20  | I2C SDA                 | IO21  | I2C SCL        |
+| 13  | IO22  | AP33772S FLIP           | IO23  |                |
+| 14  | IO24  |                         | IO25  | AP33772S INT   |
+| 15  | ADC1  |                         | ADC2  |                |
+| 16  | ADC3  |                         | ADC2  |                |
+| 17  | SWCLK |                         | SWDIO |                |
+| 18  | GND   |                         | +3.3V |                |
+| 19  | +5V   |                         | GND   |                |
+| 20  | Vbus  | source USB port voltage | GND   |                |
+
+An on-screen **Pin Map page** presents this so no labels need printing on the
+enclosure (mockup: `HTML Mockups/cbench_pinmap_apple.html`).
 
 ---
 
@@ -354,6 +382,7 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     `view1_entry` loads `D:/gift.txt` and shows the popup **once per boot**
     (`g_bootMsgShown` guard; hidden if the file is absent/empty). Tapping `image4`
     or `label24` dismisses it (`view1_hide_boot_msg`). Message is authored in view5.
+    Gated on `g_giften` (view4 sw1) — popup skipped when disabled.
   - `view1_entry` also sends `0x0033` (HMI ready) and calls `view1_apply_theme()`.
 - **view2 — Profiles:** scrolling `container0` holding a fixed pool of **13 rows**;
   each row = 6 controls (badge / voltage / meta / current / check / background),
@@ -422,7 +451,15 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
   - **Lifetime-energy odometer (done):** 7-digit `XXXX.XXX` kWh readout on Control
     IDs 42–49 (MSD→LSD: 49,48,47,45,44,43,42; id 46 = static decimal point), painted
     digit-by-digit in the `0x003B` handler via `grf_label_set_txt`. Re-pushed on the
-    `0x0033` sync so it repaints after view4's entry reset.
+    `0x0033` sync so it repaints after view4's entry reset. The lifetime card
+    (label28 id37 / label41 id58) + gift card, plus their text (ids 38/39/41/51/59/
+    62–66) and lock image `image6` (id 50, `lock-dark/-light.png`), are themed in
+    `theme_apply_view4`; label40 (id 51) uses a bespoke light-mode grey `#C4C4C6`.
+  - **Gift popup enable:** switch `sw1` (id 60, themed like sw0) toggles `g_giften`
+    via `view4_set_giften()`, persisted **panel-local** to `D:/giften.bin` (mirrors
+    `theme.bin`; no register/RP involvement). `giften_load_boot()` runs in `grf_main`
+    before `grf_prj_create()`. **Defaults ON** (no file ⇒ `g_giften=1`). view1's boot
+    popup is gated on it.
   - **Gift-message row** (`label49`, **Control ID 67**) navigates to **view5** (the
     message editor) via `grf_view_set_dis_view_anim(GRF_VIEW5_ID, …, ANIM_NONE)`.
 
@@ -433,6 +470,11 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
   `grf_txtbox_set_text`); Save reads the txtbox and writes it to `D:/gift.txt`
   (`grf_fs_open(…, GRF_FS_MODE_WR)` → `grf_fs_write` → `grf_fs_close`), then shows the
   popup. HMI-side only — no RP round-trip.
+  - **Fully themed** (`theme_apply_view5`, called on `view5_entry` via
+    `view5_apply_theme`): screen bg, txtbox0 (id 1) surface+text, Save button
+    (`label2` id 5, blue bg + white text), headers/labels (ids 3/4/6/7), and image
+    swaps `saved-dark/-light.png` (id 9) + `theme-dark/-light.png`. Theme toggle
+    `image0` (id 8) → `view1_toggle_theme()`.
 
 Row data lives in a `ROW_ID[13][6]` table in `grf_hw_uart.c` mapping each row's
 six Control IDs; `fill_row()` / `show_row()` / `highlight_row()` / selection all
@@ -702,5 +744,8 @@ Open-source hardware **and** software under the **MIT License**.
 - [ ] Settings UI for theme (move the toggle off view1 into view4 appearance).
 - [x] Lifetime-energy **odometer display** in Settings (7-digit, Control IDs 42–49).
 - [x] **Gift message**: view5 editor → `D:/gift.txt`; view1 boot popup (image4/label24).
+- [x] **Gift popup enable** (view4 sw1 → `D:/giften.bin`, panel-local, defaults ON).
+- [x] **Theme extended** to view4 lifetime/gift cards + **view5** (fully themed + toggle).
+- [ ] **Pin Map page** (GPIO breakout labels) — mockup done (`HTML Mockups/cbench_pinmap_apple.html`), Giraffe view TBD.
 - [ ] Battery page (view3) content.
 - [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).
