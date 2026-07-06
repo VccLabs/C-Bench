@@ -570,7 +570,8 @@ static void theme_apply_view4(void)
     /* Lifetime accumulator card */
         THEME_BG(GCL(GRF_VIEW4_ID, 37), TC_SURF);   /* label28 card bg            */
         THEME_TXT(GCL(GRF_VIEW4_ID, 39), TC_TXT2);  /* label30 "TOTAL ENERGY..."  */
-        THEME_TXT(GCL(GRF_VIEW4_ID, 51), TC_TXT2);  /* label40 "Counts up since.."*/
+        grf_label_set_txt_color(GCL(GRF_VIEW4_ID, 51),                       /* label40 "Counts up since.." */
+                g_dark ? GRF_COLOR_GET(0xC4, 0xC4, 0xC6) : GRF_COLOR_GET(0x8D, 0x8D, 0x93));
         THEME_TXT(GCL(GRF_VIEW4_ID, 41), TC_TXT2);  /* label31 "kWh"              */
         THEME_TXT(GCL(GRF_VIEW4_ID, 38), TC_TXT2);  /* label29 "LIFETIME"         */
         THEME_BG(GCL(GRF_VIEW4_ID, 68), TC_SURF);   /* label50 divider line       */
