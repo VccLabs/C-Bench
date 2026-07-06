@@ -559,11 +559,7 @@ static void label41_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void sw1_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_VALUE_CHANGED) view4_set_giften(grf_sw_get_state(ctrl));
 }
 
 

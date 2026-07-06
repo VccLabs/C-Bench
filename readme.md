@@ -245,7 +245,7 @@ lifetime odometer (`0x003A/0x003B`) are 32-bit, split high/low across two
 registers. Registers arrive **one at a time**, so the panel keeps a 32-bit shadow
 (`g_sess_mWh`) and recombines on each half (`(hi<<16)|lo`), repainting on either.
 Units were chosen to fit `u16` halves where single-register: session/charge use
-mWh/mAh, the odometer uses cWh. Session energy is shown as `X.XXX` Wh (mWh
+mWh/mAh, the odometer uses whole Wh. Session energy is shown as `X.XXX` Wh (mWh
 resolution) on `label3` (id 4); elapsed as `M:SS` / `H:MM:SS` on `label22` (id 26).
 
 **Analog arc (`0x001B`):** the RP eases a displayed ring value toward the measured
@@ -315,8 +315,11 @@ committed every **20 s** when the value changed, plus on **output-off**. The
 `0x0033` sync reply also re-pushes `0x003A/0x003B` so view4's entry-reset digit
 labels repaint. Boot reads the file (migrates once
 from old EEPROM `lifeCWh` if the file is absent). Sent to the HMI odometer as **Wh**
-on `0x003A/0x003B` (shown as `XXXX.XXX` kWh). Requires `board_build.filesystem_size`
-in `platformio.ini` (set to `1m`) — without it the FS is 0 bytes and writes fail.
+on `0x003A/0x003B` (shown as `XXXX.XXX` kWh). Requires **both** `board_upload.maximum_size
+= 2097152` **and** `board_build.filesystem_size = 1m` in `platformio.ini`: the
+`rpipico2` board declares 4 MB but the RP2354A has only **2 MB** internal flash, so
+without the explicit max size the FS is placed past physical flash (3–4 MB) and all
+writes fail silently — the odometer read back 0 after every power cycle until fixed.
 
 **Active profile:** pushed at 2 Hz (`0x0019` type + `0x001A` setpoint mV) so the
 view1 `label18` (id 22) reads e.g. `PPS 9.00 V` / `Fixed 20.00 V`, or `—` when
@@ -347,6 +350,10 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     sends `0x0025`.
   - **Active profile** `label18` (id 22), fed by `0x0019`/`0x001A`.
   - **Theme toggle** `image2` (id 31) → `view1_toggle_theme()`; see Theme.
+  - **Boot gift-message popup:** `image4` (id 32) card + `label24` (id 33) text.
+    `view1_entry` loads `D:/gift.txt` and shows the popup **once per boot**
+    (`g_bootMsgShown` guard; hidden if the file is absent/empty). Tapping `image4`
+    or `label24` dismisses it (`view1_hide_boot_msg`). Message is authored in view5.
   - `view1_entry` also sends `0x0033` (HMI ready) and calls `view1_apply_theme()`.
 - **view2 — Profiles:** scrolling `container0` holding a fixed pool of **13 rows**;
   each row = 6 controls (badge / voltage / meta / current / check / background),
@@ -412,7 +419,20 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     `image1`/`image2` (dark/light asset swap), nav `image0` swap, and the Appearance
     block above. Slider **borders** can't be set at runtime (no border setter shipped);
     they were zeroed in the IDE.
-  - Lifetime-energy odometer is pushed (`0x003A/0x003B`) but **not yet displayed**.
+  - **Lifetime-energy odometer (done):** 7-digit `XXXX.XXX` kWh readout on Control
+    IDs 42–49 (MSD→LSD: 49,48,47,45,44,43,42; id 46 = static decimal point), painted
+    digit-by-digit in the `0x003B` handler via `grf_label_set_txt`. Re-pushed on the
+    `0x0033` sync so it repaints after view4's entry reset.
+  - **Gift-message row** (`label49`, **Control ID 67**) navigates to **view5** (the
+    message editor) via `grf_view_set_dis_view_anim(GRF_VIEW5_ID, …, ANIM_NONE)`.
+
+- **view5 — Gift message editor:** a `txtbox0` (id 1) + `keyboard0` (id 2) pair
+  (`grf_keyboard_set_txtbox`), a **Save** label (`label2`, id 5), a "Saved!" popup
+  `image1`, and a **back** label (`label3`, **id 6**) → view4. On entry the saved
+  message is loaded from `D:/gift.txt` into the txtbox (`grf_txtbox_get_text`/
+  `grf_txtbox_set_text`); Save reads the txtbox and writes it to `D:/gift.txt`
+  (`grf_fs_open(…, GRF_FS_MODE_WR)` → `grf_fs_write` → `grf_fs_close`), then shows the
+  popup. HMI-side only — no RP round-trip.
 
 Row data lives in a `ROW_ID[13][6]` table in `grf_hw_uart.c` mapping each row's
 six Control IDs; `fill_row()` / `show_row()` / `highlight_row()` / selection all
@@ -594,11 +614,12 @@ shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_sta
 - **INA260 reads can be negative (near no-load) or railed (655 W on glitch).** Casting
   a negative float to unsigned yields garbage. Validate/clamp before display **and**
   before integrating, or an energy integrator runs away.
-- **LittleFS needs an explicit `board_build.filesystem_size`** (e.g. `1m`) in
-  `platformio.ini`; the earlephilhower default is **0 bytes**, so `LittleFS.begin()`
-  mounts nothing and writes fail silently. Also: sub-threshold values (< the 5 Wh
-  commit) live only in RAM and are lost on a bare power cut — only threshold /
-  10-min force / output-off commit them.
+- **LittleFS on RP2354A needs two `platformio.ini` keys:** `board_build.filesystem_size
+  = 1m` **and** `board_upload.maximum_size = 2097152`. The default filesystem_size is
+  0 bytes (mount fails); and because `rpipico2` declares 4 MB while the chip has 2 MB,
+  omitting the max size puts the FS past physical flash so writes fail silently. The
+  odometer commits every 20 s (on change) + on output-off; values between commits live
+  only in RAM and are lost on a bare power cut.
 - **Panel-side persistence uses the file system API** (`grf_fs_open/read/write`,
   `D:/…`), not the manual's `grf_flash_*_Data` (those are **not linked** in this
   build). Theme is stored in `D:/theme.bin`.
@@ -679,6 +700,7 @@ Open-source hardware **and** software under the **MIT License**.
       `label17`/`label1`, ids 19/20/2) + toggle `label24` (id 28). **Next: extend to
       all objects across all 4 views.** See the "Theme" notes in Firmware behavior.
 - [ ] Settings UI for theme (move the toggle off view1 into view4 appearance).
-- [ ] Lifetime-energy **odometer display** in Settings (data already on 0x003A/3B).
+- [x] Lifetime-energy **odometer display** in Settings (7-digit, Control IDs 42–49).
+- [x] **Gift message**: view5 editor → `D:/gift.txt`; view1 boot popup (image4/label24).
 - [ ] Battery page (view3) content.
 - [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).

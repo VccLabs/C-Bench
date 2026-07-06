@@ -24,6 +24,9 @@ void view4_set_autoarm(u8 on);           /* view4: 0/1 -> reg 0x0032 */
 void view4_set_bright(u8 pct);           /* view4: brightness 10..100 % -> reg 0x0030 */
 void view4_request_settings(void);       /* view4 entry: ask RP to push 0x0031/0x0032 */
 void view4_apply_settings(void);         /* view4 entry: paint controls from shadow */
+extern u8 g_giften;                      /* gift popup enable flag (panel-local) */
+void giften_load_boot(void);             /* read persisted gift-enable at boot   */
+void view4_set_giften(u8 on);            /* view4 sw1: enable/disable gift popup  */
 void view4_apply_theme(void);            /* view4 entry: re-apply saved theme */
 void view1_sync_armed(void);
 void view1_toggle_output(void);          /* view1 label7 click -> reg 0x0022 (toggle) */

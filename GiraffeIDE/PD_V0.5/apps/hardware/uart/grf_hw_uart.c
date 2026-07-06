@@ -88,6 +88,27 @@ static void theme_save(void)
     grf_fs_file_t *f = grf_fs_open(THEME_FILE, GRF_FS_MODE_WR);
     if (f) { grf_fs_write(f, &g_dark, 1); grf_fs_close(f); }
 }
+
+/* ---- gift popup enable (panel-local, persisted) ---- */
+#define GIFTEN_FILE "D:/giften.bin"
+u8 g_giften = 1;                 /* 1 = show boot gift popup, 0 = suppressed */
+void giften_load_boot(void)      /* read persisted flag before first paint */
+{
+    grf_fs_file_t *f = grf_fs_open(GIFTEN_FILE, GRF_FS_MODE_RD);
+    if (f)
+    {
+        u8 v = 1;
+        if (grf_fs_read(f, &v, 1) == 1 && v <= 1) g_giften = v;
+        grf_fs_close(f);
+    }
+}
+void view4_set_giften(u8 on)     /* sw1 toggled: update + persist */
+{
+    g_giften = on ? 1 : 0;
+    grf_fs_file_t *f = grf_fs_open(GIFTEN_FILE, GRF_FS_MODE_WR);
+    if (f) { grf_fs_write(f, &g_giften, 1); grf_fs_close(f); }
+}
+
 #define TCOL(role) (THEME[(role)][g_dark]) /* current color for a role */
 #define THEME_BG(ctrl, role) grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
@@ -667,8 +688,9 @@ void view4_set_boot_state(u8 last_used) /* user tap: paint + send */
 
 void view4_apply_settings(void) /* entry: paint controls from shadow */
 {
-    boot_state_paint(g_v4_boot);
-    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
+	boot_state_paint(g_v4_boot);
+	    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
+	    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW1_ID), g_giften);
     grf_slider_set_range(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), 10, 100);
     bright_slider(g_v4_bright);
     bright_label(g_v4_bright);

@@ -399,8 +399,8 @@ void view1_entry(void)
 		view4_request_settings();   /* HMI is up -> pull saved settings into the shadow */
 		view1_apply_theme();
 		view1_reset_press(0);       /* force press-tint overlay hidden on entry (default-visible fix) */
-		if (!g_bootMsgShown) { g_bootMsgShown = 1; view1_load_boot_msg(); }
-		else grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_IMAGE4_ID), 1);
+		if (g_giften && !g_bootMsgShown) { g_bootMsgShown = 1; view1_load_boot_msg(); }
+			else grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_IMAGE4_ID), 1);
 }
 
 void view1_exit(void)
