@@ -266,6 +266,7 @@
           "width" : 121,
           "height" : 66
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,

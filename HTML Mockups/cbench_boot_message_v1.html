@@ -1,0 +1,107 @@
+<!--
+  C-Bench — Boot Gift Message popup (over view1) — APPLE-STYLE
+  720x720. iOS system colors + Inter. Matches Monitor/Settings house style.
+  Native build map (Giraffe):
+    scrim container  <- full-screen semi-transparent overlay on view1; clickable -> hide
+    card             <- container (TC_SURF)
+    gift icon        <- image (orange)
+    message label    <- text read from HMI file (D:/gift.txt), same store as view5
+    hint label       <- "Tap anywhere to continue"
+  Show in view1_entry on first boot only (g_bootMsgShown flag); tap scrim -> grf_ctrl_set_hidden(true).
+  No RP round-trip.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C-Bench — Boot Message (Apple style)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --orange:#FF9F0A; --cyan:#64D2FF; --purple:#BF5AF2; --green:#30D158; --red:#FF453A; }
+  [data-theme="dark"]{
+    --bg:#000; --screenbg:#000; --card:#1C1C1E; --card2:#2C2C2E;
+    --txt:#FFF; --txt2:rgba(235,235,245,.60); --txt3:rgba(235,235,245,.30);
+    --track:#2C2C2E; --sep:rgba(255,255,255,.07);
+    --bezel-a:#26262A; --bezel-b:#0A0A0C; --scrim:rgba(0,0,0,.55);
+  }
+  [data-theme="light"]{
+    --bg:#F2F2F7; --screenbg:#F2F2F7; --card:#FFF; --card2:#FFF;
+    --txt:#000; --txt2:rgba(60,60,67,.60); --txt3:rgba(60,60,67,.30);
+    --track:#E5E5EA; --sep:rgba(60,60,67,.12);
+    --bezel-a:#D7DEE6; --bezel-b:#B7C2CE; --scrim:rgba(0,0,0,.35);
+    --orange:#FF9500; --cyan:#32ADE6; --purple:#AF52DE; --green:#34C759; --red:#FF3B30;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ background:#050507; font-family:'Inter',-apple-system,system-ui,sans-serif;
+        display:flex; flex-direction:column; align-items:center; gap:14px; padding:24px 12px 40px; overflow-x:hidden; }
+  .cap{ color:#5a6571; font-size:12px; letter-spacing:.04em; text-align:center; }
+  .cap b{ color:#9aa6b2; }
+  .stage{ width:100%; display:flex; justify-content:center; }
+  .fit{ width:720px; height:720px; transform-origin:top center; }
+
+  .device{ width:720px; height:720px; background:linear-gradient(160deg,var(--bezel-a),var(--bezel-b));
+           border-radius:40px; padding:18px; box-shadow:0 40px 90px -24px #000, inset 0 1px 0 rgba(255,255,255,.18); transition:background .35s; }
+  .screen{ width:100%; height:100%; background:var(--screenbg); border-radius:22px; overflow:hidden;
+           position:relative; display:flex; flex-direction:column; transition:background .35s; }
+
+  /* dimmed Monitor behind (static, illustrative) */
+  .behind{ position:absolute; inset:0; padding:26px 28px; opacity:.5; filter:saturate(.9); }
+  .behind .brand{ font-weight:700; font-size:17px; color:var(--txt); }
+  .behind .brand span{ color:var(--txt2); font-weight:500; }
+  .behind .ring{ width:230px; height:230px; border-radius:50%; border:11px solid var(--track);
+                 border-top-color:var(--orange); border-right-color:var(--orange);
+                 margin:44px auto 0; display:grid; place-items:center; transform:rotate(35deg); }
+  .behind .ring .v{ transform:rotate(-35deg); font-weight:700; font-size:60px; letter-spacing:-.04em; color:var(--txt); }
+
+  /* boot popup */
+  .scrim{ position:absolute; inset:0; background:var(--scrim); backdrop-filter:blur(2px);
+          display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .card{ width:440px; background:var(--card); border-radius:30px; padding:52px 46px 40px; text-align:center;
+         box-shadow:0 30px 80px -20px #000; }
+  .gift{ width:96px; height:96px; border-radius:50%; background:var(--card2); display:grid; place-items:center;
+         margin:0 auto 26px; }
+  .gift svg{ width:48px; height:48px; stroke:var(--orange); }
+  .eyebrow{ font-size:13px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--txt2); margin-bottom:18px; }
+  .msg{ font-size:30px; font-weight:500; line-height:1.4; color:var(--txt); }
+  .sep{ height:1px; background:var(--sep); margin:30px -46px 22px; }
+  .hint{ font-size:15px; font-weight:500; color:var(--txt3); }
+</style>
+
+<div class="cap">C-Bench — <b>Boot Gift Message / over view1</b> · scrim + card · text from HMI (D:/gift.txt) · tap to dismiss</div>
+
+<div class="stage"><div class="fit" id="fit">
+<div class="device"><div class="screen" id="screen" data-theme="dark">
+
+  <div class="behind">
+    <div class="brand">C-Bench <span>· Monitor</span></div>
+    <div class="ring"><div class="v">9.06</div></div>
+  </div>
+
+  <div class="scrim" id="scrim">
+    <div class="card">
+      <div class="gift">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M4 12v9h16v-9"/>
+          <path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5zM12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5z"/>
+        </svg>
+      </div>
+      <div class="eyebrow">A message for you</div>
+      <div class="msg" id="msg">Happy Birthday, Sam!<br>Hope this powers all your projects. ❤</div>
+      <div class="sep"></div>
+      <div class="hint">Tap anywhere to continue</div>
+    </div>
+  </div>
+
+</div></div>
+</div></div>
+
+<div class="cap">Shown once on boot when enabled · dismiss loads Monitor · edit via Settings ▸ Gift Message</div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  $('scrim').onclick=()=>{ $('scrim').style.display='none'; };
+  function fit(){ const avail=Math.min(window.innerWidth-24,760), s=Math.min(1,avail/720);
+    const f=$('fit'); f.style.transform=`scale(${s})`; f.parentElement.style.height=(720*s)+'px'; }
+  addEventListener('resize',fit); fit();
+</script>

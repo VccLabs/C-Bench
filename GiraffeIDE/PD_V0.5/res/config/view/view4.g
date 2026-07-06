@@ -249,13 +249,14 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 916
+          "height" : 506
         },
         "t_mode" : 1,
         "scrollbar_t" : {
+          "mode_e" : 1,
           "dir_e" : 12,
-          "chain_e" : 2,
-          "momentum" : true
+          "momentum" : true,
+          "elastic" : true
         },
         "alpha" : 255,
         "pub" : true
@@ -2651,6 +2652,7 @@
           "width" : 351,
           "height" : 71
         },
+        "t_mode" : 1,
         "scrollbar_t" : {
           "chain_e" : 2
         },

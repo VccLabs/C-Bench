@@ -114,4 +114,12 @@
   "imageId" : 30,
   "imagePath" : "saved-light.png",
   "child" : [ ]
+}, {
+  "imageId" : 29,
+  "imagePath" : "boot-popup-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 31,
+  "imagePath" : "boot-popup-light.png",
+  "child" : [ ]
 } ]

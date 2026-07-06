@@ -351,6 +351,26 @@ static void image3_event(grf_ctrl_t *ctrl, grf_event_e event)
 //	}
 }
 
+
+static void image4_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view1_cc.h"
 void view1_init(void)
 {
