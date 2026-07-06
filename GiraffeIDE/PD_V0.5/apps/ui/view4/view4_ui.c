@@ -642,6 +642,16 @@ static void label50_event(grf_ctrl_t *ctrl, grf_event_e event)
 //	}
 }
 
+
+static void label51_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view4_cc.h"
 void view4_init(void)
 {

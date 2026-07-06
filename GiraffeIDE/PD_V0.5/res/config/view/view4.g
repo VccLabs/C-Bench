@@ -249,7 +249,7 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 500
+          "height" : 1020
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -2702,6 +2702,45 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label51",
+        "id" : 69,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 22,
+          "y" : 850
+        },
+        "size" : {
+          "width" : 674,
+          "height" : 147
+        },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL51_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1842206,
+          "radius" : 18,
           "opa" : 255
         },
         "txt_t" : {
