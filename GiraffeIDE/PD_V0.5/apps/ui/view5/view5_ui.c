@@ -103,9 +103,24 @@ void view5_entry(void)
 {
 	grf_keyboard_set_txtbox(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID),
 	                            GCL(GRF_VIEW5_ID, VIEW5_TXTBOX0_ID));
-	    grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1); /* keyboard hidden at start */
-	    grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_IMAGE1_ID), 1);    /* saved popup hidden */
+	grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_KEYBOARD0_ID), 1); /* keyboard hidden at start */
+		    grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_IMAGE1_ID), 1);    /* saved popup hidden */
+
+
+		    	static char buf[256];
+		    	grf_fs_file_t *f = grf_fs_open("D:/gift.txt", GRF_FS_MODE_RD);
+		    	if (f)
+		    	{
+		    		s32 n = grf_fs_read(f, buf, sizeof(buf) - 1);
+		    		grf_fs_close(f);
+		    		if (n > 0)
+		    		{
+		    			buf[n] = 0;
+		    			grf_txtbox_set_text(GCL(GRF_VIEW5_ID, VIEW5_TXTBOX0_ID), buf);
+		    		}
+		    	}
 }
+
 
 void view5_exit(void)
 {

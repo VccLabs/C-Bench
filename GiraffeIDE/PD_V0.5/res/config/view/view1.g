@@ -996,6 +996,7 @@
           "width" : 406,
           "height" : 410
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -1091,6 +1092,7 @@
           "width" : 350,
           "height" : 30
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
