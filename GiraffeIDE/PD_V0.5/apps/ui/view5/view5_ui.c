@@ -49,13 +49,12 @@ static void label2_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Save */
 
 static void label3_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	switch (event) {
+		case GRF_EVENT_CLICKED:{
+			grf_view_set_dis_view_anim(GRF_VIEW4_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
+		}break;
+	}
 }
-
 
 static void label4_event(grf_ctrl_t *ctrl, grf_event_e event)
 {

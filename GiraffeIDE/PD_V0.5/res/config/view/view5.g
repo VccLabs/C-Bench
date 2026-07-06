@@ -107,7 +107,6 @@
         "alpha" : 255,
         "pub" : true
       },
-      "mode" : 2,
       "popovers" : true,
       "cn_font_size" : 30,
       "styles" : [ {

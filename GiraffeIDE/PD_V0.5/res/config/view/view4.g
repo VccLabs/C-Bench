@@ -249,10 +249,14 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 556
+          "height" : 916
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2,
+          "momentum" : true
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -285,7 +289,9 @@
           "width" : 674,
           "height" : 147
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -321,7 +327,9 @@
           "width" : 80,
           "height" : 22
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -363,7 +371,9 @@
           "width" : 80,
           "height" : 32
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL1_ID"
@@ -397,7 +407,9 @@
           "width" : 166,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL2_ID"
@@ -430,7 +442,9 @@
           "width" : 180,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL3_ID"
@@ -463,7 +477,9 @@
           "width" : 286,
           "height" : 28
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL4_ID"
@@ -497,7 +513,9 @@
           "width" : 408,
           "height" : 28
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL5_ID"
@@ -531,7 +549,9 @@
           "width" : 674,
           "height" : 1
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -568,7 +588,9 @@
           "width" : 157,
           "height" : 38
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -608,7 +630,9 @@
           "width" : 41,
           "height" : 26
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -648,7 +672,9 @@
           "width" : 86,
           "height" : 26
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL20_ID"
@@ -690,7 +716,9 @@
           "height" : 76
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL9_ID"
@@ -734,7 +762,9 @@
           "height" : 76
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL8_ID"
@@ -780,7 +810,9 @@
           "height" : 36
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "click_area" : 15
@@ -878,7 +910,9 @@
           "width" : 674,
           "height" : 172
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -917,7 +951,9 @@
           "height" : 9
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "click_area" : 30,
@@ -1002,7 +1038,9 @@
           "width" : 166,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL15_ID"
@@ -1037,7 +1075,9 @@
           "width" : 15,
           "height" : 15
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -1062,7 +1102,9 @@
           "width" : 22,
           "height" : 22
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_IMAGE2_ID"
@@ -1086,7 +1128,9 @@
           "width" : 86,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -1118,7 +1162,9 @@
           "width" : 166,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL21_ID"
@@ -1152,7 +1198,9 @@
           "width" : 158,
           "height" : 28
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL22_ID"
@@ -1186,7 +1234,9 @@
           "width" : 135,
           "height" : 38
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL23_ID"
@@ -1227,7 +1277,9 @@
           "width" : 56,
           "height" : 26
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL24_ID"
@@ -1268,7 +1320,9 @@
           "width" : 56,
           "height" : 26
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL25_ID"
@@ -1310,7 +1364,9 @@
           "height" : 70
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL26_ID"
@@ -1354,7 +1410,9 @@
           "height" : 70
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL27_ID"
@@ -1397,7 +1455,9 @@
           "width" : 674,
           "height" : 166
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL28_ID"
@@ -1434,7 +1494,9 @@
           "width" : 80,
           "height" : 32
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL29_ID"
@@ -1468,7 +1530,9 @@
           "width" : 250,
           "height" : 32
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL30_ID"
@@ -1502,7 +1566,9 @@
           "width" : 106,
           "height" : 62
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -1535,7 +1601,9 @@
           "width" : 11,
           "height" : 11
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -1573,7 +1641,9 @@
           "width" : 10,
           "height" : 11
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -1596,7 +1666,9 @@
           "width" : 300,
           "height" : 20
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL40_ID"
@@ -1641,7 +1713,9 @@
           "width" : 45,
           "height" : 66
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -1666,7 +1740,9 @@
           "width" : 45,
           "height" : 66
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_IMAGE7_ID"
@@ -1692,7 +1768,9 @@
           "width" : 45,
           "height" : 66
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_IMAGE8_ID"
@@ -1718,7 +1796,9 @@
           "width" : 45,
           "height" : 66
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_IMAGE9_ID"
@@ -1744,7 +1824,9 @@
           "width" : 45,
           "height" : 66
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_IMAGE10_ID"
@@ -1770,7 +1852,9 @@
           "width" : 45,
           "height" : 66
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_IMAGE11_ID"
@@ -1796,7 +1880,9 @@
           "width" : 45,
           "height" : 66
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_IMAGE12_ID"
@@ -1820,7 +1906,9 @@
           "width" : 47,
           "height" : 67
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -1865,7 +1953,9 @@
           "width" : 47,
           "height" : 67
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL33_ID"
@@ -1911,7 +2001,9 @@
           "width" : 47,
           "height" : 67
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL34_ID"
@@ -1957,7 +2049,9 @@
           "width" : 47,
           "height" : 67
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL35_ID"
@@ -2004,7 +2098,9 @@
           "width" : 47,
           "height" : 67
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL37_ID"
@@ -2051,7 +2147,9 @@
           "width" : 47,
           "height" : 67
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL38_ID"
@@ -2098,7 +2196,9 @@
           "width" : 47,
           "height" : 67
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL39_ID"
@@ -2145,7 +2245,9 @@
           "width" : 674,
           "height" : 147
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL41_ID"
@@ -2182,7 +2284,9 @@
           "width" : 200,
           "height" : 32
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL42_ID"
@@ -2219,7 +2323,9 @@
           "height" : 36
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "click_area" : 15,
@@ -2318,7 +2424,9 @@
           "width" : 674,
           "height" : 1
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL43_ID"
@@ -2356,7 +2464,9 @@
           "width" : 166,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL44_ID"
@@ -2389,7 +2499,9 @@
           "width" : 286,
           "height" : 28
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL45_ID"
@@ -2423,7 +2535,9 @@
           "width" : 180,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL46_ID"
@@ -2456,7 +2570,9 @@
           "width" : 408,
           "height" : 28
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL47_ID"
@@ -2490,7 +2606,9 @@
           "width" : 36,
           "height" : 40
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW4_LABEL48_ID"
@@ -2533,7 +2651,9 @@
           "width" : 351,
           "height" : 71
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
