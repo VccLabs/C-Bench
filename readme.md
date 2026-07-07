@@ -101,7 +101,7 @@ pin-pairs 1→20:
 | 3   | IO2   | INA260 ALERT            | IO3   | MAX17048 QSTRT |
 | 4   | IO4   |                         | IO5   |                |
 | 5   | IO6   | STAT_3.3V               | IO7   | CTL            |
-| 6   | IO8   | → HMI Tx                | IO9   | → HMI Rx       |
+| 6   | IO8   | → HMI Rx                | IO9   | → HMI Tx       |
 | 7   | IO10  |                         | IO11  |                |
 | 8   | IO12  |                         | IO13  |                |
 | 9   | IO14  |                         | IO15  |                |
