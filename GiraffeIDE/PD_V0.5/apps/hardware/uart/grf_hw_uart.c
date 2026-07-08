@@ -818,15 +818,29 @@ void view4_set_boot_state(u8 last_used) /* user tap: paint + send */
     grf_reg_com_send(0x0031, 1);
 }
 
+static u32 g_lifeWh = 0; /* shadow of composed lifetime Wh, repainted on entry */
+static void odo_paint(u32 wh) /* 7-digit XXXX.XXX kWh, MSD->LSD ids 49..42 */
+{
+    char d[2] = {0, 0};
+    d[0] = '0' + (wh / 1000000u) % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 49), d);
+    d[0] = '0' + (wh / 100000u)  % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 48), d);
+    d[0] = '0' + (wh / 10000u)   % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 47), d);
+    d[0] = '0' + (wh / 1000u)    % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 45), d);
+    d[0] = '0' + (wh / 100u)     % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 44), d);
+    d[0] = '0' + (wh / 10u)      % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 43), d);
+    d[0] = '0' + (wh)            % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 42), d);
+}
+
 void view4_apply_settings(void) /* entry: paint controls from shadow */
 {
 	boot_state_paint(g_v4_boot);
 	    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
 	    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW1_ID), g_giften);
-    grf_slider_set_range(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), 10, 100);
-    bright_slider(g_v4_bright);
-    bright_label(g_v4_bright);
-}
+	    grf_slider_set_range(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), 10, 100);
+	        bright_slider(g_v4_bright);
+	        bright_label(g_v4_bright);
+	        odo_paint(g_lifeWh); /* repaint lifetime digits from shadow (kills default flash) */
+	    }
 
 void view4_set_autoarm(u8 on) /* 0/1 */
 {
@@ -1122,18 +1136,11 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
                 g_lifeWhHi = data[0];
                 break;
             case 0x003B: /* lifetime energy Wh, low 16 -> split 7 digits (XXXX.XXX kWh) */
-            {
-            	u32 wh = ((u32)g_lifeWhHi << 16) | data[0];
-                char d[2] = {0, 0};
-                d[0] = '0' + (wh / 1000000u) % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 49), d);
-                d[0] = '0' + (wh / 100000u)  % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 48), d);
-                d[0] = '0' + (wh / 10000u)   % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 47), d);
-                d[0] = '0' + (wh / 1000u)    % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 45), d);
-                d[0] = '0' + (wh / 100u)     % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 44), d);
-                d[0] = '0' + (wh / 10u)      % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 43), d);
-                d[0] = '0' + (wh)            % 10; grf_label_set_txt(GCL(GRF_VIEW4_ID, 42), d);
-                break;
-            }
+                        {
+                        	g_lifeWh = ((u32)g_lifeWhHi << 16) | data[0];
+                            odo_paint(g_lifeWh);
+                            break;
+                        }
             }
         }
 
