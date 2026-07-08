@@ -393,8 +393,11 @@ static void view1_hide_boot_msg(void)
 	/* grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_SCRIM_ID), 1);  // add once scrim ID known */
 }
 
+extern void view1_tele_apply(void);
 void view1_entry(void) 
 {
+	view1_sync_armed();
+	view1_tele_apply();       /* repaint live labels from shadow (kills default-text flash) */
 	view1_sync_armed();
 		view4_request_settings();   /* HMI is up -> pull saved settings into the shadow */
 		view1_apply_theme();

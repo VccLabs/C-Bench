@@ -761,6 +761,23 @@ static void elapsed_paint(u16 s) /* MM:SS, rolls to H:MM:SS past 1h */
     grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_ELAPSED), b);
 }
 
+/* Live-telemetry shadows for view1 — repainted on entry so the IDE-default
+   text ("88.88" etc.) never flashes before the next 2 Hz push. */
+static u16 g_v_mV = 0, g_i_mA = 0, g_p_dW = 0, g_elapsed_s = 0;
+void view1_tele_apply(void) /* called from view1_entry, after control reset */
+{
+    char b[16];
+    snprintf(b, sizeof(b), "%u.%02u", g_v_mV / 1000, (g_v_mV % 1000) / 10);
+    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), b);
+    snprintf(b, sizeof(b), "%u.%03u A", g_i_mA / 1000, g_i_mA % 1000);
+    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), b);
+    snprintf(b, sizeof(b), "%u.%u W", g_p_dW / 10, g_p_dW % 10);
+    grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), b);
+    wh_paint();
+    elapsed_paint(g_elapsed_s);
+    ap_paint();
+}
+
 static void boot_state_paint(u8 last_used) /* 0 = Off white, 1 = Last used white */
 {
     grf_color_t on = TCOL(TC_TXT);                                                     /* selected   = primary */
@@ -930,7 +947,8 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
     switch (addr)
     {
     case 0x0010: /* voltage mV (numeric label only; arc eased via 0x001B) */
-        snprintf(buf, sizeof(buf), "%u.%02u", data[0] / 1000, (data[0] % 1000) / 10);
+            g_v_mV = data[0];
+            snprintf(buf, sizeof(buf), "%u.%02u", data[0] / 1000, (data[0] % 1000) / 10);
         grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_VOLT), buf);
         break;
     case 0x001B: /* eased arc value (0..280) from RP analog ramp */
@@ -938,11 +956,13 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         grf_arc_set_value(GCL(GRF_VIEW1_ID, ARC_VOLT), g_arc);
         break;
     case 0x0011: /* current mA */
-        snprintf(buf, sizeof(buf), "%u.%03u A", data[0] / 1000, data[0] % 1000);
+            g_i_mA = data[0];
+            snprintf(buf, sizeof(buf), "%u.%03u A", data[0] / 1000, data[0] % 1000);
         grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_CURR), buf);
         break;
     case 0x0012: /* power dW (0.1W) */
-        snprintf(buf, sizeof(buf), "%u.%u W", data[0] / 10, data[0] % 10);
+            g_p_dW = data[0];
+            snprintf(buf, sizeof(buf), "%u.%u W", data[0] / 10, data[0] % 10);
         grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_POWER), buf);
         break;
     case 0x0013: /* session energy mWh, low 16 */
@@ -954,7 +974,8 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         wh_paint();
         break;
     case 0x0018: /* session elapsed seconds */
-        elapsed_paint(data[0]);
+            g_elapsed_s = data[0];
+            elapsed_paint(data[0]);
         break;
     case 0x0019: /* active profile type */
         g_ap_type = (u8)data[0];
