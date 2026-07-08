@@ -739,6 +739,7 @@ static void bright_slider(u8 pct)
 {
     g_bright_guard = 1;
     grf_slider_set_value(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), pct);
+    grf_ctrl_force_refresh(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD)); /* redraw now, no default-0 flash on entry */
     g_bright_guard = 0;
 }
 
