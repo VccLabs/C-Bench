@@ -6,7 +6,7 @@
 	"start_page":	6,
 	"cacheImg":	20,
 	"app_ver":	"1.0.0",
-	"comp_time":	"260707151311",
+	"comp_time":	"260708161801",
 	"init_allview":	0,
 	"rotate":	0,
 	"show_en":	0,
@@ -39,7 +39,7 @@
 			"on_view":	0
 		}
 	},
-	"ctrl_max":	110,
+	"ctrl_max":	200,
 	"version":	"1.2.9.1",
 	"views":	[{
 			"pageId":	1,

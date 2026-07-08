@@ -122,4 +122,12 @@
   "imageId" : 31,
   "imagePath" : "boot-popup-light.png",
   "child" : [ ]
+}, {
+  "imageId" : 32,
+  "imagePath" : "nav-pin-map-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 33,
+  "imagePath" : "nav-pin-map-light.png",
+  "child" : [ ]
 } ]
