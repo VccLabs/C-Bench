@@ -604,6 +604,44 @@ static void theme_apply_view5(void)
     grf_img_set_src(GCL(GRF_VIEW5_ID, 8), g_dark ? "theme-light.png" : "theme-dark.png"); /* image0 toggle */
 }
 
+/* ── view6 (Pin Map) themed control IDs ── */
+#define V6_LOGO 1    /* image0 — logo             img swap */
+#define V6_BRAND 2   /* label0 — "C-Bench"        txt   */
+#define V6_HDR 3     /* label1 — "pin map"        txt2  */
+#define V6_THEME 4   /* image1 — theme toggle     img swap */
+#define V6_HINT1 5   /* label2 — "← Headers.."    txt2  */
+#define V6_HINT2 6   /* label3 — "left edge"      orange */
+#define V6_HINT3 7   /* label4 — ".  pins face.." txt2  */
+#define V6_LEG_GND 14  /* label11 — "GND"    txt2 */
+#define V6_LEG_PWR 15  /* label12 — "Power"  txt2 */
+#define V6_LEG_I2C 16  /* label13 — "I2C"    txt2 */
+#define V6_LEG_UART 17 /* label14 — "UART"   txt2 */
+#define V6_LEG_FN 18   /* label15 — "Special fn" txt2 */
+#define V6_LEG_SWD 19  /* label16 — "SWD"    txt2 */
+#define V6_NAV 140   /* image2 — nav bar          img swap */
+
+static void theme_apply_view6(void)
+{
+    grf_view_set_bgcolor(GRF_VIEW6_ID, TCOL(TC_BG)); /* screen bg */
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_BRAND), TC_TXT);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_HDR), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_HINT1), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_HINT2), TC_ORANGE);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_HINT3), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_LEG_GND), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_LEG_PWR), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_LEG_I2C), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_LEG_UART), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_LEG_FN), TC_TXT2);
+    THEME_TXT(GCL(GRF_VIEW6_ID, V6_LEG_SWD), TC_TXT2);
+    grf_img_set_src(GCL(GRF_VIEW6_ID, V6_LOGO),
+                    g_dark ? "logo-light.png" : "logo-dark.png");
+    grf_img_set_src(GCL(GRF_VIEW6_ID, V6_THEME),
+                    g_dark ? "theme-light.png" : "theme-dark.png");
+    grf_img_set_src(GCL(GRF_VIEW6_ID, V6_NAV),
+                    g_dark ? "nav-pin-map-light.png" : "nav-pin-map-dark.png");
+}
+
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
     theme_apply_view1();
@@ -611,6 +649,7 @@ static void theme_apply(void) /* repaint all themed views from g_dark */
     theme_apply_view3();
     theme_apply_view4();
     theme_apply_view5();
+    theme_apply_view6();
 }
 
 void view1_apply_theme(void) { theme_apply(); } /* view1 entry: repaint from shadow */
@@ -618,6 +657,7 @@ void view2_apply_theme(void) { theme_apply(); } /* view2 entry: repaint from sha
 void view3_apply_theme(void) { theme_apply(); } /* view3 entry: repaint from shadow */
 void view4_apply_theme(void) { theme_apply(); } /* view4 entry: repaint from shadow */
 void view5_apply_theme(void) { theme_apply(); } /* view5 entry: repaint from shadow */
+void view6_apply_theme(void) { theme_apply(); } /* view6 entry: repaint from shadow */
 void view1_toggle_theme(void)                   /* user tap: flip + apply + persist */
 {
 	g_dark ^= 1;

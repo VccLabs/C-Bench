@@ -32,13 +32,10 @@ static void image0_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
+extern void view1_toggle_theme(void);
 static void image1_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
 }
 
 
@@ -1212,13 +1209,10 @@ static void label117_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label136_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label136_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Settings (view4) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW4_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
@@ -1612,23 +1606,17 @@ static void label157_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label159_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label159_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Monitor (view1) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
-static void label158_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label158_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Profiles (view2) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW2_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
@@ -1642,13 +1630,10 @@ static void image2_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label160_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label160_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Battery (view3) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW3_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 #include "../../../libs/appscc/view6_cc.h"
@@ -1657,9 +1642,11 @@ void view6_init(void)
 	grf_view_create(GRF_VIEW6_ID,view_ctrls_fun_t,sizeof(view_ctrls_fun_t)/sizeof(grf_ctrl_fun_t));
 }
 
+extern void view6_apply_theme(void);
+
 void view6_entry(void)
 {
-
+    view6_apply_theme();
 }
 
 void view6_exit(void)
