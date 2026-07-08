@@ -620,16 +620,18 @@ static void theme_apply_view5(void)
 #define V6_LEG_SWD 19  /* label16 — "SWD"    txt2 */
 #define V6_NAV 140   /* image2 — nav bar          img swap */
 
-/* Pin-map chips — grey fill (TC_SURF2). Opacity is set in the IDE
-   (private properties), so no set_bg_opa here. */
-static const u8 V6_CHIP_MUTED[] = {       /* grey caption text (TC_TXT2) */
-    61, 121, 79, 80, 81,                  /* Style A */
+/* Pin-map chips. Group A/B opacity is forced opaque (255) at runtime,
+   overriding the IDE private-property transparency. */
+static const u8 V6_CHIP_C[] = {           /* Style C: TC_SURF2 fill + muted text */
     21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    31, 32, 33, 34, 35, 36, 37, 38, 39, 40 /* Style C */
+    31, 32, 33, 34, 35, 36, 37, 38, 39, 40
 };
-static const u8 V6_CHIP_PRIM[] = {        /* primary text (TC_TXT: #fff dark / #000 light) */
+static const u8 V6_CHIP_A[] = {           /* Style A: TC_CHIP fill (white in light) + muted text */
+    61, 121, 79, 80, 81
+};
+static const u8 V6_CHIP_B[] = {           /* Style B: TC_CHIP fill (white in light) + primary text */
     63, 122, 65, 124, 68, 127, 69, 128, 70, 129,
-    71, 130, 72, 131, 74, 134, 76, 135, 77, 136 /* Style B */
+    71, 130, 72, 131, 74, 134, 76, 135, 77, 136
 };
 
 static void theme_apply_view6(void)
@@ -653,16 +655,29 @@ static void theme_apply_view6(void)
     grf_img_set_src(GCL(GRF_VIEW6_ID, V6_NAV),
                     g_dark ? "nav-pin-map-light.png" : "nav-pin-map-dark.png");
 
-    for (u8 i = 0; i < sizeof(V6_CHIP_MUTED) / sizeof(V6_CHIP_MUTED[0]); i++) {
-            grf_ctrl_t *c = GCL(GRF_VIEW6_ID, V6_CHIP_MUTED[i]);
+    for (u8 i = 0; i < sizeof(V6_CHIP_C) / sizeof(V6_CHIP_C[0]); i++) {
+            grf_ctrl_t *c = GCL(GRF_VIEW6_ID, V6_CHIP_C[i]);
             THEME_BG(c, TC_SURF2);
             THEME_TXT(c, TC_TXT2);
         }
-        for (u8 i = 0; i < sizeof(V6_CHIP_PRIM) / sizeof(V6_CHIP_PRIM[0]); i++) {
-            grf_ctrl_t *c = GCL(GRF_VIEW6_ID, V6_CHIP_PRIM[i]);
-            THEME_BG(c, TC_SURF2);
+        for (u8 i = 0; i < sizeof(V6_CHIP_A) / sizeof(V6_CHIP_A[0]); i++) {
+            grf_ctrl_t *c = GCL(GRF_VIEW6_ID, V6_CHIP_A[i]);
+            THEME_BG(c, TC_CHIP);
+            grf_ctrl_style_set_bg_opa(c, 255, 0);
+            THEME_TXT(c, TC_TXT2);
+        }
+        for (u8 i = 0; i < sizeof(V6_CHIP_B) / sizeof(V6_CHIP_B[0]); i++) {
+            grf_ctrl_t *c = GCL(GRF_VIEW6_ID, V6_CHIP_B[i]);
+            THEME_BG(c, TC_CHIP);
+            grf_ctrl_style_set_bg_opa(c, 255, 0);
             THEME_TXT(c, TC_TXT);
         }
+
+
+        /* Pin-map grid lines (label161..179, ids 166–184) — bg fill only, no text */
+            for (u8 id = 166; id <= 184; id++)
+                grf_ctrl_style_set_bg_color(GCL(GRF_VIEW6_ID, id),
+                    g_dark ? GRF_COLOR_GET(0xDC, 0xDC, 0xE1) : GRF_COLOR_GET(0x12, 0x12, 0x12), 0);
 
 }
 

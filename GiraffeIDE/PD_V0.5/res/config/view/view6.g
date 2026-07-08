@@ -724,7 +724,7 @@
         },
         "size" : {
           "width" : 701,
-          "height" : 481
+          "height" : 1546
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -7454,6 +7454,708 @@
           "color" : 3199320,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 14
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label161",
+        "id" : 166,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 58
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label162",
+        "id" : 167,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 129
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL162_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label163",
+        "id" : 168,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 200
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL163_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label164",
+        "id" : 169,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 271
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL164_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label165",
+        "id" : 170,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 342
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL165_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label166",
+        "id" : 171,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 413
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL166_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label167",
+        "id" : 172,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 484
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL167_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label168",
+        "id" : 173,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 555
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL168_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label169",
+        "id" : 174,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 626
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL169_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label170",
+        "id" : 175,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 697
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL170_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label171",
+        "id" : 176,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 768
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL171_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label172",
+        "id" : 177,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 839
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL172_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label173",
+        "id" : 178,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 910
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL173_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label174",
+        "id" : 179,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 981
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL174_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label175",
+        "id" : 180,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 1052
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL175_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label176",
+        "id" : 181,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 1123
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL176_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label177",
+        "id" : 182,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 1194
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL177_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label178",
+        "id" : 183,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 1265
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL178_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label179",
+        "id" : 184,
+        "parent_id" : 20,
+        "pt" : {
+          "x" : 7,
+          "y" : 1336
+        },
+        "size" : {
+          "width" : 680,
+          "height" : 2
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW6_LABEL179_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1184274,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
         },
         "img_t" : { }
       } ]

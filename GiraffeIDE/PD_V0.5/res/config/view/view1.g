@@ -75,7 +75,6 @@
       },
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "88.88",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -343,7 +342,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "6.7",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -376,7 +374,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "6.7",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -576,7 +573,6 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "7.41",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -821,7 +817,6 @@
       },
       "animspeed" : 50,
       "align_e" : 35,
-      "txt" : "08:15",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
