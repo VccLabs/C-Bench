@@ -724,7 +724,7 @@
         },
         "size" : {
           "width" : 701,
-          "height" : 456
+          "height" : 481
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -3257,7 +3257,7 @@
           }
         },
         "txt_t" : {
-          "color" : 9671577,
+          "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 14
         },
@@ -3306,7 +3306,7 @@
           }
         },
         "txt_t" : {
-          "color" : 9671577,
+          "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 14
         },
@@ -3355,7 +3355,7 @@
           }
         },
         "txt_t" : {
-          "color" : 9671577,
+          "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 14
         },
@@ -3651,7 +3651,7 @@
         "txt_t" : {
           "color" : 689407,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
-          "font_size" : 13
+          "font_size" : 12
         },
         "img_t" : { }
       } ]
@@ -6012,7 +6012,7 @@
           }
         },
         "txt_t" : {
-          "color" : 9671577,
+          "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 14
         },
@@ -6061,7 +6061,7 @@
           }
         },
         "txt_t" : {
-          "color" : 9671577,
+          "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 14
         },
@@ -6110,7 +6110,7 @@
           }
         },
         "txt_t" : {
-          "color" : 9671577,
+          "color" : 16777215,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 14
         },
@@ -6406,7 +6406,7 @@
         "txt_t" : {
           "color" : 689407,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
-          "font_size" : 13
+          "font_size" : 12
         },
         "img_t" : { }
       } ]

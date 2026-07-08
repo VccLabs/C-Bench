@@ -620,6 +620,18 @@ static void theme_apply_view5(void)
 #define V6_LEG_SWD 19  /* label16 — "SWD"    txt2 */
 #define V6_NAV 140   /* image2 — nav bar          img swap */
 
+/* Pin-map chips — grey fill (TC_SURF2). Opacity is set in the IDE
+   (private properties), so no set_bg_opa here. */
+static const u8 V6_CHIP_MUTED[] = {       /* grey caption text (TC_TXT2) */
+    61, 121, 79, 80, 81,                  /* Style A */
+    21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+    31, 32, 33, 34, 35, 36, 37, 38, 39, 40 /* Style C */
+};
+static const u8 V6_CHIP_PRIM[] = {        /* primary text (TC_TXT: #fff dark / #000 light) */
+    63, 122, 65, 124, 68, 127, 69, 128, 70, 129,
+    71, 130, 72, 131, 74, 134, 76, 135, 77, 136 /* Style B */
+};
+
 static void theme_apply_view6(void)
 {
     grf_view_set_bgcolor(GRF_VIEW6_ID, TCOL(TC_BG)); /* screen bg */
@@ -640,6 +652,18 @@ static void theme_apply_view6(void)
                     g_dark ? "theme-light.png" : "theme-dark.png");
     grf_img_set_src(GCL(GRF_VIEW6_ID, V6_NAV),
                     g_dark ? "nav-pin-map-light.png" : "nav-pin-map-dark.png");
+
+    for (u8 i = 0; i < sizeof(V6_CHIP_MUTED) / sizeof(V6_CHIP_MUTED[0]); i++) {
+            grf_ctrl_t *c = GCL(GRF_VIEW6_ID, V6_CHIP_MUTED[i]);
+            THEME_BG(c, TC_SURF2);
+            THEME_TXT(c, TC_TXT2);
+        }
+        for (u8 i = 0; i < sizeof(V6_CHIP_PRIM) / sizeof(V6_CHIP_PRIM[0]); i++) {
+            grf_ctrl_t *c = GCL(GRF_VIEW6_ID, V6_CHIP_PRIM[i]);
+            THEME_BG(c, TC_SURF2);
+            THEME_TXT(c, TC_TXT);
+        }
+
 }
 
 static void theme_apply(void) /* repaint all themed views from g_dark */
