@@ -928,6 +928,58 @@ void view2_apply_status(void) /* label91: source summary or empty-state prompt *
     }
 }
 
+void view2_render_list(void) /* render rows from cached g_prof[] (entry + 0x0101) */
+{
+    g_sel = 0xFF;
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
+    use_btn_set(0, "Select a rail");
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY1), g_prof_n ? 1 : 0);
+    grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY2), g_prof_n ? 1 : 0);
+    for (u8 i = 0; i < g_prof_n; i++)
+        fill_row(i, &g_prof[i]);
+    for (u8 i = g_prof_n; i < MAX_PROF; i++)
+        show_row(i, 0); /* hide unused rows */
+    view2_apply_status();
+    for (u8 i = 0; i < g_prof_n; i++)
+        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
+    if (g_prof_n == 0)
+        g_applied = 0xFF;
+    if (g_applied != 0xFF && g_applied < g_prof_n)
+    {
+        g_sel = g_applied;
+        highlight_row(g_applied, 1);
+    }
+    view2_paint_cards();
+}
+
+/* view3 (Battery) live shadows — repainted on entry to kill default-text flash */
+static u16 g_cell_mV = 0, g_soc = 0xFFFF;
+static u8 g_chg = 0;
+void view3_tele_apply(void)
+{
+    char b[12];
+    if (g_cell_mV == 0)
+        snprintf(b, sizeof(b), "-.- V");
+    else
+        snprintf(b, sizeof(b), "%u.%02u V", g_cell_mV / 1000, (g_cell_mV % 1000) / 10);
+    grf_label_set_txt(GCL(GRF_VIEW3_ID, 11), b); /* cell voltage label8 id11 */
+    {
+        u16 arc = (g_soc == 0xFFFF) ? 0 : (u16)((u32)g_soc * 628 / 100);
+        if (g_soc == 0xFFFF)
+            snprintf(b, sizeof(b), "-.-");
+        else
+            snprintf(b, sizeof(b), "%u", g_soc);
+        grf_label_set_txt(GCL(GRF_VIEW3_ID, 9), b);    /* SoC label6 id9 */
+        grf_arc_set_value(GCL(GRF_VIEW3_ID, 15), arc); /* arc0 id15, full=628 */
+    }
+    {
+        const char *txt = (g_chg == 1) ? "Charging" : (g_chg == 2) ? "Charged" : "No battery";
+        grf_label_set_txt(GCL(GRF_VIEW3_ID, 2), txt); /* state label0 id2 */
+        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW3_ID, 3),
+                                    (g_chg == 0) ? TCOL(TC_SURF2) : TCOL(TC_GREEN), 0); /* dot label1 id3 */
+    }
+}
+
 static u16 g_lifeWhHi = 0;
 void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
 {
@@ -986,9 +1038,10 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         ap_paint();
         break;
     case 0x001C: /* battery cell voltage mV (0 = no battery) */
-    {
-        char b[12];
-        if (data[0] == 0)
+        {
+            char b[12];
+            g_cell_mV = data[0];
+            if (data[0] == 0)
             snprintf(b, sizeof(b), "-.- V");
         else
             snprintf(b, sizeof(b), "%u.%02u V", data[0] / 1000, (data[0] % 1000) / 10);
@@ -996,9 +1049,10 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         break;
     }
     case 0x001D: /* battery SoC % (0xFFFF = no battery) */
-    {
-        char b[8];
-        u16 arc = (data[0] == 0xFFFF) ? 0 : (u16)((u32)data[0] * 628 / 100);
+        {
+            char b[8];
+            g_soc = data[0];
+            u16 arc = (data[0] == 0xFFFF) ? 0 : (u16)((u32)data[0] * 628 / 100);
         if (data[0] == 0xFFFF)
             snprintf(b, sizeof(b), "-.-");
         else
@@ -1042,37 +1096,20 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         g_prof_n = grf_reg_get(0x0100);
         if (g_prof_n > MAX_PROF)
             g_prof_n = MAX_PROF;
-        g_sel = 0xFF;
-        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ADJ_CONT), 1);
-        use_btn_set(0, "Select a rail");
-        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY1), g_prof_n ? 1 : 0);
-        grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, LBL_EMPTY2), g_prof_n ? 1 : 0);
         for (u8 i = 0; i < g_prof_n; i++)
-        {
-            g_prof[i].type = grf_reg_get(0x0110 + i * 4 + 0);
-            g_prof[i].vmin = grf_reg_get(0x0110 + i * 4 + 1);
-            g_prof[i].vmax = grf_reg_get(0x0110 + i * 4 + 2);
-            g_prof[i].imax = grf_reg_get(0x0110 + i * 4 + 3);
-            fill_row(i, &g_prof[i]);
-        }
-        for (u8 i = g_prof_n; i < MAX_PROF; i++)
-            show_row(i, 0);   /* hide unused rows */
-        view2_apply_status(); /* refresh label91 from the new list */
-        for (u8 i = 0; i < g_prof_n; i++)
-            grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, ROW_ID[i][COL_CHECK]), 1);
-        if (g_prof_n == 0)
-            g_applied = 0xFF; /* source gone -> forget selection */
-        if (g_applied != 0xFF && g_applied < g_prof_n)
-        {
-            g_sel = g_applied; /* show active rail */
-            highlight_row(g_applied, 1);
-        }
-        view2_paint_cards(); /* apply all row column colors after render */
-        break;
+                {
+                    g_prof[i].type = grf_reg_get(0x0110 + i * 4 + 0);
+                    g_prof[i].vmin = grf_reg_get(0x0110 + i * 4 + 1);
+                    g_prof[i].vmax = grf_reg_get(0x0110 + i * 4 + 2);
+                    g_prof[i].imax = grf_reg_get(0x0110 + i * 4 + 3);
+                }
+                view2_render_list(); /* render rows from g_prof + selection + cards */
+                break;
     }
     case 0x001E: /* charge state: 0=no battery, 1=charging, 2=complete */
-    {
-        const char *txt = (data[0] == 1)   ? "Charging"
+        {
+            g_chg = (u8)data[0];
+            const char *txt = (data[0] == 1)   ? "Charging"
                           : (data[0] == 2) ? "Charged"
                                            : "No battery";
         grf_label_set_txt(GCL(GRF_VIEW3_ID, 2), txt); /* label0 id2 */

@@ -993,11 +993,13 @@ void view2_init(void)
 	grf_view_create(GRF_VIEW2_ID,view_ctrls_fun_t,sizeof(view_ctrls_fun_t)/sizeof(grf_ctrl_fun_t));
 }
 
+extern void view2_render_list(void);
 void view2_entry(void)
 {
 	view2_reset_panel();   /* clear "." placeholders, hide panel, reset Use btn */
 		view2_apply_status();  /* restore source summary / empty prompt after view reset */
 		view2_apply_theme();   /* restore dark/light colors after view reset */
+		view2_render_list();   /* repaint rows from cached g_prof (kills default flash) */
 	}
 
 void view2_exit(void)

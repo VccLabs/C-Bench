@@ -167,9 +167,11 @@ void view3_init(void)
 
 extern void view3_apply_theme(void);
 
+extern void view3_tele_apply(void);
 void view3_entry(void)
 {
     view3_apply_theme();
+    view3_tele_apply();   /* repaint SoC/cell/state from shadow (kills default-text flash) */
 }
 
 void view3_exit(void)
