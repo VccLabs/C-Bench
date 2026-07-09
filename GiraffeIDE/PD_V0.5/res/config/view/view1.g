@@ -945,7 +945,7 @@
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,
-        "click_area" : 25
+        "click_area" : 12
       },
       "init_img" : "theme-dark.png",
       "rotate_pt" : { }
@@ -998,6 +998,53 @@
       },
       "init_img" : "boot-popup-dark.png",
       "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label27",
+        "id" : 34,
+        "pt" : {
+          "x" : 557,
+          "y" : 25
+        },
+        "size" : {
+          "width" : 57,
+          "height" : 57
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "click_area" : 12,
+        "controlIDEnum" : "VIEW1_LABEL27_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : ": : :",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1842206,
+          "radius" : -1,
+          "opa" : 255,
+          "padding" : {
+            "top" : -2,
+            "bottom" : 15,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 16752394,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 22
+        },
+        "img_t" : { }
+      } ]
     }
   }, {
     "CLASSNAME" : "label",
