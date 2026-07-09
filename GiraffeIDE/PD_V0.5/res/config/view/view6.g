@@ -753,8 +753,8 @@
     "theme" : "youth",
     "property" : {
       "pub_t" : {
-        "name" : "label136",
-        "id" : 140,
+        "name" : "label158",
+        "id" : 162,
         "pt" : {
           "x" : 25,
           "y" : 640
@@ -768,7 +768,7 @@
         "alpha" : 255,
         "pub" : true,
         "click_area" : 25,
-        "controlIDEnum" : "VIEW6_LABEL159_ID"
+        "controlIDEnum" : "VIEW6_LABEL158_ID"
       },
       "auto_hight" : 1,
       "animspeed" : 50,
