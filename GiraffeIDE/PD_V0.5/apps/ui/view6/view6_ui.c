@@ -1605,17 +1605,10 @@ static void label157_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label136_event(grf_ctrl_t *ctrl, grf_event_e event)   /* back -> originating view (ctrl id 140) */
+static void label158_event(grf_ctrl_t *ctrl, grf_event_e event)   /* back -> originating view (ctrl id 162) */
 {
 	if (event == GRF_EVENT_CLICKED)
 		grf_view_set_dis_view_anim(g_prev_view, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
-}
-
-
-static void label158_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Profiles (view2) */
-{
-	if (event == GRF_EVENT_CLICKED)
-		grf_view_set_dis_view_anim(GRF_VIEW2_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
@@ -1834,7 +1827,7 @@ extern void view6_apply_theme(void);
 void view6_entry(void)
 {
     view6_apply_theme();
-    grf_label_set_txt(GCL(GRF_VIEW6_ID, 140), "Back"); /* back label = ctrl 140 (label136) */
+    grf_label_set_txt(GCL(GRF_VIEW6_ID, 162), "Back"); /* back label = ctrl 162 (label158) */
 }
 
 void view6_exit(void)
