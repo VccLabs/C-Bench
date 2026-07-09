@@ -475,6 +475,28 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     (`label2` id 5, blue bg + white text), headers/labels (ids 3/4/6/7), and image
     swaps `saved-dark/-light.png` (id 9) + `theme-dark/-light.png`. Theme toggle
     `image0` (id 8) → `view1_toggle_theme()`.
+- **view6 — Pin Map:** static reference page for the 2×20 left-edge GPIO breakout
+  (the header table in "RP2354A pin map"). Fully themed (`theme_apply_view6`): logo
+  (id 1) + theme-toggle (id 4) image swaps, brand/header/hint labels, six legend
+  labels (GND/Power/I2C/UART/Special-fn/SWD → `TC_TXT2`), the **45 pin chips**
+  (grouped: `TC_SURF2`-fill muted-text set; and a `TC_CHIP`-fill set — `#2C2C2E`
+  dark / **white** in light — forced opaque via `grf_ctrl_style_set_bg_opa(c,255,0)`
+  since IDE private-property transparency is overridden), and the 19 grid-line
+  bars (ids 166–184, inline `#121212` dark / `#DCDCE1` light). **Back button** is a
+  copied label (Control ID **162**, handler `label158_event`) → returns to the
+  originating view via `g_prev_view` (see Pin-Map shortcut). ⚠ view6's IDE label
+  names/IDs do **not** match the codegen enum (`view6.h`) — the enum value is the
+  runtime Control ID; map through `view6.h`, and note runtime-set text only renders
+  glyphs the control's font was compiled with (see gotchas).
+
+**Pin-Map shortcut (per-page):** view1–view4 each carry an orange redirect button
+(→ view6): `label27`/id34, `label90`/id100, `label3`/id17, `label60`/id79, plus the
+Settings "Go to Pin Map" row `label53`/id71. Each is themed `TC_SURF` bg + `TC_ORANGE`
+text and, before navigating, sets a global `g_prev_view` so view6's Back returns to
+the right page. Visibility is gated by **view4 `sw2`** (id 76) → `view4_set_pinbtn()`,
+persisted **panel-local** to `D:/pinbtn.bin` (mirrors `giften.bin`; `pinbtn_load_boot()`
+runs in `grf_main`, **defaults ON**). Each view's `_entry` applies `g_pinbtn` via
+`grf_ctrl_set_hidden`.
 
 Row data lives in a `ROW_ID[13][6]` table in `grf_hw_uart.c` mapping each row's
 six Control IDs; `fill_row()` / `show_row()` / `highlight_row()` / selection all
@@ -517,9 +539,12 @@ width 27 / radius 12); **image assets** are theme-swapped with `grf_img_set_src`
 | `TC_CHIP`   | `#2C2C2E` | `#FFFFFF` | FIX badge (dark chip, white in light)    |
 
 `theme_apply()` repaints from the shadow and dispatches to per-view
-`theme_apply_viewN()` (wired into each `viewN_apply_theme` entry). **view1** (Monitor),
-**view2** (Profiles), and **view4** (Settings) are fully themed; **view3** (Battery)
-theming is **not yet added**. Selected-row tint uses `SEL_TINT` (orangy `#3A2A10`
+`theme_apply_viewN()` (wired into each `viewN_apply_theme` entry). **All six views
+are fully themed** (view1 Monitor, view2 Profiles incl. the AVS/PPS adjust popup
+`container1` id82 = `TC_SURF` + labels id85/86 = `TC_TXT2`, view3 Battery, view4
+Settings incl. the pin-map section + `acc-orange`/`acc-black` image swaps, view5
+editor, view6 Pin Map). view1's boot gift popup is themed too (`image4` id32 asset
+swap + `label24` id33 = `TC_TXT`). Selected-row tint uses `SEL_TINT` (orangy `#3A2A10`
 dark / `#FFECD1` light) — note the ternary keys on `g_dark` where `1`=light. On
 view2, `view2_paint_cards()` is the
 single row-color authority — called on render (`0x0101`), entry, and toggle — and
@@ -649,10 +674,16 @@ shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_sta
   `pct*99/100`. It's a global backlight call (no view guard needed).
 - **Registers are 16-bit.** For 32-bit quantities (energy, odometer) split high/low
   across two registers; they arrive one at a time, so reassemble via a panel shadow.
-- **Continuous 2 Hz pushes self-heal the view-entry control reset** — telemetry-style
-  labels (V/I/P, session energy, elapsed, active profile) need no shadow because the
-  next push (≤500 ms) repaints them. Only *state* controls (toggles, settings,
-  theme) need a shadow + `_entry` re-apply.
+- **Entry repaint kills the default-text flash.** On view load a control briefly
+  renders its IDE-authored default (e.g. `88.88`, or `"Text"`) until the next 2 Hz
+  push (≤500 ms) — a visible flash. Fix: shadow the last value for **every** dynamic
+  control and repaint in `_entry`, not just state controls. Implemented as
+  `view1_tele_apply` (V/I/P/energy/elapsed/profile), `view2_render_list` (rows from
+  cached `g_prof[]`), `view3_tele_apply` (SoC/cell/state), and view4's
+  `odo_paint(g_lifeWh)`. Telemetry handlers now also store their raw shadow.
+- **Sliders don't repaint on `set_value` alone** — the knob shows the IDE default (0)
+  for a frame on entry. Call `grf_ctrl_force_refresh(ctrl)` right after
+  `grf_slider_set_value` (see `bright_slider`) to redraw immediately.
 - **INA260 reads can be negative (near no-load) or railed (655 W on glitch).** Casting
   a negative float to unsigned yields garbage. Validate/clamp before display **and**
   before integrating, or an energy integrator runs away.
@@ -669,6 +700,17 @@ shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_sta
   `grf_hw_init`) or the first view paints in the default theme for ~1 s then flips.
 - **The TDO boot logo is a static PNG** set via **Tools → Set boot logo** (PNG,
   ≤768 KB, ≤screen res). No runtime API — it can't follow the theme; pick one.
+- **Runtime-set text renders as white boxes (tofu) if the glyphs weren't compiled.**
+  Giraffe subsets clipped TTF fonts to only the characters used by static IDE text.
+  `grf_label_set_txt(ctrl, "Back")` boxes if that control's font never included
+  `B/a/c/k`. Fix in the IDE: set the label's **static text** to include those chars
+  and regenerate the font (Tools → Font Tools → scan → generate), or drop the custom
+  font so it falls back to the built-in 16×16 English library.
+- **view6 IDE label names/IDs diverge from the codegen enum.** After deleting/adding
+  controls, the IDE's displayed Control ID may not exist in `view6.h` (e.g. the "back"
+  control the IDE calls id 164 had no enum; the bound control was id 162). Trust the
+  `viewN.h` enum + `viewN_cc.h` binding table, not the IDE ID; an unbound handler is
+  dead code even if it looks wired.
 
 ## Other
 
@@ -737,7 +779,7 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] **Theme persistence** plumbing (reg 0x0039, RP-backed, re-applied on entry).
 - [x] **Dark/light theme** extended across view1 + view2 (roles, image swaps, cards).
 - [x] **Analog arc easing** (RP ramps toward measured V, reg 0x001B ~25 Hz on change).
-- [ ] Extend theme to **view3 / view4** and any remaining view2 elements.
+- [x] Extend theme to **view3 / view4** and any remaining view2 elements.
 - [~] **Dark/light theme — IN PROGRESS.** Proven on a TEST set (view1 `label16`/
       `label17`/`label1`, ids 19/20/2) + toggle `label24` (id 28). **Next: extend to
       all objects across all 4 views.** See the "Theme" notes in Firmware behavior.
@@ -746,6 +788,13 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] **Gift message**: view5 editor → `D:/gift.txt`; view1 boot popup (image4/label24).
 - [x] **Gift popup enable** (view4 sw1 → `D:/giften.bin`, panel-local, defaults ON).
 - [x] **Theme extended** to view4 lifetime/gift cards + **view5** (fully themed + toggle).
-- [ ] **Pin Map page** (GPIO breakout labels) — mockup done (`HTML Mockups/cbench_pinmap_apple.html`), Giraffe view TBD.
-- [ ] Battery page (view3) content.
+- [x] **Pin Map page (view6)** — full themed GPIO-breakout reference (chips, grid,
+      legend); Back returns to originating view via `g_prev_view`.
+- [x] **Per-page Pin-Map shortcut buttons** (view1–4 + Settings row), gated by
+      view4 `sw2`, persisted panel-local to `D:/pinbtn.bin` (defaults ON).
+- [x] **Anti-flash entry repaint** across view1–4 (telemetry/rows/odometer from
+      shadow; slider `force_refresh`). Session energy now shows the `Wh` unit.
+- [x] Extend theme to **view3 / view4 / view5 / view6** and remaining view2 elements.
+- [x] Battery page (view3) content.
+- [ ] **About page** — final view; not yet built.
 - [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).
