@@ -1604,10 +1604,10 @@ static void label157_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label136_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Monitor (view1) */
+static void label136_event(grf_ctrl_t *ctrl, grf_event_e event)   /* back -> originating view (ctrl id 140) */
 {
 	if (event == GRF_EVENT_CLICKED)
-		grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
+		grf_view_set_dis_view_anim(g_prev_view, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
@@ -1833,7 +1833,7 @@ extern void view6_apply_theme(void);
 void view6_entry(void)
 {
     view6_apply_theme();
-    grf_label_set_txt(GCL(GRF_VIEW6_ID, 164), "Back"); /* overwrite stale IDE default text */
+    grf_label_set_txt(GCL(GRF_VIEW6_ID, 140), "Back"); /* back label = ctrl 140 (label136) */
 }
 
 void view6_exit(void)
