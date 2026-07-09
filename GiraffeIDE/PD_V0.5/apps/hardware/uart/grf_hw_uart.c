@@ -426,9 +426,12 @@ static void theme_apply_view1(void)
                     g_dark ? "nav-monitor-light.png" : "nav-monitor.png");
     grf_img_set_src(GCL(GRF_VIEW1_ID, 31),
                         g_dark ? "theme-light.png" : "theme-dark.png");
-        grf_img_set_src(GCL(GRF_VIEW1_ID, 28),
-                        g_dark ? "logo-light.png" : "logo-dark.png");
-}
+    grf_img_set_src(GCL(GRF_VIEW1_ID, 28),
+                            g_dark ? "logo-light.png" : "logo-dark.png");
+        grf_img_set_src(GCL(GRF_VIEW1_ID, 32),
+                        g_dark ? "boot-popup-light.png" : "boot-popup-dark.png"); /* image4 gift popup */
+        THEME_TXT(GCL(GRF_VIEW1_ID, 33), TC_TXT); /* label24 gift message #fff dark / #000 light */
+    }
 
 /* ── view2 (Profiles) themed control IDs ── */
 #define V2_BRAND 91 /* label85 — "C-Bench"     txt  */
