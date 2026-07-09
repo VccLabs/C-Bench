@@ -68,5 +68,14 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW4_LABEL48_ID,label48_event},
 	{VIEW4_LABEL49_ID,label49_event},
 	{VIEW4_LABEL51_ID,label51_event},
-	{VIEW4_LABEL50_ID,label50_event}
+	{VIEW4_LABEL50_ID,label50_event},
+	{VIEW4_LABEL52_ID,label52_event},
+	{VIEW4_LABEL54_ID,label54_event},
+	{VIEW4_LABEL55_ID,label55_event},
+	{VIEW4_LABEL56_ID,label56_event},
+	{VIEW4_LABEL57_ID,label57_event},
+	{VIEW4_SW2_ID,sw2_event},
+	{VIEW4_LABEL59_ID,label59_event},
+	{VIEW4_LABEL58_ID,label58_event},
+	{VIEW4_LABEL53_ID,label53_event}
 };
