@@ -248,7 +248,7 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 521
+          "height" : 516
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -2712,7 +2712,7 @@
         "parent_id" : 1,
         "pt" : {
           "x" : 22,
-          "y" : 850
+          "y" : 822
         },
         "size" : {
           "width" : 674,
@@ -2737,6 +2737,42 @@
         },
         "txt_t" : {
           "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label50",
+        "id" : 68,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 20,
+          "y" : 792
+        },
+        "size" : {
+          "width" : 200,
+          "height" : 32
+        },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL50_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "PIN MAP",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 9276819,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 15
         },
         "img_t" : { }
       } ]

@@ -471,9 +471,12 @@ static void theme_apply_view2(void)
                     g_dark ? "nav-profiles-light.png" : "nav-profiles.png");
     grf_img_set_src(GCL(GRF_VIEW2_ID, 99),
                         g_dark ? "theme-light.png" : "theme-dark.png");
-        grf_img_set_src(GCL(GRF_VIEW2_ID, 97),
-                        g_dark ? "logo-light.png" : "logo-dark.png");
-}
+    grf_img_set_src(GCL(GRF_VIEW2_ID, 97),
+                            g_dark ? "logo-light.png" : "logo-dark.png");
+        THEME_BG(GCL(GRF_VIEW2_ID, 82), TC_SURF);    /* container1 popup bg #1c1c1e/#fff */
+        THEME_TXT(GCL(GRF_VIEW2_ID, 85), TC_TXT2);   /* label80 "Set Voltage" */
+        THEME_TXT(GCL(GRF_VIEW2_ID, 86), TC_TXT2);   /* label81 "Set Current" */
+    }
 
 /* ── view3 (Battery) themed control IDs ── */
 #define V3_BRAND 8 /* label5 — "C-Bench"     txt   */
@@ -756,7 +759,7 @@ static u32 g_sess_mWh = 0; /* reassembled 32-bit session energy (mWh) */
 static void wh_paint(void) /* show as "X.XXX" (mWh resolution) */
 {
     char b[16];
-    snprintf(b, sizeof(b), "%u.%03u", (unsigned)(g_sess_mWh / 1000), (unsigned)(g_sess_mWh % 1000));
+    snprintf(b, sizeof(b), "%u.%03u Wh", (unsigned)(g_sess_mWh / 1000), (unsigned)(g_sess_mWh % 1000));
     grf_label_set_txt(GCL(GRF_VIEW1_ID, LBL_WH), b);
 }
 
