@@ -1,4 +1,5 @@
 #include "../../apps.h"
+extern u16 g_prev_view;
 
 
 

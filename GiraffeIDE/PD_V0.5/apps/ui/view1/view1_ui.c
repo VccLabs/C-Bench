@@ -1,4 +1,5 @@
 #include "../../apps.h"
+extern u16 g_prev_view;
 
 static void view1_hide_boot_msg(void);
 
