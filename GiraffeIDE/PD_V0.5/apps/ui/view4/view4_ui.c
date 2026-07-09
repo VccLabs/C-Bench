@@ -666,7 +666,10 @@ static void label52_event(grf_ctrl_t *ctrl, grf_event_e event)
 static void label53_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> Pin Map (view6) */
 {
 	if (event == GRF_EVENT_CLICKED)
+	{
+		g_prev_view = GRF_VIEW4_ID;
 		grf_view_set_dis_view_anim(GRF_VIEW6_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
+	}
 }
 
 
@@ -740,7 +743,10 @@ static void sw2_event(grf_ctrl_t *ctrl, grf_event_e event)       /* show/hide pe
 static void label60_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> Pin Map (view6) */
 {
 	if (event == GRF_EVENT_CLICKED)
+	{
+		g_prev_view = GRF_VIEW4_ID;
 		grf_view_set_dis_view_anim(GRF_VIEW6_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
+	}
 }
 
 #include "../../../libs/appscc/view4_cc.h"

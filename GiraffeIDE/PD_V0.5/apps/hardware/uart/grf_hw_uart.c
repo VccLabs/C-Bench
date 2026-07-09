@@ -109,6 +109,7 @@ void view4_set_giften(u8 on)     /* sw1 toggled: update + persist */
     if (f) { grf_fs_write(f, &g_giften, 1); grf_fs_close(f); }
 }
 
+u16 g_prev_view = GRF_VIEW1_ID;  /* view to return to from Pin Map back button */
 #define PINBTN_FILE "D:/pinbtn.bin"
 u8 g_pinbtn = 1;                 /* 1 = show per-page Pin Map buttons, 0 = hidden */
 void pinbtn_load_boot(void)      /* read persisted flag before first paint */

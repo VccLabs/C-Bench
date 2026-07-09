@@ -1209,10 +1209,11 @@ static void label117_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label136_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Settings (view4) */
+extern u16 g_prev_view;
+static void label159_event(grf_ctrl_t *ctrl, grf_event_e event)   /* back -> originating view */
 {
 	if (event == GRF_EVENT_CLICKED)
-		grf_view_set_dis_view_anim(GRF_VIEW4_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
+		grf_view_set_dis_view_anim(g_prev_view, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
@@ -1606,7 +1607,7 @@ static void label157_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label159_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Monitor (view1) */
+static void label136_event(grf_ctrl_t *ctrl, grf_event_e event)   /* nav -> Monitor (view1) */
 {
 	if (event == GRF_EVENT_CLICKED)
 		grf_view_set_dis_view_anim(GRF_VIEW1_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);

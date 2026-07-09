@@ -785,8 +785,11 @@ static void label91_event(grf_ctrl_t *ctrl, grf_event_e event)
 static void label90_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> Pin Map (view6) */
 {
 	if (event == GRF_EVENT_CLICKED)
-		grf_view_set_dis_view_anim(GRF_VIEW6_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
-}
+		{
+			g_prev_view = GRF_VIEW2_ID;
+			grf_view_set_dis_view_anim(GRF_VIEW6_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
+		}
+	}
 
 
 static void label88_event(grf_ctrl_t *ctrl, grf_event_e event)  /* nav -> view3 Battery */

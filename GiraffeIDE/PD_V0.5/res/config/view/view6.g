@@ -724,7 +724,7 @@
         },
         "size" : {
           "width" : 701,
-          "height" : 456
+          "height" : 431
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -749,152 +749,49 @@
       } ]
     }
   }, {
-    "CLASSNAME" : "image",
-    "theme" : "youth",
-    "type" : 19,
-    "property" : {
-      "pub_t" : {
-        "name" : "image2",
-        "id" : 140,
-        "ctrl_type" : 19,
-        "pt" : {
-          "y" : 641
-        },
-        "size" : {
-          "width" : 720,
-          "height" : 79
-        },
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true,
-        "controlIDEnum" : "VIEW6_IMAGE2_ID"
-      },
-      "init_img" : "nav-pin-map-dark.png",
-      "rotate_pt" : { }
-    }
-  }, {
     "CLASSNAME" : "label",
     "theme" : "youth",
     "property" : {
       "pub_t" : {
         "name" : "label136",
-        "id" : 162,
+        "id" : 140,
         "pt" : {
-          "x" : 540,
-          "y" : 641
+          "x" : 25,
+          "y" : 640
         },
         "size" : {
-          "width" : 180,
-          "height" : 79
+          "width" : 670,
+          "height" : 55
         },
         "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,
-        "controlIDEnum" : "VIEW6_LABEL136_ID"
-      },
-      "auto_hight" : 1,
-      "animspeed" : 50,
-      "align_e" : 34,
-      "styles" : [ {
-        "name" : "style",
-        "txt_t" : {
-          "opa" : 2147483647
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
-        "name" : "label158",
-        "id" : 163,
-        "pt" : {
-          "x" : 180,
-          "y" : 641
-        },
-        "size" : {
-          "width" : 180,
-          "height" : 79
-        },
-        "t_mode" : 1,
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true,
-        "controlIDEnum" : "VIEW6_LABEL158_ID"
-      },
-      "auto_hight" : 1,
-      "animspeed" : 50,
-      "align_e" : 34,
-      "styles" : [ {
-        "name" : "style",
-        "txt_t" : {
-          "opa" : 2147483647
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
-        "name" : "label159",
-        "id" : 164,
-        "pt" : {
-          "y" : 641
-        },
-        "size" : {
-          "width" : 180,
-          "height" : 79
-        },
-        "t_mode" : 1,
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true,
+        "click_area" : 25,
         "controlIDEnum" : "VIEW6_LABEL159_ID"
       },
       "auto_hight" : 1,
       "animspeed" : 50,
       "align_e" : 34,
+      "txt" : "Back",
       "styles" : [ {
         "name" : "style",
+        "body_t" : {
+          "main_color" : 689407,
+          "radius" : 18,
+          "opa" : 255,
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
         "txt_t" : {
-          "opa" : 2147483647
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
-        "name" : "label160",
-        "id" : 165,
-        "pt" : {
-          "x" : 360,
-          "y" : 641
-        },
-        "size" : {
-          "width" : 180,
-          "height" : 79
-        },
-        "t_mode" : 1,
-        "scrollbar_t" : { },
-        "alpha" : 255,
-        "pub" : true,
-        "controlIDEnum" : "VIEW6_LABEL160_ID"
-      },
-      "auto_hight" : 1,
-      "animspeed" : 50,
-      "align_e" : 34,
-      "styles" : [ {
-        "name" : "style",
-        "txt_t" : {
-          "opa" : 2147483647
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 24
         },
         "img_t" : { }
       } ]
