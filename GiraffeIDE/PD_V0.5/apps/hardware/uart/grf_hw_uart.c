@@ -586,9 +586,18 @@ static void theme_apply_view4(void)
         THEME_TXT(GCL(GRF_VIEW4_ID, 65), TC_TXT2);  /* label47 "Personalize..."   */
         THEME_TXT(GCL(GRF_VIEW4_ID, 66), TC_TXT2);  /* label48 "›"                */
         boot_state_paint(g_v4_boot); /* text colors (TC_TXT/grey) + chip show-hide */
-    theme_state_paint();         /* Dark/Light texts + chip show-hide */
-}
-
+            theme_state_paint();         /* Dark/Light texts + chip show-hide */
+            {
+                static const u8 V4_ACC_ORANGE[] = {40, 52, 53};         /* image5, image7, image8 */
+                static const u8 V4_ACC_BLACK[]  = {54, 55, 56, 57};     /* image9..image12 */
+                for (u8 i = 0; i < sizeof(V4_ACC_ORANGE) / sizeof(V4_ACC_ORANGE[0]); i++)
+                    grf_img_set_src(GCL(GRF_VIEW4_ID, V4_ACC_ORANGE[i]),
+                                    g_dark ? "acc-orange-light.png" : "acc-orange-dark.png");
+                for (u8 i = 0; i < sizeof(V4_ACC_BLACK) / sizeof(V4_ACC_BLACK[0]); i++)
+                    grf_img_set_src(GCL(GRF_VIEW4_ID, V4_ACC_BLACK[i]),
+                                    g_dark ? "acc-black-light.png" : "acc-black-dark.png");
+            }
+        }
 static void theme_apply_view5(void)
 {
     grf_view_set_bgcolor(GRF_VIEW5_ID, TCOL(TC_BG));                     /* screen bg */

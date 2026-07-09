@@ -278,6 +278,39 @@
     "theme" : "youth",
     "property" : {
       "pub_t" : {
+        "name" : "label18",
+        "id" : 25,
+        "pt" : {
+          "x" : 8,
+          "y" : 62
+        },
+        "size" : {
+          "width" : 111,
+          "height" : 34
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL18_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "C-Bench",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 18
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
         "name" : "label6",
         "id" : 8,
         "parent_id" : 1,
