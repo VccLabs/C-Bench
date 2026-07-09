@@ -248,7 +248,7 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 1036
+          "height" : 996
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -2802,7 +2802,7 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Show on Boot",
+      "txt" : "Pin Map Shortcut",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2837,7 +2837,7 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Display the message at startup",
+      "txt" : "Add a quick Pin Map button to every page",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2873,7 +2873,7 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Edit Message",
+      "txt" : "Go to Pin Map",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -2908,7 +2908,7 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Personalize your note",
+      "txt" : "Open the 2×20 GPIO header pinout",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {

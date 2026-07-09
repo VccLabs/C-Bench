@@ -579,7 +579,8 @@ static void theme_apply_view4(void)
                 g_dark ? GRF_COLOR_GET(0xC4, 0xC4, 0xC6) : GRF_COLOR_GET(0x8D, 0x8D, 0x93));
         THEME_TXT(GCL(GRF_VIEW4_ID, 41), TC_TXT2);  /* label31 "kWh"              */
         THEME_TXT(GCL(GRF_VIEW4_ID, 38), TC_TXT2);  /* label29 "LIFETIME"         */
-        THEME_TXT(GCL(GRF_VIEW4_ID, 68), TC_TXT2);  /* label50 "PIN MAP"          */
+        THEME_BG(GCL(GRF_VIEW4_ID, 69), TC_SURF);   /* label51 pin-map card bg    */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 68), TC_TXT2);  /* label50 "PIN MAP"          */
                 THEME_TXT(GCL(GRF_VIEW4_ID, 70), TC_TXT);   /* label52 "Pin Map Shortcut" */
                 THEME_TXT(GCL(GRF_VIEW4_ID, 72), TC_TXT2);  /* label54 shortcut desc      */
                 THEME_TXT(GCL(GRF_VIEW4_ID, 73), TC_TXT);   /* label55 "Go to Pin Map"    */

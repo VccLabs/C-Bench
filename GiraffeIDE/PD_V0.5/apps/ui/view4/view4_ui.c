@@ -663,13 +663,10 @@ static void label52_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label53_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label53_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> Pin Map (view6) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW6_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
