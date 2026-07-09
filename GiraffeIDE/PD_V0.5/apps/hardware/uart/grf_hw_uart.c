@@ -109,6 +109,25 @@ void view4_set_giften(u8 on)     /* sw1 toggled: update + persist */
     if (f) { grf_fs_write(f, &g_giften, 1); grf_fs_close(f); }
 }
 
+#define PINBTN_FILE "D:/pinbtn.bin"
+u8 g_pinbtn = 1;                 /* 1 = show per-page Pin Map buttons, 0 = hidden */
+void pinbtn_load_boot(void)      /* read persisted flag before first paint */
+{
+    grf_fs_file_t *f = grf_fs_open(PINBTN_FILE, GRF_FS_MODE_RD);
+    if (f) {
+        u8 v;
+        if (grf_fs_read(f, &v, 1) == 1 && v <= 1) g_pinbtn = v;
+        grf_fs_close(f);
+    }
+}
+void view4_set_pinbtn(u8 on)     /* sw2 toggled: update + persist + live hide on view4 */
+{
+    g_pinbtn = on ? 1 : 0;
+    grf_fs_file_t *f = grf_fs_open(PINBTN_FILE, GRF_FS_MODE_WR);
+    if (f) { grf_fs_write(f, &g_pinbtn, 1); grf_fs_close(f); }
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, 79), g_pinbtn ? 0 : 1); /* this page's button now */
+}
+
 #define TCOL(role) (THEME[(role)][g_dark]) /* current color for a role */
 #define THEME_BG(ctrl, role) grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
@@ -379,7 +398,8 @@ void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
 
 static void theme_apply_view1(void)
 {
-    grf_view_set_bgcolor(GRF_VIEW1_ID, TCOL(TC_BG)); /* screen bg */
+	grf_view_set_bgcolor(GRF_VIEW1_ID, TCOL(TC_BG)); /* screen bg */
+	    THEME_BG(GCL(GRF_VIEW1_ID, 34), TC_SURF); THEME_TXT(GCL(GRF_VIEW1_ID, 34), TC_ORANGE); /* pin-map btn */
     THEME_TXT(GCL(GRF_VIEW1_ID, V1_VVAL), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW1_ID, V1_LBL25), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW1_ID, V1_LBL26), TC_TXT2);
@@ -458,7 +478,8 @@ static void view2_paint_cards(void) /* single row-color authority: render + entr
 
 static void theme_apply_view2(void)
 {
-    grf_view_set_bgcolor(GRF_VIEW2_ID, TCOL(TC_BG)); /* screen bg */
+	grf_view_set_bgcolor(GRF_VIEW2_ID, TCOL(TC_BG));
+	    THEME_BG(GCL(GRF_VIEW2_ID, 100), TC_SURF); THEME_TXT(GCL(GRF_VIEW2_ID, 100), TC_ORANGE); /* pin-map btn */
     THEME_TXT(GCL(GRF_VIEW2_ID, V2_BRAND), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW2_ID, V2_SUB), TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW2_ID, V2_TITLE), TC_TXT);
@@ -490,7 +511,8 @@ static void theme_apply_view2(void)
 
 static void theme_apply_view3(void)
 {
-    grf_view_set_bgcolor(GRF_VIEW3_ID, TCOL(TC_BG)); /* screen bg */
+	grf_view_set_bgcolor(GRF_VIEW3_ID, TCOL(TC_BG));
+	    THEME_BG(GCL(GRF_VIEW3_ID, 17), TC_SURF); THEME_TXT(GCL(GRF_VIEW3_ID, 17), TC_ORANGE); /* pin-map btn */
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_BRAND), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_SUB), TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW3_ID, V3_STATE), TC_TXT2);
@@ -537,7 +559,8 @@ static void theme_apply_view3(void)
 
 static void theme_apply_view4(void)
 {
-    grf_view_set_bgcolor(GRF_VIEW4_ID, TCOL(TC_BG)); /* screen bg */
+	grf_view_set_bgcolor(GRF_VIEW4_ID, TCOL(TC_BG));
+	    THEME_BG(GCL(GRF_VIEW4_ID, 79), TC_SURF); THEME_TXT(GCL(GRF_VIEW4_ID, 79), TC_ORANGE); /* pin-map btn */
     THEME_TXT(GCL(GRF_VIEW4_ID, V4_BRAND), TC_TXT);
     THEME_TXT(GCL(GRF_VIEW4_ID, V4_SUB), TC_TXT2);
     THEME_TXT(GCL(GRF_VIEW4_ID, V4_HDR_OUT), TC_TXT2);
@@ -856,8 +879,9 @@ static void odo_paint(u32 wh) /* 7-digit XXXX.XXX kWh, MSD->LSD ids 49..42 */
 void view4_apply_settings(void) /* entry: paint controls from shadow */
 {
 	boot_state_paint(g_v4_boot);
-	    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
-	    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW1_ID), g_giften);
+	grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
+		    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW1_ID), g_giften);
+		    grf_sw_set_state(GCL(GRF_VIEW4_ID, 76), g_pinbtn); /* sw2 pin-map buttons */
 	    grf_slider_set_range(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), 10, 100);
 	        bright_slider(g_v4_bright);
 	        bright_label(g_v4_bright);

@@ -366,13 +366,10 @@ static void label24_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label27_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label27_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> Pin Map (view6) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW6_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 #include "../../../libs/appscc/view1_cc.h"
@@ -403,11 +400,13 @@ static void view1_hide_boot_msg(void)
 	/* grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, VIEW1_SCRIM_ID), 1);  // add once scrim ID known */
 }
 
+extern u8 g_pinbtn;
 extern void view1_tele_apply(void);
 void view1_entry(void) 
 {
 	view1_sync_armed();
-	view1_tele_apply();       /* repaint live labels from shadow (kills default-text flash) */
+		view1_tele_apply();       /* repaint live labels from shadow (kills default-text flash) */
+		grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, 34), g_pinbtn ? 0 : 1); /* pin-map btn gated by sw2 */
 	view1_sync_armed();
 		view4_request_settings();   /* HMI is up -> pull saved settings into the shadow */
 		view1_apply_theme();

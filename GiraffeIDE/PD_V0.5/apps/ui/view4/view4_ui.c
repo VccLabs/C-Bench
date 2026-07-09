@@ -730,23 +730,17 @@ static void label59_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void sw2_event(grf_ctrl_t *ctrl, grf_event_e event)
+extern void view4_set_pinbtn(u8 on);
+static void sw2_event(grf_ctrl_t *ctrl, grf_event_e event)       /* show/hide per-page pin-map buttons */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_VALUE_CHANGED) view4_set_pinbtn(grf_sw_get_state(ctrl));
 }
 
 
-static void label60_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label60_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> Pin Map (view6) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW6_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 #include "../../../libs/appscc/view4_cc.h"
@@ -755,9 +749,11 @@ void view4_init(void)
 	grf_view_create(GRF_VIEW4_ID,view_ctrls_fun_t,sizeof(view_ctrls_fun_t)/sizeof(grf_ctrl_fun_t));
 }
 
+extern u8 g_pinbtn;
 void view4_entry(void)
 {
 	view4_apply_settings();   /* paint Off/Last-used + switch from last-known settings */
+		grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, 79), g_pinbtn ? 0 : 1); /* pin-map btn gated by sw2 */
 		view4_apply_theme();      /* restore dark/light colors after view reset */
 	grf_ctrl_set_ext_click_area(GCL(GRF_VIEW4_ID, VIEW4_LABEL8_ID), 12);  /* "Off"  bigger hit area */
 	grf_ctrl_set_ext_click_area(GCL(GRF_VIEW4_ID, VIEW4_LABEL9_ID), 12);  /* "Last used"           */

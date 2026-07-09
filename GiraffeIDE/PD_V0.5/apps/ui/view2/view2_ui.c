@@ -782,13 +782,10 @@ static void label91_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void label90_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label90_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> Pin Map (view6) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW6_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 
@@ -993,6 +990,7 @@ void view2_init(void)
 	grf_view_create(GRF_VIEW2_ID,view_ctrls_fun_t,sizeof(view_ctrls_fun_t)/sizeof(grf_ctrl_fun_t));
 }
 
+extern u8 g_pinbtn;
 extern void view2_render_list(void);
 void view2_entry(void)
 {
@@ -1000,8 +998,8 @@ void view2_entry(void)
 		view2_apply_status();  /* restore source summary / empty prompt after view reset */
 		view2_apply_theme();   /* restore dark/light colors after view reset */
 		view2_render_list();   /* repaint rows from cached g_prof (kills default flash) */
-	}
-
+				grf_ctrl_set_hidden(GCL(GRF_VIEW2_ID, 100), g_pinbtn ? 0 : 1); /* pin-map btn gated by sw2 */
+			}
 void view2_exit(void)
 {
 
