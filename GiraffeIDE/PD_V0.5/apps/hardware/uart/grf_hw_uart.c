@@ -551,7 +551,8 @@ static void theme_apply_view4(void)
     THEME_TXT(GCL(GRF_VIEW4_ID, V4_PCT), TC_TXT2);
     THEME_BG(GCL(GRF_VIEW4_ID, 19), TC_SURF2);                                /* slider0 id19 track (bar main part) */
     grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, V4_SW), TCOL(TC_SURF2), 0); /* sw0 bg fill (part MAIN=0) */
-        grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, 60), TCOL(TC_SURF2), 0);    /* sw1 bg fill (part MAIN=0) */
+    grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, 60), TCOL(TC_SURF2), 0);    /* sw1 bg fill (part MAIN=0) */
+            grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, 76), TCOL(TC_SURF2), 0);    /* sw2 bg fill (part MAIN=0) */
     grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_SML),
                     g_dark ? "Brightness-symbol-small-light.png" : "Brightness-symbol-small-dark.png");
     grf_img_set_src(GCL(GRF_VIEW4_ID, V4_IMG_FUL),
@@ -578,12 +579,17 @@ static void theme_apply_view4(void)
                 g_dark ? GRF_COLOR_GET(0xC4, 0xC4, 0xC6) : GRF_COLOR_GET(0x8D, 0x8D, 0x93));
         THEME_TXT(GCL(GRF_VIEW4_ID, 41), TC_TXT2);  /* label31 "kWh"              */
         THEME_TXT(GCL(GRF_VIEW4_ID, 38), TC_TXT2);  /* label29 "LIFETIME"         */
-        THEME_BG(GCL(GRF_VIEW4_ID, 68), TC_SURF);   /* label50 divider line       */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 68), TC_TXT2);  /* label50 "PIN MAP"          */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 70), TC_TXT);   /* label52 "Pin Map Shortcut" */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 72), TC_TXT2);  /* label54 shortcut desc      */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 73), TC_TXT);   /* label55 "Go to Pin Map"    */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 74), TC_TXT2);  /* label56 go-to desc         */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 77), TC_TXT2);  /* label58 "›"                */
         grf_img_set_src(GCL(GRF_VIEW4_ID, 50), g_dark ? "lock-light.png" : "lock-dark.png"); /* image6 lock */
         /* Gift message card */
         THEME_BG(GCL(GRF_VIEW4_ID, 58), TC_SURF);   /* label41 card bg            */
         THEME_TXT(GCL(GRF_VIEW4_ID, 59), TC_TXT2);  /* label42 "GIFT MESSAGE"     */
-        THEME_TXT(GCL(GRF_VIEW4_ID, 62), TC_TXT2);  /* label44 "Show on Boot"     */
+        THEME_TXT(GCL(GRF_VIEW4_ID, 62), TC_TXT);   /* label44 "Show on Boot"     */
         THEME_TXT(GCL(GRF_VIEW4_ID, 63), TC_TXT2);  /* label45 "Display the..."   */
         THEME_TXT(GCL(GRF_VIEW4_ID, 64), TC_TXT);   /* label46 "Edit Message"     */
         THEME_TXT(GCL(GRF_VIEW4_ID, 65), TC_TXT2);  /* label47 "Personalize..."   */
