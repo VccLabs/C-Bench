@@ -13,13 +13,10 @@ static void image0_event(grf_ctrl_t *ctrl, grf_event_e event)   /* theme toggle 
 }
 
 
-static void label0_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label0_event(grf_ctrl_t *ctrl, grf_event_e event)   /* back -> Settings (view4) */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED)
+		grf_view_set_dis_view_anim(GRF_VIEW4_ID, GRF_SCR_LOAD_ANIM_NONE, 0, 0, GRF_ANIM_PATH_END_SLOW);
 }
 
 

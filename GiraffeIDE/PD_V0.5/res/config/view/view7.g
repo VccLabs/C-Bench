@@ -46,7 +46,7 @@
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,
-        "click_area" : 25
+        "click_area" : 50
       },
       "auto_hight" : 1,
       "animspeed" : 50,
@@ -233,7 +233,7 @@
         "name" : "label4",
         "id" : 8,
         "pt" : {
-          "x" : 252,
+          "x" : 250,
           "y" : 192
         },
         "size" : {
@@ -336,7 +336,7 @@
         "body_t" : {
           "main_color" : 1842206,
           "radius" : -1,
-          "opa" : 90
+          "opa" : 255
         },
         "txt_t" : {
           "opa" : 2147483647
@@ -359,7 +359,7 @@
         },
         "size" : {
           "width" : 691,
-          "height" : 726
+          "height" : 611
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -400,9 +400,11 @@
           "width" : 378,
           "height" : 359
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
-        "pub" : true
+        "pub" : true,
+        "click_area" : 500
       },
       "init_img" : "qr-website-dark.png",
       "rotate_pt" : { }
@@ -1910,6 +1912,7 @@
           "width" : 238,
           "height" : 64
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true
@@ -1951,6 +1954,7 @@
           "width" : 238,
           "height" : 64
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,
@@ -1993,6 +1997,7 @@
           "width" : 238,
           "height" : 64
         },
+        "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,

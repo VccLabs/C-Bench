@@ -758,16 +758,47 @@ void view7_qr_hide(void) /* tap overlay / outside: hide + clear */
     grf_ctrl_set_hidden(GCL(GRF_VIEW7_ID, V7_QR), 1);
 }
 
+/* view7 themed control groups (ids from view7.h) */
+static const u16 V7_TXT[]  = {3, 8, 18, 19, 20, 21, 22, 42, 43, 44};              /* primary text  */
+static const u16 V7_TXT2[] = {4, 9, 14, 17, 23, 24, 25, 26, 27, 37, 45, 46, 47, 48, 51, 52}; /* secondary */
+static const u16 V7_SURF[] = {10, 16, 38};        /* pill + hardware/project card bgs */
+static const u16 V7_LINE[] = {33, 34, 35, 36};    /* hairline separators (bg only)   */
+
 static void theme_apply_view7(void)
 {
     grf_view_set_bgcolor(GRF_VIEW7_ID, TCOL(TC_BG)); /* screen bg */
+
+    /* header images */
     grf_img_set_src(GCL(GRF_VIEW7_ID, V7_THEME),
                     g_dark ? "theme-light.png" : "theme-dark.png");
-    if (g_v7_qr) {                                   /* re-swap an open QR to match new theme */
-    	char *src = v7_qr_asset();
+    grf_img_set_src(GCL(GRF_VIEW7_ID, 5),            /* image1 - VccLabs logo */
+                    g_dark ? "logo-light.png" : "logo-dark.png");
+
+    /* back button (label0/id2): orange text on a surface card */
+    THEME_BG (GCL(GRF_VIEW7_ID, 2), TC_SURF);
+    THEME_TXT(GCL(GRF_VIEW7_ID, 2), TC_ORANGE);
+
+    /* orange accent text */
+    THEME_TXT(GCL(GRF_VIEW7_ID, 13), TC_ORANGE);     /* label9 - version */
+
+    /* primary / secondary text groups */
+    for (u8 i = 0; i < sizeof(V7_TXT)/sizeof(V7_TXT[0]); i++)
+        THEME_TXT(GCL(GRF_VIEW7_ID, V7_TXT[i]), TC_TXT);
+    for (u8 i = 0; i < sizeof(V7_TXT2)/sizeof(V7_TXT2[0]); i++)
+        THEME_TXT(GCL(GRF_VIEW7_ID, V7_TXT2[i]), TC_TXT2);
+
+    /* card surfaces + hairline separators (bg only) */
+    for (u8 i = 0; i < sizeof(V7_SURF)/sizeof(V7_SURF[0]); i++)
+        THEME_BG(GCL(GRF_VIEW7_ID, V7_SURF[i]), TC_SURF);
+    for (u8 i = 0; i < sizeof(V7_LINE)/sizeof(V7_LINE[0]); i++)
+        THEME_BG(GCL(GRF_VIEW7_ID, V7_LINE[i]), TC_SURF2);
+
+    /* QR overlay: re-swap to match theme if open */
+    if (g_v7_qr) {
+        char *src = v7_qr_asset();
         if (src) grf_img_set_src(GCL(GRF_VIEW7_ID, V7_QR), src);
     }
-    /* TODO: theme remaining view7 controls (brand/logo/nav/cards/link labels) once IDs given */
+    /* label7/id11 green pip left fixed (accent, like cyan/orange elsewhere) */
 }
 
 static void theme_apply(void) /* repaint all themed views from g_dark */
