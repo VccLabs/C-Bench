@@ -762,7 +762,7 @@ void view7_qr_hide(void) /* tap overlay / outside: hide + clear */
 static const u16 V7_TXT[]  = {3, 8, 18, 19, 20, 21, 22, 42, 43, 44};              /* primary text  */
 static const u16 V7_TXT2[] = {4, 9, 14, 17, 23, 24, 25, 26, 27, 37, 45, 46, 47, 48, 51, 52}; /* secondary */
 static const u16 V7_SURF[] = {10, 16, 38};        /* pill + hardware/project card bgs */
-static const u16 V7_LINE[] = {33, 34, 35, 36};    /* hairline separators (bg only)   */
+static const u16 V7_LINE[] = {33, 34, 35, 36, 49, 50}; /* hairline separators (bg only) */
 
 static void theme_apply_view7(void)
 {
