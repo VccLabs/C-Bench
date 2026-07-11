@@ -729,6 +729,47 @@ static void theme_apply_view6(void)
 
 }
 
+/* ---- view7 (About) ---- */
+#define V7_THEME 1   /* image0  - theme toggle */
+#define V7_QR    53  /* image11 - QR popup overlay (full-screen) */
+static u8 g_v7_qr = 0; /* which QR is showing: 0 none, 1 crowd-supply, 2 github, 3 website */
+
+static char *v7_qr_asset(void) /* current QR png for g_v7_qr + theme */
+{
+    switch (g_v7_qr) {
+        case 1: return g_dark ? "qr-crowd-supply-light.png" : "qr-crowd-supply-dark.png";
+        case 2: return g_dark ? "qr-github-light.png"       : "qr-github-dark.png";
+        case 3: return g_dark ? "qr-website-light.png"      : "qr-website-dark.png";
+        default: return 0;
+    }
+}
+
+void view7_qr_show(u8 which) /* link tap: pick QR, swap asset, reveal overlay */
+{
+    g_v7_qr = which;
+    char *src = v7_qr_asset();
+    if (src) grf_img_set_src(GCL(GRF_VIEW7_ID, V7_QR), src);
+    grf_ctrl_set_hidden(GCL(GRF_VIEW7_ID, V7_QR), 0);
+}
+
+void view7_qr_hide(void) /* tap overlay / outside: hide + clear */
+{
+    g_v7_qr = 0;
+    grf_ctrl_set_hidden(GCL(GRF_VIEW7_ID, V7_QR), 1);
+}
+
+static void theme_apply_view7(void)
+{
+    grf_view_set_bgcolor(GRF_VIEW7_ID, TCOL(TC_BG)); /* screen bg */
+    grf_img_set_src(GCL(GRF_VIEW7_ID, V7_THEME),
+                    g_dark ? "theme-light.png" : "theme-dark.png");
+    if (g_v7_qr) {                                   /* re-swap an open QR to match new theme */
+    	char *src = v7_qr_asset();
+        if (src) grf_img_set_src(GCL(GRF_VIEW7_ID, V7_QR), src);
+    }
+    /* TODO: theme remaining view7 controls (brand/logo/nav/cards/link labels) once IDs given */
+}
+
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
     theme_apply_view1();
@@ -737,7 +778,8 @@ static void theme_apply(void) /* repaint all themed views from g_dark */
     theme_apply_view4();
     theme_apply_view5();
     theme_apply_view6();
-}
+    theme_apply_view7();
+    }
 
 void view1_apply_theme(void) { theme_apply(); } /* view1 entry: repaint from shadow */
 void view2_apply_theme(void) { theme_apply(); } /* view2 entry: repaint from shadow */
@@ -745,6 +787,7 @@ void view3_apply_theme(void) { theme_apply(); } /* view3 entry: repaint from sha
 void view4_apply_theme(void) { theme_apply(); } /* view4 entry: repaint from shadow */
 void view5_apply_theme(void) { theme_apply(); } /* view5 entry: repaint from shadow */
 void view6_apply_theme(void) { theme_apply(); } /* view6 entry: repaint from shadow */
+void view7_apply_theme(void) { theme_apply(); } /* view7 entry: repaint from shadow */
 void view1_toggle_theme(void)                   /* user tap: flip + apply + persist */
 {
 	g_dark ^= 1;

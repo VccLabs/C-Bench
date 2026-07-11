@@ -1,14 +1,15 @@
 #include "../../apps.h"
 
+extern void view1_toggle_theme(void);
+extern void view7_apply_theme(void);
+extern void view7_qr_show(u8 which);
+extern void view7_qr_hide(void);
 
 
-static void image0_event(grf_ctrl_t *ctrl, grf_event_e event)
+
+static void image0_event(grf_ctrl_t *ctrl, grf_event_e event)   /* theme toggle */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view1_toggle_theme();
 }
 
 
@@ -522,43 +523,27 @@ static void label38_event(grf_ctrl_t *ctrl, grf_event_e event)
 }
 
 
-static void image11_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void image11_event(grf_ctrl_t *ctrl, grf_event_e event)   /* QR overlay: tap to dismiss */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view7_qr_hide();
 }
 
 
-static void label40_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label40_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Crowd Supply QR */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view7_qr_show(1);
 }
 
 
-static void label42_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label42_event(grf_ctrl_t *ctrl, grf_event_e event)   /* Website QR */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view7_qr_show(3);
 }
 
 
-static void label41_event(grf_ctrl_t *ctrl, grf_event_e event)
+static void label41_event(grf_ctrl_t *ctrl, grf_event_e event)   /* GitHub QR */
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) view7_qr_show(2);
 }
 
 #include "../../../libs/appscc/view7_cc.h"
@@ -569,7 +554,8 @@ void view7_init(void)
 
 void view7_entry(void)
 {
-
+	view7_apply_theme();   /* repaint from theme shadow */
+	view7_qr_hide();       /* QR overlay hidden by default */
 }
 
 void view7_exit(void)
