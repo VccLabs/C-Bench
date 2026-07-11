@@ -52,5 +52,8 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW7_LABEL36_ID,label36_event},
 	{VIEW7_LABEL37_ID,label37_event},
 	{VIEW7_LABEL38_ID,label38_event},
-	{VIEW7_LABEL39_ID,label39_event}
+	{VIEW7_LABEL39_ID,label39_event},
+	{VIEW7_LABEL40_ID,label40_event},
+	{VIEW7_LABEL41_ID,label41_event},
+	{VIEW7_LABEL42_ID,label42_event}
 };
