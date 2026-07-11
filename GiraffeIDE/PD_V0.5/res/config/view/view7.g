@@ -359,10 +359,16 @@
         },
         "size" : {
           "width" : 691,
-          "height" : 536
+          "height" : 726
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "mode_e" : 1,
+          "dir_e" : 12,
+          "chain_e" : 2,
+          "momentum" : true,
+          "elastic" : true
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -376,6 +382,30 @@
         },
         "img_t" : { }
       } ]
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image11",
+        "id" : 53,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 171,
+          "y" : 40
+        },
+        "size" : {
+          "width" : 378,
+          "height" : 359
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true
+      },
+      "init_img" : "qr-website-dark.png",
+      "rotate_pt" : { }
     }
   }, {
     "CLASSNAME" : "label",
@@ -539,7 +569,10 @@
           "width" : 675,
           "height" : 314
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -575,7 +608,10 @@
           "width" : 111,
           "height" : 32
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL12_ID"
@@ -609,7 +645,10 @@
           "width" : 163,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL13_ID"
@@ -642,7 +681,10 @@
           "width" : 163,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL14_ID"
@@ -675,7 +717,10 @@
           "width" : 163,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL15_ID"
@@ -708,7 +753,10 @@
           "width" : 163,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL16_ID"
@@ -741,7 +789,10 @@
           "width" : 163,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL17_ID"
@@ -774,7 +825,10 @@
           "width" : 328,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL18_ID"
@@ -807,7 +861,10 @@
           "width" : 328,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL19_ID"
@@ -840,7 +897,10 @@
           "width" : 328,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL20_ID"
@@ -873,7 +933,10 @@
           "width" : 328,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL21_ID"
@@ -906,7 +969,10 @@
           "width" : 475,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL22_ID"
@@ -941,7 +1007,10 @@
           "width" : 33,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -966,7 +1035,10 @@
           "width" : 33,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_IMAGE4_ID"
@@ -992,7 +1064,10 @@
           "width" : 33,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_IMAGE5_ID"
@@ -1018,7 +1093,10 @@
           "width" : 33,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_IMAGE6_ID"
@@ -1044,7 +1122,10 @@
           "width" : 33,
           "height" : 33
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_IMAGE7_ID"
@@ -1068,7 +1149,10 @@
           "width" : 675,
           "height" : 2
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL23_ID"
@@ -1105,7 +1189,10 @@
           "width" : 675,
           "height" : 2
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL24_ID"
@@ -1142,7 +1229,10 @@
           "width" : 675,
           "height" : 2
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL25_ID"
@@ -1179,7 +1269,10 @@
           "width" : 675,
           "height" : 2
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL26_ID"
@@ -1216,7 +1309,10 @@
           "width" : 111,
           "height" : 32
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL27_ID"
@@ -1248,9 +1344,12 @@
         },
         "size" : {
           "width" : 675,
-          "height" : 161
+          "height" : 187
         },
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL28_ID"
@@ -1267,6 +1366,530 @@
         },
         "txt_t" : {
           "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image8",
+        "id" : 39,
+        "parent_id" : 15,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 23,
+          "y" : 410
+        },
+        "size" : {
+          "width" : 33,
+          "height" : 33
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_IMAGE8_ID"
+      },
+      "init_img" : "crowd-supply-icon.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image9",
+        "id" : 40,
+        "parent_id" : 15,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 23,
+          "y" : 472
+        },
+        "size" : {
+          "width" : 33,
+          "height" : 33
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_IMAGE9_ID"
+      },
+      "init_img" : "github-icon.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image10",
+        "id" : 41,
+        "parent_id" : 15,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 23,
+          "y" : 534
+        },
+        "size" : {
+          "width" : 33,
+          "height" : 33
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_IMAGE10_ID"
+      },
+      "init_img" : "website-icon.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label29",
+        "id" : 42,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 64,
+          "y" : 467
+        },
+        "size" : {
+          "width" : 271,
+          "height" : 33
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL29_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Source & docs",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label30",
+        "id" : 43,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 64,
+          "y" : 529
+        },
+        "size" : {
+          "width" : 271,
+          "height" : 33
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL30_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Vcc Labs",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label31",
+        "id" : 44,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 64,
+          "y" : 405
+        },
+        "size" : {
+          "width" : 271,
+          "height" : 33
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL31_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "Crowd Supply",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf"
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label32",
+        "id" : 45,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 64,
+          "y" : 425
+        },
+        "size" : {
+          "width" : 328,
+          "height" : 27
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL32_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "https://www.crowdsupply.com/vcc-labs",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 13
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label33",
+        "id" : 46,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 64,
+          "y" : 487
+        },
+        "size" : {
+          "width" : 328,
+          "height" : 27
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL33_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "https://github.com/VccLabs",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 13
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label34",
+        "id" : 47,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 64,
+          "y" : 549
+        },
+        "size" : {
+          "width" : 328,
+          "height" : 27
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL34_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 33,
+      "txt" : "https://github.com/VccLabs",
+      "styles" : [ {
+        "name" : "style",
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 13
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label35",
+        "id" : 48,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 620,
+          "y" : 411
+        },
+        "size" : {
+          "width" : 36,
+          "height" : 30
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL35_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "›",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 22
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label36",
+        "id" : 49,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 3,
+          "y" : 458
+        },
+        "size" : {
+          "width" : 675,
+          "height" : 2
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL36_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label37",
+        "id" : 50,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 3,
+          "y" : 520
+        },
+        "size" : {
+          "width" : 675,
+          "height" : 2
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL37_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : 2147483647,
+          "opa" : 255
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label38",
+        "id" : 51,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 620,
+          "y" : 473
+        },
+        "size" : {
+          "width" : 36,
+          "height" : 30
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL38_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "›",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 22
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label39",
+        "id" : 52,
+        "parent_id" : 15,
+        "pt" : {
+          "x" : 620,
+          "y" : 535
+        },
+        "size" : {
+          "width" : 36,
+          "height" : 30
+        },
+        "scrollbar_t" : {
+          "dir_e" : 12,
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW7_LABEL39_ID"
+      },
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "›",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 22
         },
         "img_t" : { }
       } ]

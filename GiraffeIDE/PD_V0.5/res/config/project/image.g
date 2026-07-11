@@ -123,10 +123,6 @@
   "imagePath" : "boot-popup-light.png",
   "child" : [ ]
 }, {
-  "imageId" : 34,
-  "imagePath" : "view7.png",
-  "child" : [ ]
-}, {
   "imageId" : 33,
   "imagePath" : "qr.png",
   "child" : [ ]
@@ -149,5 +145,41 @@
 }, {
   "imageId" : 38,
   "imagePath" : "sensing.png",
+  "child" : [ ]
+}, {
+  "imageId" : 39,
+  "imagePath" : "crowd-supply-icon.png",
+  "child" : [ ]
+}, {
+  "imageId" : 40,
+  "imagePath" : "github-icon.png",
+  "child" : [ ]
+}, {
+  "imageId" : 41,
+  "imagePath" : "website-icon.png",
+  "child" : [ ]
+}, {
+  "imageId" : 34,
+  "imagePath" : "qr-crowd-supply-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 42,
+  "imagePath" : "qr-crowd-supply-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 43,
+  "imagePath" : "qr-github-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 44,
+  "imagePath" : "qr-github-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 45,
+  "imagePath" : "qr-website-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 46,
+  "imagePath" : "qr-website-light.png",
   "child" : [ ]
 } ]

@@ -11,6 +11,7 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW7_LABEL5_ID,label5_event},
 	{VIEW7_LABEL6_ID,label6_event},
 	{VIEW7_CONTAINER0_ID,container0_event},
+	{VIEW7_IMAGE11_ID,image11_event},
 	{VIEW7_LABEL7_ID,label7_event},
 	{VIEW7_LABEL8_ID,label8_event},
 	{VIEW7_LABEL9_ID,label9_event},
@@ -37,5 +38,19 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW7_LABEL25_ID,label25_event},
 	{VIEW7_LABEL26_ID,label26_event},
 	{VIEW7_LABEL27_ID,label27_event},
-	{VIEW7_LABEL28_ID,label28_event}
+	{VIEW7_LABEL28_ID,label28_event},
+	{VIEW7_IMAGE8_ID,image8_event},
+	{VIEW7_IMAGE9_ID,image9_event},
+	{VIEW7_IMAGE10_ID,image10_event},
+	{VIEW7_LABEL29_ID,label29_event},
+	{VIEW7_LABEL30_ID,label30_event},
+	{VIEW7_LABEL31_ID,label31_event},
+	{VIEW7_LABEL32_ID,label32_event},
+	{VIEW7_LABEL33_ID,label33_event},
+	{VIEW7_LABEL34_ID,label34_event},
+	{VIEW7_LABEL35_ID,label35_event},
+	{VIEW7_LABEL36_ID,label36_event},
+	{VIEW7_LABEL37_ID,label37_event},
+	{VIEW7_LABEL38_ID,label38_event},
+	{VIEW7_LABEL39_ID,label39_event}
 };
