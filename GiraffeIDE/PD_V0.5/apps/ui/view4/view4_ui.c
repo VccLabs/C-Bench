@@ -750,6 +750,16 @@ static void label60_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> 
 	}
 }
 
+
+static void label61_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view4_cc.h"
 void view4_init(void)
 {

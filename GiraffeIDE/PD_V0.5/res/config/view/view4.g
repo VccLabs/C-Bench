@@ -248,7 +248,7 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 521
+          "height" : 1146
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -3232,6 +3232,54 @@
         "name" : "style",
         "txt_t" : {
           "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label61",
+        "id" : 80,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 22,
+          "y" : 1007
+        },
+        "size" : {
+          "width" : 674,
+          "height" : 66
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL61_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "About",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 689407,
+          "radius" : 18,
+          "opa" : 255,
+          "padding" : {
+            "top" : 2147483647,
+            "bottom" : 2147483647,
+            "left" : 2147483647,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 16777215,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 24
         },
         "img_t" : { }
       } ]

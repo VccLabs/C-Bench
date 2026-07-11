@@ -359,7 +359,7 @@
         },
         "size" : {
           "width" : 691,
-          "height" : 611
+          "height" : 316
         },
         "t_mode" : 1,
         "scrollbar_t" : {
