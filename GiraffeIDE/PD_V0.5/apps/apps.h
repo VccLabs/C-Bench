@@ -10,5 +10,6 @@
 #include "ui/view4/view4.h"
 #include "ui/view5/view5.h"
 #include "ui/view6/view6.h"
+#include "ui/view7/view7.h"
 
 #endif

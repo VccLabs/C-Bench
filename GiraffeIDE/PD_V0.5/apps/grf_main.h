@@ -8,7 +8,8 @@ typedef enum {
 	GRF_VIEW3_ID = 3,
 	GRF_VIEW4_ID = 4,
 	GRF_VIEW5_ID = 5,
-	GRF_VIEW6_ID = 6
+	GRF_VIEW6_ID = 6,
+	GRF_VIEW7_ID = 7
 } grf_view_id_e;
 
 #endif

@@ -1,0 +1,233 @@
+<!--
+  C-Bench — About (view7 — final page) — APPLE-STYLE
+  720x720. iOS system colors + SF-style type. Static reference page (like view6 Pin Map).
+  Reached via a per-page shortcut; Back returns to the originating view via g_prev_view.
+  Fully themed dark/light (theme_apply_view7), theme toggle in the top bar (stays in sync).
+
+  Build map (Giraffe):
+    HEADER
+      Back chevron       -> imgbtn/label -> view7_back() -> grf_view_show(g_prev_view)
+      Theme toggle       -> image -> view1_toggle_theme() (shared handler, sends 0x0039)
+    HERO
+      Logo               -> image asset swap (-dark/-light) via grf_img_set_src
+      Product name / tag  -> static labels (TC_TXT / TC_TXT2)
+      Version pill        -> static label (TC_CHIP)
+    SPECS group (surface = TC_SURF card, rows = TC_TXT / TC_TXT2)
+      Output / Host / PD sink / Sensors / Display — read-only labels
+    LINKS group (TC_SURF card)
+      Crowd Supply / GitHub / VccLabs — static rows (URLs are print/reference only,
+      no live browser on panel). Right chevrons decorative.
+    FOOTER
+      License + brand line -> static labels (TC_TXT2 / TC_TXT3)
+    Nav tab bar (matches others) — Settings highlighted since About is entered from Settings.
+  All facts sourced from readme.md (single source of truth). Odometer-style version not used.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C-Bench — About (Apple style)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --orange:#FF9F0A; --cyan:#64D2FF; --purple:#BF5AF2; --green:#30D158; --red:#FF453A; --blue:#0A84FF; }
+  [data-theme="dark"]{
+    --bg:#000; --screenbg:#000; --card:#1C1C1E; --card2:#2C2C2E;
+    --txt:#FFF; --txt2:rgba(235,235,245,.60); --txt3:rgba(235,235,245,.30);
+    --track:#2C2C2E; --tabbar:rgba(20,20,22,.9); --sep:rgba(255,255,255,.07);
+    --bezel-a:#26262A; --bezel-b:#0A0A0C; --logo-a:#FF9F0A; --logo-b:#FFB84D;
+  }
+  [data-theme="light"]{
+    --bg:#F2F2F7; --screenbg:#F2F2F7; --card:#FFF; --card2:#FFF;
+    --txt:#000; --txt2:rgba(60,60,67,.60); --txt3:rgba(60,60,67,.30);
+    --track:#E5E5EA; --tabbar:rgba(249,249,251,.92); --sep:rgba(60,60,67,.12);
+    --bezel-a:#D7DEE6; --bezel-b:#B7C2CE; --logo-a:#FF9500; --logo-b:#FFB340;
+    --orange:#FF9500; --cyan:#32ADE6; --purple:#AF52DE; --green:#34C759; --red:#FF3B30; --blue:#007AFF;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ background:#050507; font-family:'Inter',-apple-system,system-ui,sans-serif;
+        display:flex; flex-direction:column; align-items:center; gap:14px; padding:24px 12px 40px; overflow-x:hidden; }
+  .cap{ color:#5a6571; font-size:12px; letter-spacing:.04em; text-align:center; }
+  .cap b{ color:#9aa6b2; }
+  .stage{ width:100%; display:flex; justify-content:center; }
+  .fit{ width:720px; height:720px; transform-origin:top center; }
+
+  .device{ width:720px; height:720px; background:linear-gradient(160deg,var(--bezel-a),var(--bezel-b));
+           border-radius:40px; padding:18px; box-shadow:0 40px 90px -24px #000, inset 0 1px 0 rgba(255,255,255,.18); transition:background .35s; }
+  .screen{ width:100%; height:100%; background:var(--screenbg); border-radius:22px; overflow:hidden;
+           position:relative; display:flex; flex-direction:column; transition:background .35s; }
+
+  /* top bar with Back chevron (matches others) */
+  .top{ display:flex; align-items:center; justify-content:space-between; padding:20px 24px 4px; }
+  .top .brand{ font-weight:700; font-size:17px; letter-spacing:-.01em; color:var(--txt); }
+  .top .brand span{ color:var(--txt2); font-weight:500; }
+  .back{ display:flex; align-items:center; gap:5px; border:none; background:var(--card);
+         color:var(--orange); font-family:inherit; font-weight:600; font-size:15px;
+         padding:9px 15px 9px 12px; border-radius:22px; cursor:pointer; }
+  .back:active{ transform:scale(.94); }
+  .tbtn{ width:38px; height:38px; border-radius:50%; border:none; background:var(--card);
+         color:var(--txt); font-size:17px; cursor:pointer; display:grid; place-items:center; }
+  .tbtn:active{ transform:scale(.92); }
+
+  .body{ flex:1; overflow-y:auto; padding:6px 22px 4px; }
+  .body::-webkit-scrollbar{ display:none; }
+
+  /* hero */
+  .hero{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:12px 0 6px; }
+  .logo{ width:96px; height:96px; border-radius:24px; display:grid; place-items:center;
+         background:linear-gradient(155deg,var(--logo-a),var(--logo-b));
+         box-shadow:0 12px 30px -8px color-mix(in srgb,var(--orange) 55%,transparent);
+         margin-bottom:14px; }
+  .name{ font-weight:800; font-size:34px; letter-spacing:-.03em; color:var(--txt); line-height:1; }
+  .tag{ font-size:14px; font-weight:500; color:var(--txt2); margin-top:8px; max-width:320px; }
+  .pill{ margin-top:14px; display:inline-flex; align-items:center; gap:7px;
+         background:var(--card); color:var(--txt2); font-size:13px; font-weight:600;
+         padding:7px 14px; border-radius:16px; }
+  .pill b{ color:var(--orange); font-weight:700; }
+  .pill .gd{ width:7px; height:7px; border-radius:50%; background:var(--green); }
+
+  /* section groups */
+  .sechead{ font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+            color:var(--txt2); margin:20px 6px 8px; }
+  .group{ background:var(--card); border-radius:18px; overflow:hidden; }
+  .row{ display:flex; align-items:center; gap:14px; padding:14px 18px; min-height:54px; }
+  .row + .row{ border-top:1px solid var(--sep); }
+  .row .k{ font-size:15px; font-weight:600; color:var(--txt); }
+  .row .v{ margin-left:auto; font-size:15px; font-weight:500; color:var(--txt2); text-align:right; }
+  .row .v b{ color:var(--txt); font-weight:600; }
+  .row .ic{ width:30px; height:30px; border-radius:9px; display:grid; place-items:center; flex:none; color:#fff; }
+  .row .ic.o{ background:var(--orange); } .row .ic.c{ background:var(--cyan); }
+  .row .ic.p{ background:var(--purple); } .row .ic.g{ background:var(--green); }
+  .row .ic.b{ background:var(--blue); }
+
+  /* link rows */
+  .lrow{ display:flex; align-items:center; gap:14px; padding:15px 18px; min-height:56px; cursor:pointer; }
+  .lrow + .lrow{ border-top:1px solid var(--sep); }
+  .lrow:active{ background:var(--card2); }
+  .lrow .txt .t{ font-size:15px; font-weight:600; color:var(--txt); }
+  .lrow .txt .u{ font-size:12.5px; font-weight:500; color:var(--txt3); margin-top:2px; }
+  .lrow .chev{ margin-left:auto; color:var(--txt3); flex:none; }
+
+  .foot{ text-align:center; padding:22px 10px 10px; }
+  .foot .lic{ font-size:12.5px; font-weight:500; color:var(--txt2); }
+  .foot .brand2{ font-size:12px; font-weight:500; color:var(--txt3); margin-top:6px; }
+
+  .tabs{ display:flex; padding:8px 0 14px; background:var(--tabbar); backdrop-filter:blur(20px); border-top:1px solid var(--sep); }
+  .tab{ flex:1; border:none; background:transparent; cursor:pointer; padding:6px 0;
+        display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--txt3); }
+  .tab .tl{ font-size:11px; font-weight:500; letter-spacing:.01em; }
+  .tab.on{ color:var(--orange); }
+  svg.ic{ display:block; }
+</style>
+
+<div class="cap"><b>About / view7</b> · final page · static reference (like Pin Map) · Back → g_prev_view · themed</div>
+
+<div class="stage"><div class="fit" id="fit">
+<div class="device"><div class="screen" id="screen" data-theme="dark">
+
+  <div class="top">
+    <button class="back" id="back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <div class="brand">C-Bench <span>· About</span></div>
+    <button class="tbtn" id="theme">☾</button>
+  </div>
+
+  <div class="body">
+
+    <div class="hero">
+      <div class="logo">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#231300" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L4.5 13.5H11l-1 8L19.5 10H13z"/>
+        </svg>
+      </div>
+      <div class="name">C-Bench</div>
+      <div class="tag">A mini bench power supply powered by USB-C Power Delivery.</div>
+      <div class="pill"><span class="gd"></span>Firmware <b>v0.5</b> · HMI PD_V0.5</div>
+    </div>
+
+    <!-- HARDWARE -->
+    <div class="sechead">Hardware</div>
+    <div class="group">
+      <div class="row">
+        <div class="ic o"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13.5H11l-1 8L19.5 10H13z"/></svg></div>
+        <div class="k">Output</div>
+        <div class="v"><b>28 V · 5 A</b> · 140 W max</div>
+      </div>
+      <div class="row">
+        <div class="ic b"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M9 4v-2M15 4v-2M9 22v-2M15 22v-2M4 9H2M4 15H2M22 9h-2M22 15h-2"/></svg></div>
+        <div class="k">Host</div>
+        <div class="v">Raspberry Pi <b>RP2354A</b></div>
+      </div>
+      <div class="row">
+        <div class="ic g"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v6M8 3v3M16 3v3"/><rect x="7" y="9" width="10" height="8" rx="2"/><path d="M12 17v4"/></svg></div>
+        <div class="k">PD sink</div>
+        <div class="v"><b>AP33772S</b> · Fixed/PPS/AVS</div>
+      </div>
+      <div class="row">
+        <div class="ic c"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg></div>
+        <div class="k">Sensing</div>
+        <div class="v">INA260 · TMP102 · MAX17048</div>
+      </div>
+      <div class="row">
+        <div class="ic p"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2.5"/><circle cx="12" cy="17" r="1.3"/></svg></div>
+        <div class="k">Display</div>
+        <div class="v">4″ 720×720 touch HMI</div>
+      </div>
+    </div>
+
+    <!-- PROJECT -->
+    <div class="sechead">Project</div>
+    <div class="group">
+      <div class="lrow" id="lk-cs">
+        <div class="ic o" style="background:var(--orange)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 15a4 4 0 0 1 1-7.8A5.5 5.5 0 0 1 15 6a4.5 4.5 0 0 1 1 8.9"/><path d="M12 12v7M12 12l-3 3M12 12l3 3"/></svg></div>
+        <div class="txt"><div class="t">Crowd Supply</div><div class="u">crowdsupply.com/vcclabs/c-bench</div></div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+      <div class="lrow" id="lk-gh">
+        <div class="ic" style="background:#333"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 2A10 10 0 0 0 8.8 21.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.4-2.2-.2-4.6-1.1-4.6-4.9 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.6.7 1 1.6 1 2.7 0 3.8-2.4 4.7-4.6 4.9.3.3.7 1 .7 2v2.9c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></div>
+        <div class="txt"><div class="t">Source & docs</div><div class="u">github.com/VccLabs/C-Bench</div></div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+      <div class="lrow" id="lk-vl">
+        <div class="ic c" style="background:var(--cyan)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></div>
+        <div class="txt"><div class="t">VccLabs</div><div class="u">Open hardware · BoxBox Industries</div></div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="lic">Open-source hardware & firmware</div>
+      <div class="brand2">© 2026 VccLabs · Amman, Jordan</div>
+    </div>
+
+  </div>
+
+  <div class="tabs">
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 1.5"/></svg><span class="tl">Monitor</span></button>
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="8" x2="19" y2="8"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="5" y1="16" x2="13" y2="16"/></svg><span class="tl">Profiles</span></button>
+    <button class="tab"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="15" height="9" rx="2.5"/><line x1="21" y1="11" x2="21" y2="14"/></svg><span class="tl">Battery</span></button>
+    <button class="tab on"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.5 5.5l2 2M16.5 16.5l2 2M18.5 5.5l-2 2M7.5 16.5l-2 2"/></svg><span class="tl">Settings</span></button>
+  </div>
+
+</div></div>
+</div></div>
+
+<div class="cap">Static labels + image swaps · Back returns to g_prev_view · link URLs are print/reference (no live browser on panel)</div>
+
+<script>
+  const $=id=>document.getElementById(id);
+
+  /* theme (shared pattern; on panel this is view1_toggle_theme + 0x0039) */
+  $('theme').onclick=()=>{ const s=$('screen'); const d=s.dataset.theme==='dark';
+    s.dataset.theme=d?'light':'dark'; $('theme').textContent=d?'☀':'☾'; };
+
+  /* Back → g_prev_view (mockup: just log) */
+  $('back').onclick=()=> console.log('view7_back() → grf_view_show(g_prev_view)');
+
+  /* responsive fit (matches others) */
+  function fit(){ const avail=Math.min(window.innerWidth-24,760), s=Math.min(1,avail/720);
+    const f=$('fit'); f.style.transform=`scale(${s})`; f.parentElement.style.height=(720*s)+'px'; }
+  addEventListener('resize',fit); fit();
+</script>

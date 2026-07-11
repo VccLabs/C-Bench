@@ -123,11 +123,31 @@
   "imagePath" : "boot-popup-light.png",
   "child" : [ ]
 }, {
-  "imageId" : 32,
-  "imagePath" : "nav-pin-map-dark.png",
+  "imageId" : 34,
+  "imagePath" : "view7.png",
   "child" : [ ]
 }, {
   "imageId" : 33,
-  "imagePath" : "nav-pin-map-light.png",
+  "imagePath" : "qr.png",
+  "child" : [ ]
+}, {
+  "imageId" : 32,
+  "imagePath" : "display.png",
+  "child" : [ ]
+}, {
+  "imageId" : 35,
+  "imagePath" : "host.png",
+  "child" : [ ]
+}, {
+  "imageId" : 36,
+  "imagePath" : "output.png",
+  "child" : [ ]
+}, {
+  "imageId" : 37,
+  "imagePath" : "pd-sink.png",
+  "child" : [ ]
+}, {
+  "imageId" : 38,
+  "imagePath" : "sensing.png",
   "child" : [ ]
 } ]
