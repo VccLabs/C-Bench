@@ -1913,7 +1913,9 @@
           "height" : 64
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true
       },
@@ -1955,7 +1957,9 @@
           "height" : 64
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL41_ID"
@@ -1998,7 +2002,9 @@
           "height" : 64
         },
         "t_mode" : 1,
-        "scrollbar_t" : { },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
         "alpha" : 255,
         "pub" : true,
         "controlIDEnum" : "VIEW7_LABEL42_ID"
