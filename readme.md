@@ -1,4 +1,4 @@
-![License](https://img.shields.io/badge/license-MIT-green)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 ![Platform](https://img.shields.io/badge/MCU-RP2354A-informational)
 ![PD](https://img.shields.io/badge/USB--C-PD%203.1%20PPS%2FAVS-blue)
 ![Build with](https://img.shields.io/badge/PlatformIO-firmware-orange)
