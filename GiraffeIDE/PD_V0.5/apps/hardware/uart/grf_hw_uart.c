@@ -72,7 +72,8 @@ static const u32 THEME[TC_N][2] = {
     /* TC_CHIP   */ {GRF_COLOR_GET(0x2C, 0x2C, 0x2E), GRF_COLOR_GET(0xFF, 0xFF, 0xFF)},
 };
 static u8 g_dark = 0;
-static u8 g_ocp  = 0; /* OCP fault active (RP reg 0x001F): drives popup show + theme */
+static u8  g_ocp  = 0; /* OCP fault active (RP reg 0x001F): drives popup show + theme */
+static u16 g_tempRaw = 0xFFFF; /* temp tenths C from RP reg 0x0026 (0xFFFF = no sensor) */
 #define THEME_FILE "D:/theme.bin"
 void theme_load_boot(void)   /* read persisted theme before first paint */
 {
@@ -855,6 +856,28 @@ static void ocp_theme_apply(void)
     }
 }
 
+/* Temp widget: one value label per view. Formats g_tempRaw (tenths C) and colors it
+   by status (green<45, orange 45-60, red>60). Runs from reg 0x0026 and theme_apply,
+   so the status color overrides the TC_GREEN theme default and survives entry/toggle. */
+static void temp_paint(void)
+{
+    static const u16 val[7][2] = {
+        {GRF_VIEW1_ID, 37}, {GRF_VIEW2_ID, 102}, {GRF_VIEW3_ID, 19},
+        {GRF_VIEW4_ID, 82}, {GRF_VIEW5_ID, 11},  {GRF_VIEW6_ID, 163},
+        {GRF_VIEW7_ID, 58}};
+    char b[8];
+    u8 role;
+    if (g_tempRaw == 0xFFFF) { snprintf(b, sizeof(b), "--"); role = TC_TXT2; }
+    else {
+        snprintf(b, sizeof(b), "%u.%u", g_tempRaw / 10, g_tempRaw % 10);
+        role = (g_tempRaw > 600) ? TC_RED : (g_tempRaw >= 450) ? TC_ORANGE : TC_GREEN;
+    }
+    for (u8 i = 0; i < 7; i++) {
+        grf_label_set_txt(GCL(val[i][0], val[i][1]), b);
+        grf_label_set_txt_color(GCL(val[i][0], val[i][1]), TCOL(role));
+    }
+}
+
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
     theme_apply_view1();
@@ -864,8 +887,9 @@ static void theme_apply(void) /* repaint all themed views from g_dark */
     theme_apply_view5();
     theme_apply_view6();
     theme_apply_view7();
-    ocp_theme_apply();
-    }
+        ocp_theme_apply();
+        temp_paint(); /* value text + status color (overrides the TC_GREEN theme default) */
+        }
 
 void view1_apply_theme(void) { theme_apply(); } /* view1 entry: repaint from shadow */
 void view2_apply_theme(void) { theme_apply(); } /* view2 entry: repaint from shadow */
@@ -1270,6 +1294,10 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
     }
     case 0x001F: /* OCP fault flag from RP -> raise/lower popups on all views */
                 ocp_popups_set(data[0] ? 1 : 0);
+                break;
+    case 0x0026: /* temperature, tenths C (0xFFFF = no sensor) -> all 7 value labels */
+                g_tempRaw = data[0];
+                temp_paint();
                 break;
         case 0x0016: /* real output state from RP -> drive toggle */
         g_out_on = data[0];
