@@ -680,7 +680,7 @@ void loop()
     lastOut = -1;  // force re-apply of outputOn (default OFF) on the next check
   }
   // boot "Last used": once the initial attach is consumed, restore the rail
-  if (g_bootRestore && !g_outAttach)
+  if (g_bootRestore && !g_outAttach && g_set.lastSel < g_slotN) // list must be ready, else flag can stick
   {
     g_bootRestore = false;
     reqMV = g_set.lastMV;      // restore PPS/AVS voltage...
