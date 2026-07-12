@@ -38,6 +38,9 @@ void view1_reset_session(void);          /* view1 ↺ click -> reg 0x0025 (trip 
 void view1_toggle_theme(void);           /* TEST: dark/light text color toggle */
 void view1_apply_theme(void);            /* view1 entry: re-apply saved theme */
 void temp_toggle_unit(void); /* flip temp display between C and F (all views) */
+void temp_set_unit(u8 f);       /* set C(0)/F(1) from the view4 chips */
 void tempunit_load_boot(void); /* restore persisted C/F unit at boot */
+void view4_set_tempshow(u8 on); /* sw3: show/hide temp widget on all pages */
+void tempshow_load_boot(void);  /* restore persisted widget show/hide at boot */
 
 #endif

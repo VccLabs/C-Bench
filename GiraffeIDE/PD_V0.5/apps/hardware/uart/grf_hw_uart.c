@@ -149,6 +149,31 @@ void view4_set_pinbtn(u8 on)     /* sw2 toggled: update + persist + live hide on
     grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, 79), g_pinbtn ? 0 : 1); /* this page's button now */
 }
 
+u8 g_tempShow = 1;               /* 1 = show temp widget on all pages, 0 = hidden (sw3) */
+#define TEMPSHOW_FILE "D:/tempshow.bin"
+void tempshow_load_boot(void)    /* restore persisted widget show/hide at boot */
+{
+    grf_fs_file_t *f = grf_fs_open(TEMPSHOW_FILE, GRF_FS_MODE_RD);
+    if (f) { u8 v = 0; if (grf_fs_read(f, &v, 1) == 1 && v <= 1) g_tempShow = v; grf_fs_close(f); }
+}
+static void temp_widget_apply(void) /* hide/show widget (value+thermo+unit) on all 7 views */
+{
+    static const u16 W[7][4] = { /* view, value, thermo, unit */
+        {GRF_VIEW1_ID, 37, 38, 39}, {GRF_VIEW2_ID, 102, 103, 104}, {GRF_VIEW3_ID, 19, 20, 21},
+        {GRF_VIEW4_ID, 82, 83, 84}, {GRF_VIEW5_ID, 11, 12, 13},    {GRF_VIEW6_ID, 163, 164, 165},
+        {GRF_VIEW7_ID, 58, 59, 60}};
+    for (u8 i = 0; i < 7; i++)
+        for (u8 j = 1; j < 4; j++)
+            grf_ctrl_set_hidden(GCL(W[i][0], W[i][j]), g_tempShow ? 0 : 1);
+}
+void view4_set_tempshow(u8 on)   /* sw3 toggled: update + persist + live apply */
+{
+    g_tempShow = on ? 1 : 0;
+    grf_fs_file_t *f = grf_fs_open(TEMPSHOW_FILE, GRF_FS_MODE_WR);
+    if (f) { grf_fs_write(f, &g_tempShow, 1); grf_fs_close(f); }
+    temp_widget_apply();
+}
+
 #define TCOL(role) (THEME[(role)][g_dark]) /* current color for a role */
 #define THEME_BG(ctrl, role) grf_ctrl_style_set_bg_color((ctrl), TCOL(role), 0)
 #define THEME_TXT(ctrl, role) grf_label_set_txt_color((ctrl), TCOL(role))
@@ -914,7 +939,16 @@ static void temp_paint(void)
     }
 }
 
-void temp_toggle_unit(void) { g_tempF = !g_tempF; temp_paint(); temp_unit_state_paint(); tempunit_save(); } /* flip C/F + sync view4 chip + persist */
+void temp_set_unit(u8 f) /* set C(0)/F(1): repaint all views, sync view4 chip, persist */
+{
+    f = f ? 1 : 0;
+    if (g_tempF == f) return;
+    g_tempF = f;
+    temp_paint();
+    temp_unit_state_paint();
+    tempunit_save();
+}
+void temp_toggle_unit(void) { temp_set_unit(!g_tempF); } /* tap widget -> flip C/F */
 
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
@@ -927,6 +961,7 @@ static void theme_apply(void) /* repaint all themed views from g_dark */
     theme_apply_view7();
         ocp_theme_apply();
         temp_paint(); /* value text + status color (overrides the TC_GREEN theme default) */
+                temp_widget_apply(); /* honor sw3 show/hide on every view entry + toggle */
         }
 
 void view1_apply_theme(void) { theme_apply(); } /* view1 entry: repaint from shadow */
@@ -1087,6 +1122,7 @@ void view4_apply_settings(void) /* entry: paint controls from shadow */
 	grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW0_ID), g_v4_autoarm);
 		    grf_sw_set_state(GCL(GRF_VIEW4_ID, VIEW4_SW1_ID), g_giften);
 		    grf_sw_set_state(GCL(GRF_VIEW4_ID, 76), g_pinbtn); /* sw2 pin-map buttons */
+		    		    grf_sw_set_state(GCL(GRF_VIEW4_ID, 92), g_tempShow); /* sw3 temp widget show */
 	    grf_slider_set_range(GCL(GRF_VIEW4_ID, V4_BRIGHT_SLD), 10, 100);
 	        bright_slider(g_v4_bright);
 	        bright_label(g_v4_bright);

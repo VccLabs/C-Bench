@@ -862,31 +862,19 @@ static void label69_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void sw3_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_VALUE_CHANGED) view4_set_tempshow(grf_sw_get_state(ctrl));
 }
 
 
 static void label73_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) temp_set_unit(1); /* °F */
 }
 
 
 static void label72_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) temp_set_unit(0); /* °C */
 }
 
 
