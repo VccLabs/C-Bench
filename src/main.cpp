@@ -269,46 +269,25 @@ static void activeProfileInfo(uint16_t *type, uint16_t *mV)
   *mV = (s.type == 1 || s.type == 2) ? reqMV : s.vmin; // PPS/AVS: requested; else PDO voltage
 }
 
-// Battery presence — HW constraint: MAX17048 CELL sits on +BATT, so with NO cell the
-// charger cycles the tiny VBAT caps: top-off -> terminate -> caps sag -> recharge.
-// That yields a periodic STAT flap (00<->11) + a sharp mV TROUGH. The quiet plateau
-// between troughs can last tens of seconds, so "steady for N s" alone false-positives.
-// A REAL cell holds complete (or rises while charging) with NO recharge event for
-// minutes. So: treat each STAT flap / mV sag as a DISTURBANCE; presence latches only
-// after PRESENT_QUIET disturbance-free samples, and drops the instant one appears.
-#define PRESENT_QUIET 150 // ~75 s disturbance-free @2Hz before present latches (tunable)
-#define SAG_MV 40         // mV drop from recent peak = a no-cell recharge trough
-#define PEAK_DECAY_MV 2   // per-sample peak bleed (~4 mV/s) so a resting/discharging
-                          // real cell doesn't self-trigger a false sag
+// Battery presence — deterministic, charger-STAT only. The full-cell vs no-cell
+// termination plateau is physically indistinguishable on +BATT, so we don't try:
+// "complete" (00) and High-Z (01) BOTH map to NO BATTERY. Only sustained charging
+// (11) — held for minutes by a real cell, never by the ~1.4us no-cell cap-recharge
+// blips — counts as present. A cell reverts to "no battery" once it tops off.
+#define CHG_DEBOUNCE 2 // consecutive charging reads before latching present
 
-static uint8_t g_prev_chg = 0xFF; // last STAT state (0xFF = uninit)
-static uint16_t g_mv_peak = 0;    // decaying recent-peak mV reference
-static uint16_t g_quiet = 0;      // consecutive disturbance-free samples
+static uint8_t g_chg_run = 0; // consecutive chg==1 samples
 
-static bool batteryPresent(uint16_t cellmv, uint8_t chg)
+static bool batteryPresent(uint8_t chg)
 {
-  bool disturb = false;
-
-  if (g_prev_chg != 0xFF && chg != g_prev_chg)
-    disturb = true; // STAT flap = recharge/term
-  g_prev_chg = chg;
-
-  if (g_mv_peak > PEAK_DECAY_MV)
-    g_mv_peak -= PEAK_DECAY_MV; // bleed the reference
-  if (cellmv > g_mv_peak)
-    g_mv_peak = cellmv; // track new peaks at once
-  if (cellmv + SAG_MV <= g_mv_peak)
+  if (chg == 1)
   {
-    disturb = true;
-    g_mv_peak = cellmv;
-  } // trough
-
-  if (disturb)
-    g_quiet = 0;
-  else if (g_quiet < 0xFFFF)
-    g_quiet++;
-
-  return g_quiet >= PRESENT_QUIET;
+    if (g_chg_run < 0xFF)
+      g_chg_run++;
+  }
+  else
+    g_chg_run = 0;
+  return g_chg_run >= CHG_DEBOUNCE;
 }
 
 // SoC from resting Li-ion voltage (MAX17048 ModelGauge unusable: CELL on +BATT).
@@ -733,18 +712,16 @@ void loop()
     writeReg(0x0019, apType); /* active profile type (0=none) */
     writeReg(0x001A, apMV);   /* active profile setpoint mV   */
 
-    /* presence from dynamics: caps sawtooth + state flaps when no cell present */
+    /* presence == sustained charging; full/none both -> "no battery" (by design) */
     uint8_t chg = readChargeState();
-    uint16_t vcellmv = battOk ? (uint16_t)(maxlipo.cellVoltage() * 1000.0f) : 0;
-    bool present = battOk && batteryPresent(vcellmv, chg);
-    Serial.printf("BATT mv=%u chg=%u quiet=%u present=%u\n", vcellmv, chg, g_quiet, present);
-    writeReg(0x001E, present ? chg : 0); /* 0=none, 1=charging, 2=complete */
+    bool present = battOk && batteryPresent(chg);
+    uint16_t vcellmv = present ? (uint16_t)(maxlipo.cellVoltage() * 1000.0f) : 0;
+    Serial.printf("BATT mv=%u chg=%u run=%u present=%u\n", vcellmv, chg, g_chg_run, present);
+    writeReg(0x001E, present ? 1 : 0); /* 0=none/full, 1=charging (2=complete unused) */
     if (present)
     {
-      float vcell = vcellmv / 1000.0f;
-      uint16_t socPct = socFromVoltage(vcellmv);
-      writeReg(0x001C, (uint16_t)(vcell * 1000.0f)); /* cell mV */
-      writeReg(0x001D, socPct);                      /* SoC % */
+      writeReg(0x001C, vcellmv);                 /* cell mV */
+      writeReg(0x001D, socFromVoltage(vcellmv)); /* SoC % */
     }
     else
     {
