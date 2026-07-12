@@ -187,28 +187,30 @@ lets the MCU both **bias** the STAT node and **read** it safely.
 | LOW    | 1            | 1             | `11`    | Charging                   |
 | HIGH   | 0            | 0             | `00`    | Charge complete            |
 
-<!-- RESOLVED (battery presence + SoC):
-  - Root cause: MAX17048 CELL tied to +BATT. With NO battery the charger charges
-    only the VBAT caps (C33/C34) -> terminates -> caps sag -> re-charge, so cell mV
-    SAWTOOTHS and charge-state FLAPS `00`<->`11`. High-Z (`01`) never appears while
-    VDD is powered, so neither voltage level nor the state enum can gate presence.
-  - Presence gate (`batteryPresent()` in main.cpp): `BATT_WIN=10` samples (~5 s
-    @ 2 Hz); present iff cell-mV span <=30 mV AND state flaps <2. A real cell is
-    ~DC + stable; no cell sawtooths/flaps. Don't drop below 10 samples — shorter
-    windows false-positive (miss the sawtooth).
-  - Second-order false positive (fixed): after ~5-10 min with no cell, the no-load
-    charger settles into its termination/recharge cycle and briefly parks +BATT at a
-    steady plateau (~4.1-4.2 V) with a stable STAT, which passes one raw window ->
-    momentary "96-99% Charged" that flips back. Fixed with ASYMMETRIC DEBOUNCE:
-    presence must hold for `BATT_CONFIRM=40` consecutive windows (~20 s @ 2 Hz) to
-    latch, and clears on the FIRST failing window. Plateau episodes (~seconds) never
-    reach 40; real cell latches in ~20 s. Lower BATT_CONFIRM for faster detect at the
-    cost of margin; raise it if a plateau ever sneaks through.
-  - SoC: MAX17048 ModelGauge is UNUSABLE with CELL on +BATT (reported 100/11/15%,
-    never converged). `quickStart()` removed entirely. SoC now computed from
-    `cellVoltage()` via a piecewise Li-ion curve (`socFromVoltage()`); voltage read
-    itself is trustworthy. Sags under load / rises on charge (no coulomb counting)
-    but stable and honest. Tune the curve to the cell if needed. -->
+<!-- OPEN — battery presence detection UNSOLVED (being redone from schematics):
+  - HW constraint: MAX17048 CELL sits on +BATT (no dedicated cell sense). With NO
+    cell the MCP73831 cycles the tiny VBAT caps (C33/C34): top-off -> terminate ->
+    caps sag -> recharge. Cell mV sawtooths and STAT flaps `00`<->`11`. High-Z (`01`)
+    never appears while VDD is powered, so neither voltage level nor the state enum
+    alone can gate presence.
+  - Approaches tried, all INSUFFICIENT:
+      1. Short dynamics window (`BATT_WIN=10`, ~5 s; span <=30 mV + flaps <2). False-
+         positived once the no-load charger settled into a steady termination plateau.
+      2. Asymmetric confirm debounce (`BATT_CONFIRM`, ~20 s steady before latch).
+         Plateau on real HW lasts 20-40 s, exceeding the confirm -> still latched a
+         phantom "96-99% Charged".
+      3. Disturbance-reset quiet-latch (reset on STAT flap / mV sag, latch after
+         PRESENT_QUIET ~75 s disturbance-free). Delayed the phantom but did not
+         eliminate it; real-cell detection also got slow.
+  - Conclusion: dynamics-only discrimination off +BATT cannot cleanly separate a
+    long cap-plateau from a real full cell. Next attempt starts fresh from the
+    battery-circuit schematic (see new design chat) — likely needs a different
+    signal (e.g. active load/decay probe, or a proper cell-sense tap) rather than
+    heuristics on +BATT.
+  - SoC (KEEP — this part works): MAX17048 ModelGauge is unusable with CELL on +BATT;
+    `quickStart()` removed. SoC computed from `cellVoltage()` via a piecewise Li-ion
+    curve (`socFromVoltage()`); the raw voltage read is trustworthy. Only the
+    PRESENCE gate is unresolved. -->
     
 ---
 
@@ -429,10 +431,10 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     `view3_apply_theme`) so control colors persist across navigation. Arc track
     (`TC_TRACK`) themed via `grf_arc_set_dis` part 0; green fg is constant.
     Charge-state pill `label0` (id 2) bg = `TC_SURF2`. Nav img `nav-battery.png` /
-    `-light`. Presence detection now reliable (see RESOLVED block above). Expect a
-    **~20 s delay** between connecting a real cell and it showing "Charging" — this
-    is the intended `BATT_CONFIRM` debounce (~20 s @ 2 Hz) that rejects the charger
-    termination-plateau false positive, not a fault.
+    `-light`. ⚠ **Presence detection is currently UNRELIABLE** — see the OPEN block
+    above. With no cell the charger's termination plateau still intermittently reads
+    as "Charged" 96-99%. Being redone from the battery schematic; SoC-from-voltage is
+    fine, only the presence gate is broken.
 - **view4 — Settings:** boot output state (segmented Off / Last used) and auto-arm
   output (switch), wired to `0x0031`/`0x0032`. Controls are painted from a
   panel-side shadow on entry (`view4_apply_settings`), kept in sync by RP pushes.
@@ -816,7 +818,6 @@ Open-source hardware **and** software under the **MIT License**.
 - [~] **Dark/light theme — IN PROGRESS.** Proven on a TEST set (view1 `label16`/
       `label17`/`label1`, ids 19/20/2) + toggle `label24` (id 28). **Next: extend to
       all objects across all 4 views.** See the "Theme" notes in Firmware behavior.
-- [ ] Settings UI for theme (move the toggle off view1 into view4 appearance).
 - [x] Lifetime-energy **odometer display** in Settings (7-digit, Control IDs 42–49).
 - [x] **Gift message**: view5 editor → `D:/gift.txt`; view1 boot popup (image4/label24).
 - [x] **Gift popup enable** (view4 sw1 → `D:/giften.bin`, panel-local, defaults ON).
@@ -832,4 +833,7 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] **About page (view7)** — themed product/credits reference; theme-aware QR
       popup overlay (Crowd Supply / GitHub / Website); Back → Settings; reached
       from Settings row `label61`/id80.
+- [ ] **Battery presence detection — REDO from schematic.** Dynamics-only heuristics
+      off +BATT (short window / confirm debounce / disturbance quiet-latch) all
+      false-positive on the no-cell charger plateau. Needs a different approach.
 - [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).

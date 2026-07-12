@@ -269,42 +269,46 @@ static void activeProfileInfo(uint16_t *type, uint16_t *mV)
   *mV = (s.type == 1 || s.type == 2) ? reqMV : s.vmin; // PPS/AVS: requested; else PDO voltage
 }
 
-// Battery presence via DYNAMICS, not level/state:
-//  - no cell: +BATT caps sawtooth (cell mV wanders) and charge-state flaps 00<->11
-//  - real cell: cell mV is ~DC (<~mV/s) and state is stable for minutes
-// Window ~10 s @ 2 Hz. Present iff cell mV span small AND state not flapping.
-#define BATT_WIN 10 // samples (~5 s at 2 Hz)
-static uint16_t g_bmv[BATT_WIN];
-static uint8_t g_bst[BATT_WIN];
-static uint8_t g_bi = 0, g_bn = 0;
-static uint8_t g_bpresent = 0; // debounced presence actually reported to the panel
-static uint8_t g_bconfirm = 0; // consecutive "present" windows so far
-#define BATT_CONFIRM 40        // ~20 s steady @2Hz before presence latches (tunable)
+// Battery presence — HW constraint: MAX17048 CELL sits on +BATT, so with NO cell the
+// charger cycles the tiny VBAT caps: top-off -> terminate -> caps sag -> recharge.
+// That yields a periodic STAT flap (00<->11) + a sharp mV TROUGH. The quiet plateau
+// between troughs can last tens of seconds, so "steady for N s" alone false-positives.
+// A REAL cell holds complete (or rises while charging) with NO recharge event for
+// minutes. So: treat each STAT flap / mV sag as a DISTURBANCE; presence latches only
+// after PRESENT_QUIET disturbance-free samples, and drops the instant one appears.
+#define PRESENT_QUIET 150 // ~75 s disturbance-free @2Hz before present latches (tunable)
+#define SAG_MV 40         // mV drop from recent peak = a no-cell recharge trough
+#define PEAK_DECAY_MV 2   // per-sample peak bleed (~4 mV/s) so a resting/discharging
+                          // real cell doesn't self-trigger a false sag
+
+static uint8_t g_prev_chg = 0xFF; // last STAT state (0xFF = uninit)
+static uint16_t g_mv_peak = 0;    // decaying recent-peak mV reference
+static uint16_t g_quiet = 0;      // consecutive disturbance-free samples
 
 static bool batteryPresent(uint16_t cellmv, uint8_t chg)
 {
-  g_bmv[g_bi] = cellmv;
-  g_bst[g_bi] = chg;
-  g_bi = (g_bi + 1) % BATT_WIN;
-  if (g_bn < BATT_WIN)
-    g_bn++;
-  if (g_bn < BATT_WIN)
-    return false; // need a full window first
+  bool disturb = false;
 
-  uint16_t lo = 0xFFFF, hi = 0;
-  uint8_t flaps = 0;
-  for (uint8_t k = 0; k < BATT_WIN; k++)
+  if (g_prev_chg != 0xFF && chg != g_prev_chg)
+    disturb = true; // STAT flap = recharge/term
+  g_prev_chg = chg;
+
+  if (g_mv_peak > PEAK_DECAY_MV)
+    g_mv_peak -= PEAK_DECAY_MV; // bleed the reference
+  if (cellmv > g_mv_peak)
+    g_mv_peak = cellmv; // track new peaks at once
+  if (cellmv + SAG_MV <= g_mv_peak)
   {
-    if (g_bmv[k] < lo)
-      lo = g_bmv[k];
-    if (g_bmv[k] > hi)
-      hi = g_bmv[k];
-  }
-  for (uint8_t k = 1; k < BATT_WIN; k++)
-    if (g_bst[k] != g_bst[(k + BATT_WIN - 1) % BATT_WIN])
-      flaps++;
+    disturb = true;
+    g_mv_peak = cellmv;
+  } // trough
 
-  return (hi - lo) <= 30 && flaps < 2; // steady mV + steady state = cell
+  if (disturb)
+    g_quiet = 0;
+  else if (g_quiet < 0xFFFF)
+    g_quiet++;
+
+  return g_quiet >= PRESENT_QUIET;
 }
 
 // SoC from resting Li-ion voltage (MAX17048 ModelGauge unusable: CELL on +BATT).
@@ -732,20 +736,8 @@ void loop()
     /* presence from dynamics: caps sawtooth + state flaps when no cell present */
     uint8_t chg = readChargeState();
     uint16_t vcellmv = battOk ? (uint16_t)(maxlipo.cellVoltage() * 1000.0f) : 0;
-    bool raw = battOk && batteryPresent(vcellmv, chg);
-    if (raw)
-    {
-      if (g_bconfirm < BATT_CONFIRM)
-        g_bconfirm++;
-    }
-    else
-    {
-      g_bconfirm = 0;
-      g_bpresent = 0;
-    } /* any failing window -> drop now */
-    if (g_bconfirm >= BATT_CONFIRM)
-      g_bpresent = 1;
-    bool present = g_bpresent;
+    bool present = battOk && batteryPresent(vcellmv, chg);
+    Serial.printf("BATT mv=%u chg=%u quiet=%u present=%u\n", vcellmv, chg, g_quiet, present);
     writeReg(0x001E, present ? chg : 0); /* 0=none, 1=charging, 2=complete */
     if (present)
     {
