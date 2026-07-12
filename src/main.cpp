@@ -645,17 +645,17 @@ void loop()
         g_set.lastMA = limMA;
         saveSettings();
       }
-      if (g_set.autoArm) // auto-arm setting (reg 0x0032)
+      if (g_bootRestoreOut >= 0) // boot "Last used": rail restored, force output OFF
+      {
+        outputOn = false;    // never arm on boot, regardless of autoArm or saved state
+        g_bootRestoreOut = -1;
+      }
+      else if (g_set.autoArm) // auto-arm setting (reg 0x0032) — only for user applies
       {
         usbpd.setOutput(1);
         outputOn = true;
         g_ocpLatched = false;
         writeReg(0x001F, 0); // fresh apply clears any OCP latch + popups
-      }
-      if (g_bootRestoreOut >= 0) // boot "Last used": force saved output state
-      {
-        outputOn = (g_bootRestoreOut != 0);
-        g_bootRestoreOut = -1;
       }
     }
   }
@@ -683,10 +683,10 @@ void loop()
   if (g_bootRestore && !g_outAttach)
   {
     g_bootRestore = false;
-    reqMV = g_set.lastMV;                  // restore PPS/AVS voltage...
-    limMA = g_set.lastMA;                  // ...and current limit
-    pendingSel = g_set.lastSel;            // applied next loop pass
-    g_bootRestoreOut = g_set.lastOutputOn; // then forces saved output state
+    reqMV = g_set.lastMV;      // restore PPS/AVS voltage...
+    limMA = g_set.lastMA;      // ...and current limit
+    pendingSel = g_set.lastSel; // applied next loop pass
+    g_bootRestoreOut = 0;      // boot restores the RAIL ONLY — output stays OFF, always
   }
   if ((int)outputOn != lastOut)
   {
