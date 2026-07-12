@@ -1,3 +1,13 @@
+![License](https://img.shields.io/badge/license-MIT-green)
+![Platform](https://img.shields.io/badge/MCU-RP2354A-informational)
+![PD](https://img.shields.io/badge/USB--C-PD%203.1%20PPS%2FAVS-blue)
+![Build with](https://img.shields.io/badge/PlatformIO-firmware-orange)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![Stars](https://img.shields.io/github/stars/VccLabs/C-Bench)
+![Last commit](https://img.shields.io/github/last-commit/VccLabs/C-Bench)
+![Issues](https://img.shields.io/github/issues/VccLabs/C-Bench)
+![Top language](https://img.shields.io/github/languages/top/VccLabs/C-Bench)
+
 # C-Bench
 
 **A mini bench power supply powered by USB-C Power Delivery.**
