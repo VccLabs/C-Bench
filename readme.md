@@ -187,30 +187,34 @@ lets the MCU both **bias** the STAT node and **read** it safely.
 | LOW    | 1            | 1             | `11`    | Charging                   |
 | HIGH   | 0            | 0             | `00`    | Charge complete            |
 
-<!-- OPEN — battery presence detection UNSOLVED (being redone from schematics):
-  - HW constraint: MAX17048 CELL sits on +BATT (no dedicated cell sense). With NO
-    cell the MCP73831 cycles the tiny VBAT caps (C33/C34): top-off -> terminate ->
-    caps sag -> recharge. Cell mV sawtooths and STAT flaps `00`<->`11`. High-Z (`01`)
-    never appears while VDD is powered, so neither voltage level nor the state enum
-    alone can gate presence.
-  - Approaches tried, all INSUFFICIENT:
-      1. Short dynamics window (`BATT_WIN=10`, ~5 s; span <=30 mV + flaps <2). False-
-         positived once the no-load charger settled into a steady termination plateau.
-      2. Asymmetric confirm debounce (`BATT_CONFIRM`, ~20 s steady before latch).
-         Plateau on real HW lasts 20-40 s, exceeding the confirm -> still latched a
-         phantom "96-99% Charged".
-      3. Disturbance-reset quiet-latch (reset on STAT flap / mV sag, latch after
-         PRESENT_QUIET ~75 s disturbance-free). Delayed the phantom but did not
-         eliminate it; real-cell detection also got slow.
-  - Conclusion: dynamics-only discrimination off +BATT cannot cleanly separate a
-    long cap-plateau from a real full cell. Next attempt starts fresh from the
-    battery-circuit schematic (see new design chat) — likely needs a different
-    signal (e.g. active load/decay probe, or a proper cell-sense tap) rather than
-    heuristics on +BATT.
-  - SoC (KEEP — this part works): MAX17048 ModelGauge is unusable with CELL on +BATT;
-    `quickStart()` removed. SoC computed from `cellVoltage()` via a piecewise Li-ion
-    curve (`socFromVoltage()`); the raw voltage read is trustworthy. Only the
-    PRESENCE gate is unresolved. -->
+### Battery presence detection (resolved — charging-only model)
+
+The full-cell vs. no-cell case is physically unsolvable off +BATT: with no cell the
+MCP73831 cycles the VBAT caps (C33/C34 ≈ 4.8 µF) — top-off → terminate → sag →
+recharge — and the **termination plateau** sits at `00`, steady, ~4.2 V, identical
+in level and steadiness to a real full cell. High-Z (`01`) never appears while VDD
+is powered. No dynamics heuristic on +BATT can separate the two (3 attempts tried:
+short dynamics window, asymmetric confirm debounce, disturbance-reset quiet-latch —
+all false-positived into a phantom "96–99% Charged" on the 20–40 s plateau).
+
+**Design decision:** don't distinguish them. Presence = **sustained charging only**:
+
+- A real charging cell holds STAT `11` for minutes → latches present (`0x001E`=1).
+- The no-cell recharge blip is ~1.4 µs (0.72 µC into 4.8 µF); at 2 Hz it is never
+  caught and never sustained → never latches.
+- `00` (complete) and `01` (High-Z) both map to **no battery**. Consequence: a real
+  cell reverts to "no battery" the instant it tops off. This is intended UX.
+
+`0x001E` now only ever emits `0` (none/full) or `1` (charging); `2` (complete) is
+unused. No +BATT dynamics, no log-threshold tuning — reads the charger's own state.
+
+The deterministic alternative (kept for a future hardware rev) needs a FET load +
++BATT→ADC divider for a transient decay probe (caps collapse ~1 V, real cell <5 mV),
+which cleanly detects a floating full cell too. Deferred — no board change for now.
+
+**SoC (unchanged, works):** MAX17048 ModelGauge unusable with CELL on +BATT
+(`quickStart()` removed); SoC from `cellVoltage()` via piecewise Li-ion curve
+(`socFromVoltage()`). Only presence changed.
     
 ---
 
@@ -274,7 +278,7 @@ and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
 | `0x001B` | Eased arc value (analog ring ramp) — see note             | 0–280 (0.1 V) |
 | `0x001C` | Battery cell voltage (MAX17048); `0` = no battery         | mV            |
 | `0x001D` | Battery SoC (MAX17048), clamped 0–100; `0xFFFF` = no batt | %             |
-| `0x001E` | Charge state: 0 no battery, 1 charging, 2 complete        | enum          |
+| `0x001E` | Charge state: 0 no battery/full, 1 charging (2 unused)    | enum          |
 | `0x003A` | Lifetime energy odometer — **high 16 bits** of Wh         | Wh            |
 | `0x003B` | Lifetime energy odometer — **low 16 bits** of Wh          | Wh            |
 
@@ -431,10 +435,9 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     `view3_apply_theme`) so control colors persist across navigation. Arc track
     (`TC_TRACK`) themed via `grf_arc_set_dis` part 0; green fg is constant.
     Charge-state pill `label0` (id 2) bg = `TC_SURF2`. Nav img `nav-battery.png` /
-    `-light`. ⚠ **Presence detection is currently UNRELIABLE** — see the OPEN block
-    above. With no cell the charger's termination plateau still intermittently reads
-    as "Charged" 96-99%. Being redone from the battery schematic; SoC-from-voltage is
-    fine, only the presence gate is broken.
+    `-light`. Presence = sustained charging only (see "Battery presence detection"
+    above): a cell shows "Charging" until it tops off, then reverts to "No battery"
+    by design. "Charged" state is intentionally never emitted.
 - **view4 — Settings:** boot output state (segmented Off / Last used) and auto-arm
   output (switch), wired to `0x0031`/`0x0032`. Controls are painted from a
   panel-side shadow on entry (`view4_apply_settings`), kept in sync by RP pushes.
