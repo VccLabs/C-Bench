@@ -359,7 +359,7 @@
         },
         "size" : {
           "width" : 691,
-          "height" : 650
+          "height" : 320
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -1905,11 +1905,11 @@
         "id" : 54,
         "parent_id" : 15,
         "pt" : {
-          "x" : 439,
+          "x" : 9,
           "y" : 395
         },
         "size" : {
-          "width" : 238,
+          "width" : 667,
           "height" : 64
         },
         "t_mode" : 1,
@@ -1949,11 +1949,11 @@
         "id" : 55,
         "parent_id" : 15,
         "pt" : {
-          "x" : 439,
+          "x" : 9,
           "y" : 457
         },
         "size" : {
-          "width" : 238,
+          "width" : 666,
           "height" : 64
         },
         "t_mode" : 1,
@@ -1994,11 +1994,11 @@
         "id" : 56,
         "parent_id" : 15,
         "pt" : {
-          "x" : 439,
+          "x" : 9,
           "y" : 519
         },
         "size" : {
-          "width" : 238,
+          "width" : 668,
           "height" : 64
         },
         "t_mode" : 1,

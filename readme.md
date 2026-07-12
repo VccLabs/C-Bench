@@ -488,6 +488,23 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
   names/IDs do **not** match the codegen enum (`view6.h`) — the enum value is the
   runtime Control ID; map through `view6.h`, and note runtime-set text only renders
   glyphs the control's font was compiled with (see gotchas).
+- **view7 — About:** final page — static product / credits reference (like view6).
+  Fully themed (`theme_apply_view7`): VccLabs logo (`image1`/id5) + theme-toggle
+  (`image0`/id1 → `view1_toggle_theme()`) image swaps; text groups `V7_TXT`→`TC_TXT`
+  and `V7_TXT2`→`TC_TXT2`; card surfaces `V7_SURF`→`TC_SURF` (pill + hardware/project
+  panels, ids 10/16/38); hairline separators `V7_LINE`→`TC_SURF2` (ids 33–36, 49, 50);
+  version label (id13) + **Back button** (`label0`/id2, `TC_SURF` bg + `TC_ORANGE` text)
+  accented orange. Back goes **straight to Settings (view4)** — single origin, so no
+  `g_prev_view`. The green pip (`label7`/id11) is left a fixed accent.
+  **QR popup:** `image11`/id53 is a full-screen overlay, hidden by default. Three link
+  labels — `label40`/id54 (Crowd Supply), `label41`/id55 (GitHub), `label42`/id56
+  (Website) — call `view7_qr_show(1..3)`, swapping `qr-{crowd-supply,github,website}-{dark,light}.png`
+  by `g_dark` and unhiding it; any tap dismisses via `image11_event`→`view7_qr_hide()`.
+  A `g_v7_qr` shadow tracks which QR so `theme_apply_view7` re-swaps it if the theme is
+  toggled while open. The overlay needs **touch mode = "can touch"** + an enlarged
+  **extended-touch range** (both IDE properties) so a tap *anywhere* lands on it.
+
+**About entry point:** Settings row `label61`/id80 → view7 (`view4_ui.c label61_event`).
 
 **Pin-Map shortcut (per-page):** view1–view4 each carry an orange redirect button
 (→ view6): `label27`/id34, `label90`/id100, `label3`/id17, `label60`/id79, plus the
@@ -543,7 +560,7 @@ width 27 / radius 12); **image assets** are theme-swapped with `grf_img_set_src`
 are fully themed** (view1 Monitor, view2 Profiles incl. the AVS/PPS adjust popup
 `container1` id82 = `TC_SURF` + labels id85/86 = `TC_TXT2`, view3 Battery, view4
 Settings incl. the pin-map section + `acc-orange`/`acc-black` image swaps, view5
-editor, view6 Pin Map). view1's boot gift popup is themed too (`image4` id32 asset
+editor, view6 Pin Map, view7 About). view1's boot gift popup is themed too (`image4` id32 asset
 swap + `label24` id33 = `TC_TXT`). Selected-row tint uses `SEL_TINT` (orangy `#3A2A10`
 dark / `#FFECD1` light) — note the ternary keys on `g_dark` where `1`=light. On
 view2, `view2_paint_cards()` is the
@@ -706,6 +723,11 @@ shows `"<W> W USB-C · <n> profiles"` or an empty-state prompt (`view2_apply_sta
   `B/a/c/k`. Fix in the IDE: set the label's **static text** to include those chars
   and regenerate the font (Tools → Font Tools → scan → generate), or drop the custom
   font so it falls back to the built-in 16×16 English library.
+- **Image controls aren't touchable by default.** An `image` fires no `CLICKED`
+  until its IDE **touch mode** is set to "can touch"; to have it swallow taps beyond
+  its bounds (e.g. a modal overlay dismissed by tapping anywhere), raise its
+  **extended-touch range** and keep it top-most in z-order (view7 QR popup).
+- **view6 IDE label names/IDs diverge from the codegen enum.** After deleting/adding
 - **view6 IDE label names/IDs diverge from the codegen enum.** After deleting/adding
   controls, the IDE's displayed Control ID may not exist in `view6.h` (e.g. the "back"
   control the IDE calls id 164 had no enum; the bound control was id 162). Trust the
@@ -796,5 +818,7 @@ Open-source hardware **and** software under the **MIT License**.
       shadow; slider `force_refresh`). Session energy now shows the `Wh` unit.
 - [x] Extend theme to **view3 / view4 / view5 / view6** and remaining view2 elements.
 - [x] Battery page (view3) content.
-- [ ] **About page** — final view; not yet built.
+- [x] **About page (view7)** — themed product/credits reference; theme-aware QR
+      popup overlay (Crowd Supply / GitHub / Website); Back → Settings; reached
+      from Settings row `label61`/id80.
 - [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).
