@@ -97,7 +97,6 @@ static uint8_t activeType = 0;        // 0 FIX, 1 PPS, 2 AVS, 3 EPR
 static bool g_prevSource = false;     // source-present edge detect
 static volatile bool g_pdInt = false; // AP33772S INT pending (set in ISR)
 static void pdIntISR() { g_pdInt = true; }
-static void pdIntISR() { g_pdInt = true; }
 
 // Arm AP33772S hardware OCP at the given trip current (50 mA/LSB). Re-armed on every
 // apply: limMA changes, and PD renegotiation can reset chip config.

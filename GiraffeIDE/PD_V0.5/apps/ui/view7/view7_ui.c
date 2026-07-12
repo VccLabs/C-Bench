@@ -543,6 +543,16 @@ static void label41_event(grf_ctrl_t *ctrl, grf_event_e event)   /* GitHub QR */
 	if (event == GRF_EVENT_CLICKED) view7_qr_show(2);
 }
 
+
+static void image12_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view7_cc.h"
 void view7_init(void)
 {

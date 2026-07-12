@@ -1121,6 +1121,19 @@ void view3_tele_apply(void)
     }
 }
 
+/* ---- OCP fault popups (RP reg 0x001F) --------------------------------------
+   One overlay image per view, all bound to ocp-light/ocp-dark.png. Raised
+   together on an OCP trip; dismissed together on any tap (see view*_ui.c). */
+void ocp_popups_set(u8 show)
+{
+    static const u16 pop[7][2] = {
+        {GRF_VIEW1_ID, 35}, {GRF_VIEW2_ID, 101}, {GRF_VIEW3_ID, 18},
+        {GRF_VIEW4_ID, 81}, {GRF_VIEW5_ID, 10},  {GRF_VIEW6_ID, 140},
+        {GRF_VIEW7_ID, 57}};
+    for (u8 i = 0; i < 7; i++)
+        grf_ctrl_set_hidden(GCL(pop[i][0], pop[i][1]), show ? 0 : 1);
+}
+
 static u16 g_lifeWhHi = 0;
 void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
 {
@@ -1202,7 +1215,10 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         grf_arc_set_value(GCL(GRF_VIEW3_ID, 15), arc); /* arc0 id15, full=628 */
         break;
     }
-    case 0x0016: /* real output state from RP -> drive toggle */
+    case 0x001F: /* OCP fault flag from RP -> raise/lower popups on all views */
+            ocp_popups_set(data[0] ? 1 : 0);
+            break;
+        case 0x0016: /* real output state from RP -> drive toggle */
         g_out_on = data[0];
         view1_set_output_btn(g_out_on);
         break;
