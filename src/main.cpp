@@ -108,7 +108,6 @@ static void armOCP(uint16_t ocpMA)
 }
 static volatile bool g_outAttach = false; // re-assert output after a (re)attach
 
-
 // Read AP33772S 2-byte STATUS (clear-on-read): [0]=nego events, [1]=protect events.
 // Called from INT and polled, so OCP is caught even if it never asserts INT.
 static void serviceStatus()
@@ -129,6 +128,23 @@ static void serviceStatus()
     writeReg(0x0016, 0);
     writeReg(0x001F, 1);
   }
+}
+
+// TMP102 (0x4B): read temperature register 0x00 (12-bit, left-justified, 0.0625 C/LSB).
+// Returns tenths of a degree C, or INT16_MIN on I2C failure.
+static int16_t tmp102ReadTenths()
+{
+  Wire.beginTransmission(0x4B);
+  Wire.write(0x00); // pointer -> temperature register
+  if (Wire.endTransmission(false) != 0)
+    return INT16_MIN;
+  if (Wire.requestFrom(0x4B, 2) != 2)
+    return INT16_MIN;
+  uint8_t msb = Wire.read(), lsb = Wire.read();
+  int16_t raw = ((int16_t)msb << 4) | (lsb >> 4); // 12-bit
+  if (raw & 0x0800)
+    raw |= 0xF000;                        // sign-extend
+  return (int16_t)((int32_t)raw * 5 / 8); // *0.0625 C, in tenths (raw*0.625)
 }
 
 // Read source PDOs over I2C and push the real list to the HMI
@@ -644,7 +660,7 @@ void loop()
       }
       if (g_bootRestoreOut >= 0) // boot "Last used": rail restored, force output OFF
       {
-        outputOn = false;    // never arm on boot, regardless of autoArm or saved state
+        outputOn = false; // never arm on boot, regardless of autoArm or saved state
         g_bootRestoreOut = -1;
       }
       else if (g_set.autoArm) // auto-arm setting (reg 0x0032) — only for user applies
@@ -680,10 +696,10 @@ void loop()
   if (g_bootRestore && !g_outAttach)
   {
     g_bootRestore = false;
-    reqMV = g_set.lastMV;      // restore PPS/AVS voltage...
-    limMA = g_set.lastMA;      // ...and current limit
+    reqMV = g_set.lastMV;       // restore PPS/AVS voltage...
+    limMA = g_set.lastMA;       // ...and current limit
     pendingSel = g_set.lastSel; // applied next loop pass
-    g_bootRestoreOut = 0;      // boot restores the RAIL ONLY — output stays OFF, always
+    g_bootRestoreOut = 0;       // boot restores the RAIL ONLY — output stays OFF, always
   }
   if ((int)outputOn != lastOut)
   {
@@ -747,8 +763,12 @@ void loop()
     g_arcTgtMV = mV; /* feed the analog arc easer */
     writeReg(0x0011, mA);
     writeReg(0x0012, (uint16_t)(mW / 100));
-    writeReg(0x0016, outputOn ? 1 : 0);  /* real output state for the view1 toggle */
-    energyAccumulate(now, mW, mA, good); /* session + lifetime integration */
+    int16_t tC = tmp102ReadTenths();                                            /* TMP102 @0x4B, tenths C */
+    writeReg(0x0026, (tC == INT16_MIN) ? 0xFFFF : (uint16_t)(tC < 0 ? 0 : tC)); /* 0xFFFF = no sensor */
+    if (tC != INT16_MIN)
+      Serial.printf("TEMP=%d.%d C\n", tC / 10, (tC % 10 < 0 ? -tC % 10 : tC % 10)); // TEMP debug
+    writeReg(0x0016, outputOn ? 1 : 0);                                             /* real output state for the view1 toggle */
+    energyAccumulate(now, mW, mA, good);                                            /* session + lifetime integration */
     uint16_t apType, apMV;
     activeProfileInfo(&apType, &apMV);
     writeReg(0x0019, apType); /* active profile type (0=none) */
