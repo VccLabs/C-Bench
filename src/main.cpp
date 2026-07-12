@@ -108,7 +108,6 @@ static void armOCP(uint16_t ocpMA)
 }
 static volatile bool g_outAttach = false; // re-assert output after a (re)attach
 
-static volatile bool g_outAttach = false; // re-assert output after a (re)attach
 
 // Read AP33772S 2-byte STATUS (clear-on-read): [0]=nego events, [1]=protect events.
 // Called from INT and polled, so OCP is caught even if it never asserts INT.
@@ -116,19 +115,16 @@ static void serviceStatus()
 {
   Wire.beginTransmission(0x52);
   Wire.write(0x01);
-  uint8_t st0 = 0, st1 = 0;
-  if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 2) == 2)
-  {
-    st0 = Wire.read();
-    st1 = Wire.read();
-  }
-  if (st1) Serial.printf("PDSTAT st0=%02X st1=%02X\n", st0, st1); // TEMP: confirm OCP bit
-  if (st0 & 0x07) // (re)negotiated
+  uint8_t st = 0; // STATUS is 1 byte (bits mirror MASK: OCP = bit5)
+  if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 1) == 1)
+    st = Wire.read();
+  if (st) Serial.printf("PDSTAT=%02X\n", st); // TEMP: capture idle vs during OC
+  if (st & 0x07) // (re)negotiated
   {
     g_outAttach = true;
     lastSig = 0xFFFFFFFF;
   }
-  if (st1 & 0x02) // OCP (protectEvent bit1): chip only flags -> cut VOUT + latch off
+  if (st & 0x20) // OCP (STATUS bit5): chip only flags -> cut VOUT + latch off
   {
     outputOn = false;
     g_ocpLatched = true;
