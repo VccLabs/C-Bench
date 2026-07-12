@@ -786,11 +786,7 @@ static void image14_event(grf_ctrl_t *ctrl, grf_event_e event)
 
 static void label62_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) temp_toggle_unit(); /* tap temp value -> toggle C/F */
 }
 
 #include "../../../libs/appscc/view4_cc.h"

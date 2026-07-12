@@ -37,6 +37,6 @@ void view1_reset_press(u8 down);         /* view1 reset press-tint overlay show/
 void view1_reset_session(void);          /* view1 ↺ click -> reg 0x0025 (trip reset)    */
 void view1_toggle_theme(void);           /* TEST: dark/light text color toggle */
 void view1_apply_theme(void);            /* view1 entry: re-apply saved theme */
-
+void temp_toggle_unit(void); /* flip temp display between C and F (all views) */
 
 #endif

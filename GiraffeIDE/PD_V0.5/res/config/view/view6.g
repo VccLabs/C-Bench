@@ -848,7 +848,7 @@
       "auto_hight" : 1,
       "animspeed" : 50,
       "align_e" : 34,
-      "txt" : "42.5",
+      "txt" : "00.0",
       "styles" : [ {
         "name" : "style",
         "body_t" : {

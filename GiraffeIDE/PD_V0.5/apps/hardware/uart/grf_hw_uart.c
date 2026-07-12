@@ -74,6 +74,7 @@ static const u32 THEME[TC_N][2] = {
 static u8 g_dark = 0;
 static u8  g_ocp  = 0; /* OCP fault active (RP reg 0x001F): drives popup show + theme */
 static u16 g_tempRaw = 0xFFFF; /* temp tenths C from RP reg 0x0026 (0xFFFF = no sensor) */
+static u8  g_tempF   = 0;      /* display unit: 0 = C, 1 = F (global, tap value to toggle) */
 #define THEME_FILE "D:/theme.bin"
 void theme_load_boot(void)   /* read persisted theme before first paint */
 {
@@ -861,22 +862,27 @@ static void ocp_theme_apply(void)
    so the status color overrides the TC_GREEN theme default and survives entry/toggle. */
 static void temp_paint(void)
 {
-    static const u16 val[7][2] = {
-        {GRF_VIEW1_ID, 37}, {GRF_VIEW2_ID, 102}, {GRF_VIEW3_ID, 19},
-        {GRF_VIEW4_ID, 82}, {GRF_VIEW5_ID, 11},  {GRF_VIEW6_ID, 163},
-        {GRF_VIEW7_ID, 58}};
+    static const u16 val[7][3] = { /* view, value-label, unit-label */
+        {GRF_VIEW1_ID, 37, 39}, {GRF_VIEW2_ID, 102, 104}, {GRF_VIEW3_ID, 19, 21},
+        {GRF_VIEW4_ID, 82, 84}, {GRF_VIEW5_ID, 11, 13},   {GRF_VIEW6_ID, 163, 165},
+        {GRF_VIEW7_ID, 58, 60}};
+    const char *unit = g_tempF ? "\xC2\xB0" "F" : "\xC2\xB0" "C"; /* UTF-8 degree + C/F */
     char b[8];
     u8 role;
     if (g_tempRaw == 0xFFFF) { snprintf(b, sizeof(b), "--"); role = TC_TXT2; }
     else {
-        snprintf(b, sizeof(b), "%u.%u", g_tempRaw / 10, g_tempRaw % 10);
-        role = (g_tempRaw > 600) ? TC_RED : (g_tempRaw >= 450) ? TC_ORANGE : TC_GREEN;
+        int t = g_tempF ? ((int)g_tempRaw * 9 / 5 + 320) : (int)g_tempRaw; /* tenths, C or F */
+        snprintf(b, sizeof(b), "%d.%d", t / 10, t % 10);
+        role = (g_tempRaw > 600) ? TC_RED : (g_tempRaw >= 450) ? TC_ORANGE : TC_GREEN; /* thresholds stay in C */
     }
     for (u8 i = 0; i < 7; i++) {
         grf_label_set_txt(GCL(val[i][0], val[i][1]), b);
         grf_label_set_txt_color(GCL(val[i][0], val[i][1]), TCOL(role));
+        grf_label_set_txt(GCL(val[i][0], val[i][2]), unit);
     }
 }
+
+void temp_toggle_unit(void) { g_tempF = !g_tempF; temp_paint(); } /* tap value label -> flip C/F everywhere */
 
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
