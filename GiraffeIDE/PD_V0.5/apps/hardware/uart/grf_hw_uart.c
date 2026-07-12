@@ -815,7 +815,7 @@ static void ocp_theme_apply(void)
         {GRF_VIEW7_ID, 57}};
     for (u8 i = 0; i < 7; i++) {
         grf_ctrl_t *c = GCL(pop[i][0], pop[i][1]);
-        grf_img_set_src(c, g_dark ? "ocp-dark.png" : "ocp-light.png");
+        grf_img_set_src(c, g_dark ? "ocp-light.png" : "ocp-dark.png");
         grf_ctrl_set_hidden(c, g_ocp ? 0 : 1);
     }
 }
@@ -1147,6 +1147,7 @@ void ocp_popups_set(u8 show)
         {GRF_VIEW1_ID, 35}, {GRF_VIEW2_ID, 101}, {GRF_VIEW3_ID, 18},
         {GRF_VIEW4_ID, 81}, {GRF_VIEW5_ID, 10},  {GRF_VIEW6_ID, 140},
         {GRF_VIEW7_ID, 57}};
+    g_ocp = show ? 1 : 0; /* single source of truth: dismiss (show=0) clears it too */
     for (u8 i = 0; i < 7; i++)
         grf_ctrl_set_hidden(GCL(pop[i][0], pop[i][1]), show ? 0 : 1);
 }
@@ -1233,8 +1234,7 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         break;
     }
     case 0x001F: /* OCP fault flag from RP -> raise/lower popups on all views */
-                g_ocp = data[0] ? 1 : 0;
-                ocp_popups_set(g_ocp);
+                ocp_popups_set(data[0] ? 1 : 0);
                 break;
         case 0x0016: /* real output state from RP -> drive toggle */
         g_out_on = data[0];
