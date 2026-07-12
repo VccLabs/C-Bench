@@ -1614,11 +1614,7 @@ static void label158_event(grf_ctrl_t *ctrl, grf_event_e event)   /* back -> ori
 
 static void image2_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) ocp_popups_set(0); /* tap dismisses all OCP popups */
 }
 
 

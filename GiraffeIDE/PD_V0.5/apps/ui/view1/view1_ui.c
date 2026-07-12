@@ -379,11 +379,7 @@ static void label27_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> 
 
 static void image5_event(grf_ctrl_t *ctrl, grf_event_e event)
 {
-//	switch (event) {
-//		case GRF_EVENT_CLICKED:{
-//
-//		}break;
-//	}
+	if (event == GRF_EVENT_CLICKED) ocp_popups_set(0); /* tap dismisses all OCP popups */
 }
 
 #include "../../../libs/appscc/view1_cc.h"
