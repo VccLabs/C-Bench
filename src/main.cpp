@@ -118,12 +118,9 @@ static void serviceStatus()
   uint8_t st = 0; // STATUS is 1 byte (bits mirror MASK: OCP = bit5)
   if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 1) == 1)
     st = Wire.read();
-  if (st) Serial.printf("PDSTAT=%02X\n", st); // TEMP: capture idle vs during OC
-  if (st & 0x07) // (re)negotiated
-  {
-    g_outAttach = true;
-    lastSig = 0xFFFFFFFF;
-  }
+  // Nego bits (st&0x07) are deliberately NOT handled here: source attach is edge-
+  // tracked in sendProfileList()/500ms watch. Acting on every re-negotiation (each
+  // profile apply) caused a spurious re-attach that reverted the rail to default.
   if (st & 0x20) // OCP (STATUS bit5): chip only flags -> cut VOUT + latch off
   {
     outputOn = false;
@@ -680,7 +677,7 @@ void loop()
     lastOut = -1;  // force re-apply of outputOn (default OFF) on the next check
   }
   // boot "Last used": once the initial attach is consumed, restore the rail
-  if (g_bootRestore && !g_outAttach && g_set.lastSel < g_slotN) // list must be ready, else flag can stick
+  if (g_bootRestore && !g_outAttach)
   {
     g_bootRestore = false;
     reqMV = g_set.lastMV;      // restore PPS/AVS voltage...
