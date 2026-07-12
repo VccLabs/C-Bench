@@ -72,6 +72,7 @@ static const u32 THEME[TC_N][2] = {
     /* TC_CHIP   */ {GRF_COLOR_GET(0x2C, 0x2C, 0x2E), GRF_COLOR_GET(0xFF, 0xFF, 0xFF)},
 };
 static u8 g_dark = 0;
+static u8 g_ocp  = 0; /* OCP fault active (RP reg 0x001F): drives popup show + theme */
 #define THEME_FILE "D:/theme.bin"
 void theme_load_boot(void)   /* read persisted theme before first paint */
 {
@@ -804,6 +805,21 @@ static void theme_apply_view7(void)
     /* label7/id11 green pip left fixed (accent, like cyan/orange elsewhere) */
 }
 
+/* OCP popups: per-theme asset + visibility from g_ocp. Runs on every view entry
+   (via theme_apply) so a freshly-entered view neither flashes nor mis-themes it. */
+static void ocp_theme_apply(void)
+{
+    static const u16 pop[7][2] = {
+        {GRF_VIEW1_ID, 35}, {GRF_VIEW2_ID, 101}, {GRF_VIEW3_ID, 18},
+        {GRF_VIEW4_ID, 81}, {GRF_VIEW5_ID, 10},  {GRF_VIEW6_ID, 140},
+        {GRF_VIEW7_ID, 57}};
+    for (u8 i = 0; i < 7; i++) {
+        grf_ctrl_t *c = GCL(pop[i][0], pop[i][1]);
+        grf_img_set_src(c, g_dark ? "ocp-dark.png" : "ocp-light.png");
+        grf_ctrl_set_hidden(c, g_ocp ? 0 : 1);
+    }
+}
+
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
     theme_apply_view1();
@@ -813,6 +829,7 @@ static void theme_apply(void) /* repaint all themed views from g_dark */
     theme_apply_view5();
     theme_apply_view6();
     theme_apply_view7();
+    ocp_theme_apply();
     }
 
 void view1_apply_theme(void) { theme_apply(); } /* view1 entry: repaint from shadow */
@@ -1216,8 +1233,9 @@ void grf_reg_set_user(u16 addr, u16 *data, u8 datalen)
         break;
     }
     case 0x001F: /* OCP fault flag from RP -> raise/lower popups on all views */
-            ocp_popups_set(data[0] ? 1 : 0);
-            break;
+                g_ocp = data[0] ? 1 : 0;
+                ocp_popups_set(g_ocp);
+                break;
         case 0x0016: /* real output state from RP -> drive toggle */
         g_out_on = data[0];
         view1_set_output_btn(g_out_on);
