@@ -156,6 +156,7 @@ void view4_set_pinbtn(u8 on)     /* sw2 toggled: update + persist + live hide on
 #define SEL_TINT (g_dark ? GRF_COLOR_GET(0xFF, 0xEC, 0xD1) : GRF_COLOR_GET(0x3A, 0x2A, 0x10))
 static void boot_state_paint(u8 last_used); /* fwd decl: used by theme_apply_view4 */
 static void theme_state_paint(void);        /* fwd decl: used by theme_apply_view4 */
+static void temp_unit_state_paint(void);    /* fwd decl: used by theme_apply_view4 */
 static u8 g_v4_boot = 0;                    /* shadow of reg 0x0031 (0=Off, 1=Last used) */
 extern u8 g_v4_boot;                        /* fwd: boot-state shadow (defined below) */
 
@@ -663,7 +664,8 @@ static void theme_apply_view4(void)
         THEME_TXT(GCL(GRF_VIEW4_ID, 65), TC_TXT2);  /* label47 "Personalize..."   */
         THEME_TXT(GCL(GRF_VIEW4_ID, 66), TC_TXT2);  /* label48 "›"                */
         boot_state_paint(g_v4_boot); /* text colors (TC_TXT/grey) + chip show-hide */
-            theme_state_paint();         /* Dark/Light texts + chip show-hide */
+        theme_state_paint();         /* Dark/Light texts + chip show-hide */
+                    temp_unit_state_paint();     /* °C/°F texts + chip show-hide */
             {
                 static const u8 V4_ACC_ORANGE[] = {40, 52, 53};         /* image5, image7, image8 */
                 static const u8 V4_ACC_BLACK[]  = {54, 55, 56, 57};     /* image9..image12 */
@@ -675,11 +677,24 @@ static void theme_apply_view4(void)
                                     g_dark ? "acc-black-light.png" : "acc-black-dark.png");
             }
             /* temp widget */
-                THEME_BG (GCL(GRF_VIEW4_ID, 82), TC_SURF);
-                THEME_TXT(GCL(GRF_VIEW4_ID, 82), TC_GREEN);
-                THEME_TXT(GCL(GRF_VIEW4_ID, 84), TC_TXT2);
-                grf_img_set_src(GCL(GRF_VIEW4_ID, 83), g_dark ? "temp-light.png" : "temp-dark.png");
-}
+                            THEME_BG (GCL(GRF_VIEW4_ID, 82), TC_SURF);
+                            THEME_TXT(GCL(GRF_VIEW4_ID, 82), TC_GREEN);
+                            THEME_TXT(GCL(GRF_VIEW4_ID, 84), TC_TXT2);
+                            grf_img_set_src(GCL(GRF_VIEW4_ID, 83), g_dark ? "temp-light.png" : "temp-dark.png");
+
+                /* Temperature settings section */
+                THEME_BG (GCL(GRF_VIEW4_ID, 85), TC_SURF);  /* label64 section card bg            */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 86), TC_TXT2);  /* label65 "TEMPERATURE" header       */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 88), TC_TXT);   /* label67 "Temperature Widget"       */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 89), TC_TXT2);  /* label68 widget subtitle            */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 90), TC_TXT);   /* label69 "Temperature Unit"         */
+                THEME_TXT(GCL(GRF_VIEW4_ID, 91), TC_TXT2);  /* label70 unit subtitle              */
+                grf_ctrl_style_set_bg_color(GCL(GRF_VIEW4_ID, 92), TCOL(TC_SURF2), 0); /* sw3 bg fill (like sw2) */
+                /* temp-unit segmented toggle — mirrors the theme Dark/Light toggle backgrounds */
+                THEME_BG (GCL(GRF_VIEW4_ID, 93), TC_SURF2); /* label71 unit segment bg (like V4_TH_SEG)  */
+                THEME_BG (GCL(GRF_VIEW4_ID, 96), TC_SURF2); /* label74 "°C" chip bg (like V4_CH_DARK)    */
+                THEME_BG (GCL(GRF_VIEW4_ID, 97), TC_SURF2); /* label75 "°F" chip bg (like V4_CH_LIGHT)   */
+                }
 static void theme_apply_view5(void)
 {
     grf_view_set_bgcolor(GRF_VIEW5_ID, TCOL(TC_BG));                     /* screen bg */
@@ -899,7 +914,7 @@ static void temp_paint(void)
     }
 }
 
-void temp_toggle_unit(void) { g_tempF = !g_tempF; temp_paint(); tempunit_save(); } /* flip C/F everywhere + persist */
+void temp_toggle_unit(void) { g_tempF = !g_tempF; temp_paint(); temp_unit_state_paint(); tempunit_save(); } /* flip C/F + sync view4 chip + persist */
 
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
@@ -1022,6 +1037,16 @@ static void theme_state_paint(void) /* g_dark: 0=Dark selected, 1=Light selected
     grf_label_set_txt_color(GCL(GRF_VIEW4_ID, V4_TH_LIGHT), g_dark ? on : off); /* "Light" ID34 */
     grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, V4_CH_DARK), g_dark ? 1 : 0);         /* chip Dark  ID31 */
     grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, V4_CH_LIGHT), g_dark ? 0 : 1);        /* chip Light ID32 */
+}
+
+static void temp_unit_state_paint(void) /* g_tempF: 0=C selected, 1=F selected */
+{
+    grf_color_t on = TCOL(TC_TXT);                                             /* selected   = primary */
+    grf_color_t off = GRF_COLOR_GET(0x98, 0x98, 0x9F);                         /* unselected = grey    */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, 94), g_tempF ? off : on);        /* "°C" text  label72 */
+    grf_label_set_txt_color(GCL(GRF_VIEW4_ID, 95), g_tempF ? on : off);        /* "°F" text  label73 */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, 96), g_tempF ? 1 : 0);               /* "°C" chip  label74 */
+    grf_ctrl_set_hidden(GCL(GRF_VIEW4_ID, 97), g_tempF ? 0 : 1);               /* "°F" chip  label75 */
 }
 
 void view4_set_theme(u8 light) /* user tap: set absolute theme + apply + persist */

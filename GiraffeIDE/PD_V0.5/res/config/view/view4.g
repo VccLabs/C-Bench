@@ -248,7 +248,7 @@
         },
         "size" : {
           "width" : 720,
-          "height" : 1296
+          "height" : 521
         },
         "t_mode" : 1,
         "scrollbar_t" : {
@@ -3523,7 +3523,7 @@
           "y" : 1040
         },
         "size" : {
-          "width" : 286,
+          "width" : 353,
           "height" : 28
         },
         "scrollbar_t" : {
@@ -3535,7 +3535,7 @@
       },
       "animspeed" : 50,
       "align_e" : 33,
-      "txt" : "Add a quick Pin Map button to every page",
+      "txt" : "Show/hide temparature widget in all pages",
       "styles" : [ {
         "name" : "style",
         "txt_t" : {
@@ -3594,7 +3594,7 @@
           "y" : 1114
         },
         "size" : {
-          "width" : 482,
+          "width" : 513,
           "height" : 28
         },
         "scrollbar_t" : {
@@ -3769,6 +3769,92 @@
     "theme" : "youth",
     "property" : {
       "pub_t" : {
+        "name" : "label75",
+        "id" : 97,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 548,
+          "y" : 1103
+        },
+        "size" : {
+          "width" : 56,
+          "height" : 26
+        },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL75_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : 8,
+          "opa" : 255,
+          "shadow" : {
+            "color" : 4934475,
+            "width" : 12
+          }
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label74",
+        "id" : 96,
+        "parent_id" : 1,
+        "pt" : {
+          "x" : 614,
+          "y" : 1103
+        },
+        "size" : {
+          "width" : 56,
+          "height" : 26
+        },
+        "scrollbar_t" : {
+          "chain_e" : 2
+        },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW4_LABEL74_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 2894894,
+          "radius" : 8,
+          "opa" : 255,
+          "shadow" : {
+            "color" : 4934475,
+            "width" : 12
+          }
+        },
+        "txt_t" : {
+          "opa" : 2147483647
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
         "name" : "label72",
         "id" : 94,
         "parent_id" : 1,
@@ -3852,92 +3938,6 @@
         "txt_t" : {
           "color" : 10000543,
           "font_lib" : "Inter_24pt-ExtraBold.ttf"
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
-        "name" : "label74",
-        "id" : 96,
-        "parent_id" : 1,
-        "pt" : {
-          "x" : 614,
-          "y" : 1007
-        },
-        "size" : {
-          "width" : 56,
-          "height" : 26
-        },
-        "scrollbar_t" : {
-          "chain_e" : 2
-        },
-        "alpha" : 255,
-        "pub" : true,
-        "controlIDEnum" : "VIEW4_LABEL74_ID"
-      },
-      "auto_hight" : 1,
-      "animspeed" : 50,
-      "align_e" : 34,
-      "styles" : [ {
-        "name" : "style",
-        "body_t" : {
-          "main_color" : 2894894,
-          "radius" : 8,
-          "opa" : 255,
-          "shadow" : {
-            "color" : 4934475,
-            "width" : 12
-          }
-        },
-        "txt_t" : {
-          "opa" : 2147483647
-        },
-        "img_t" : { }
-      } ]
-    }
-  }, {
-    "CLASSNAME" : "label",
-    "theme" : "youth",
-    "property" : {
-      "pub_t" : {
-        "name" : "label75",
-        "id" : 97,
-        "parent_id" : 1,
-        "pt" : {
-          "x" : 548,
-          "y" : 1007
-        },
-        "size" : {
-          "width" : 56,
-          "height" : 26
-        },
-        "scrollbar_t" : {
-          "chain_e" : 2
-        },
-        "alpha" : 255,
-        "pub" : true,
-        "controlIDEnum" : "VIEW4_LABEL75_ID"
-      },
-      "auto_hight" : 1,
-      "animspeed" : 50,
-      "align_e" : 34,
-      "styles" : [ {
-        "name" : "style",
-        "body_t" : {
-          "main_color" : 2894894,
-          "radius" : 8,
-          "opa" : 255,
-          "shadow" : {
-            "color" : 4934475,
-            "width" : 12
-          }
-        },
-        "txt_t" : {
-          "opa" : 2147483647
         },
         "img_t" : { }
       } ]

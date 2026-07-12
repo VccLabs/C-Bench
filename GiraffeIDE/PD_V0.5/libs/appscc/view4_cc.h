@@ -91,10 +91,10 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW4_LABEL70_ID,label70_event},
 	{VIEW4_SW3_ID,sw3_event},
 	{VIEW4_LABEL71_ID,label71_event},
+	{VIEW4_LABEL75_ID,label75_event},
+	{VIEW4_LABEL74_ID,label74_event},
 	{VIEW4_LABEL72_ID,label72_event},
 	{VIEW4_LABEL73_ID,label73_event},
-	{VIEW4_LABEL74_ID,label74_event},
-	{VIEW4_LABEL75_ID,label75_event},
 	{VIEW4_IMAGE14_ID,image14_event},
 	{VIEW4_LABEL63_ID,label63_event}
 };
