@@ -1,1 +1,2 @@
 *.g linguist-detectable=false
+HTML Mockups/** linguist-detectable=false
