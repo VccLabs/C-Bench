@@ -376,6 +376,16 @@ static void label27_event(grf_ctrl_t *ctrl, grf_event_e event)   /* redirect -> 
 		}
 	}
 
+
+static void image5_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view1_cc.h"
 void view1_init(void)
 {

@@ -10,6 +10,7 @@ typedef enum {
 	VIEW5_LABEL1_ID = 4,
 	VIEW5_LABEL4_ID = 7,
 	VIEW5_IMAGE1_ID = 9,
+	VIEW5_IMAGE2_ID = 10,
 	VIEW5_IMAGE0_ID = 8,
 	VIEW5_KEYBOARD0_ID = 2
 } view5_ctrls_id_e;

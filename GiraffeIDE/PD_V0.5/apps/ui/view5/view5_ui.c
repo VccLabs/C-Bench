@@ -89,6 +89,16 @@ static void image1_event(grf_ctrl_t *ctrl, grf_event_e event)   /* saved popup *
 		grf_ctrl_set_hidden(GCL(GRF_VIEW5_ID, VIEW5_IMAGE1_ID), 1);
 }
 
+
+static void image2_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view5_cc.h"
 void view5_init(void)
 {

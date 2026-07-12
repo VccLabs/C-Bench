@@ -317,6 +317,31 @@
       } ]
     }
   }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image3",
+        "id" : 18,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 805,
+          "y" : 95
+        },
+        "size" : {
+          "width" : 51,
+          "height" : 41
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW3_IMAGE3_ID"
+      },
+      "rotate_pt" : { }
+    }
+  }, {
     "CLASSNAME" : "label",
     "theme" : "youth",
     "property" : {

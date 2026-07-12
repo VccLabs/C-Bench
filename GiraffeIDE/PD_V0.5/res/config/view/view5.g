@@ -390,6 +390,31 @@
       "init_img" : "theme-dark.png",
       "rotate_pt" : { }
     }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image2",
+        "id" : 10,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 805,
+          "y" : 95
+        },
+        "size" : {
+          "width" : 51,
+          "height" : 41
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW5_IMAGE2_ID"
+      },
+      "rotate_pt" : { }
+    }
   } ],
   "view" : {
     "v_name" : "view5",
