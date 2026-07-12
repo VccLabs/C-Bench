@@ -23,6 +23,7 @@ int ppsIdx = -1;
 volatile uint16_t reqMV = PPS_TARGET_MV; // reg 0x0020 (next milestone)
 volatile uint16_t limMA = PPS_LIMIT_MA;  // reg 0x0021 (next milestone)
 volatile bool outputOn = false;          // reg 0x0022 - default OFF for safety
+volatile bool g_ocpLatched = false;      // OCP tripped -> latched off until user re-arms
 static uint16_t g_arcTgtMV = 0;          // latest measured mV, fed to the arc easer
 volatile int pendingSel = -1;            // reg 0x0023 list position, applied in loop()
 
@@ -96,6 +97,16 @@ static uint8_t activeType = 0;        // 0 FIX, 1 PPS, 2 AVS, 3 EPR
 static bool g_prevSource = false;     // source-present edge detect
 static volatile bool g_pdInt = false; // AP33772S INT pending (set in ISR)
 static void pdIntISR() { g_pdInt = true; }
+static void pdIntISR() { g_pdInt = true; }
+
+// Arm AP33772S hardware OCP at the given trip current (50 mA/LSB). Re-armed on every
+// apply: limMA changes, and PD renegotiation can reset chip config.
+static void armOCP(uint16_t ocpMA)
+{
+  usbpd.setOCPTHR(ocpMA);  // trip threshold, 50 mA/LSB
+  usbpd.setConfig(OCP_EN); // enable OCP -> chip opens VOUT on trip
+  usbpd.setMask(OCP_MSK);  // route OCP to INT so firmware can latch
+}
 static volatile bool g_outAttach = false; // re-assert output after a (re)attach
 
 // Read source PDOs over I2C and push the real list to the HMI
@@ -395,6 +406,11 @@ static void applyControl(uint16_t addr, uint16_t val)
     break;                             // current limit (mA)
   case 0x0022:
     outputOn = (val != 0);
+    if (val) // manual re-arm clears the OCP latch + dismisses popups
+    {
+      g_ocpLatched = false;
+      writeReg(0x001F, 0);
+    }
     break; // output enable
   case 0x0023:
     if (val < g_slotN)
@@ -594,7 +610,9 @@ void loop()
       }
       activePdoIdx = s.pdoIndex;
       activeType = s.type;
-      g_activeSel = sel; // active position for the profile-list highlight (reg 0x0017)
+      armOCP((s.type == 1 || s.type == 2) ? limMA
+                                          : ((s.imax > 4999) ? 4999 : s.imax)); // PPS/AVS use limMA; FIX uses PDO imax
+      g_activeSel = sel;                                                        // active position for the profile-list highlight (reg 0x0017)
       if (g_set.lastSel != sel || g_set.lastMV != reqMV || g_set.lastMA != limMA)
       {
         g_set.lastSel = sel; // remember rail + adjust for "Last used"
@@ -606,6 +624,8 @@ void loop()
       {
         usbpd.setOutput(1);
         outputOn = true;
+        g_ocpLatched = false;
+        writeReg(0x001F, 0); // fresh apply clears any OCP latch + popups
       }
       if (g_bootRestoreOut >= 0) // boot "Last used": force saved output state
       {
@@ -783,7 +803,14 @@ void loop()
       g_outAttach = true;   // re-assert output (default OFF) immediately
       lastSig = 0xFFFFFFFF; // refresh the PDO list now
     }
-    // fault bits st&0x78 (UVP/OVP/OCP/OTP) -> HMI surfacing in a later step
+    if (st & 0x20) // OCP: chip already opened VOUT -> latch off, force re-arm
+    {
+      outputOn = false;
+      g_ocpLatched = true;
+      writeReg(0x0016, 0); // arm button (label7) back to green
+      writeReg(0x001F, 1); // raise OCP popups on all views
+    }
+    // remaining fault bits st&0x58 (UVP/OVP/OTP) -> surfaced later
   }
   // Fallback attach watch (INT backstop): slow poll for detach/missed edges
   static uint32_t tAtt = 0;
