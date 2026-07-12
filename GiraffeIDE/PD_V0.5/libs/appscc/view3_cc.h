@@ -11,11 +11,14 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW3_IMAGE2_ID,image2_event},
 	{VIEW3_LABEL3_ID,label3_event},
 	{VIEW3_IMAGE3_ID,image3_event},
+	{VIEW3_LABEL12_ID,label12_event},
 	{VIEW3_LABEL2_ID,label2_event},
 	{VIEW3_ARC0_ID,arc0_event},
 	{VIEW3_LABEL6_ID,label6_event},
 	{VIEW3_LABEL7_ID,label7_event},
 	{VIEW3_LABEL8_ID,label8_event},
 	{VIEW3_LABEL0_ID,label0_event},
-	{VIEW3_LABEL1_ID,label1_event}
+	{VIEW3_LABEL1_ID,label1_event},
+	{VIEW3_IMAGE4_ID,image4_event},
+	{VIEW3_LABEL13_ID,label13_event}
 };

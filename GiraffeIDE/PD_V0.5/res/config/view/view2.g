@@ -525,6 +525,55 @@
     "theme" : "youth",
     "property" : {
       "pub_t" : {
+        "name" : "label92",
+        "id" : 102,
+        "pt" : {
+          "x" : 438,
+          "y" : 35
+        },
+        "size" : {
+          "width" : 91,
+          "height" : 36
+        },
+        "t_mode" : 1,
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "click_area" : 12,
+        "controlIDEnum" : "VIEW2_LABEL92_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "42.5",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "main_color" : 1842206,
+          "grad_color" : 16711680,
+          "radius" : -1,
+          "opa" : 255,
+          "padding" : {
+            "top" : 2,
+            "bottom" : 2147483647,
+            "left" : 2,
+            "right" : 2147483647,
+            "inner" : 2147483647
+          }
+        },
+        "txt_t" : {
+          "color" : 3199320,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 15
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
         "name" : "label72",
         "id" : 74,
         "parent_id" : 66,
@@ -3531,6 +3580,73 @@
           "color" : 6607615,
           "font_lib" : "Inter_24pt-ExtraBold.ttf",
           "font_size" : 26
+        },
+        "img_t" : { }
+      } ]
+    }
+  }, {
+    "CLASSNAME" : "image",
+    "theme" : "youth",
+    "type" : 19,
+    "property" : {
+      "pub_t" : {
+        "name" : "image4",
+        "id" : 103,
+        "parent_id" : 102,
+        "ctrl_type" : 19,
+        "pt" : {
+          "x" : 10,
+          "y" : 7
+        },
+        "size" : {
+          "width" : 9,
+          "height" : 22
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW2_IMAGE4_ID"
+      },
+      "init_img" : "temp-dark.png",
+      "rotate_pt" : { }
+    }
+  }, {
+    "CLASSNAME" : "label",
+    "theme" : "youth",
+    "property" : {
+      "pub_t" : {
+        "name" : "label93",
+        "id" : 104,
+        "parent_id" : 102,
+        "pt" : {
+          "x" : 55,
+          "y" : 10
+        },
+        "size" : {
+          "width" : 36,
+          "height" : 16
+        },
+        "scrollbar_t" : { },
+        "alpha" : 255,
+        "pub" : true,
+        "controlIDEnum" : "VIEW2_LABEL93_ID"
+      },
+      "auto_hight" : 1,
+      "animspeed" : 50,
+      "align_e" : 34,
+      "txt" : "°C",
+      "styles" : [ {
+        "name" : "style",
+        "body_t" : {
+          "padding" : {
+            "top" : 2,
+            "left" : 2
+          }
+        },
+        "txt_t" : {
+          "color" : 10000543,
+          "font_lib" : "Inter_24pt-ExtraBold.ttf",
+          "font_size" : 12
         },
         "img_t" : { }
       } ]

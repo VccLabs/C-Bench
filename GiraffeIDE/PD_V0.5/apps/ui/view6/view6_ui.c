@@ -1812,6 +1812,26 @@ static void label165_event(grf_ctrl_t *ctrl, grf_event_e event)
 //	}
 }
 
+
+static void image3_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
+
+static void label136_event(grf_ctrl_t *ctrl, grf_event_e event)
+{
+//	switch (event) {
+//		case GRF_EVENT_CLICKED:{
+//
+//		}break;
+//	}
+}
+
 #include "../../../libs/appscc/view6_cc.h"
 void view6_init(void)
 {

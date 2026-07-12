@@ -198,4 +198,16 @@
   "imageId" : 50,
   "imagePath" : "ocp-light.png",
   "child" : [ ]
+}, {
+  "imageId" : 53,
+  "imagePath" : "temp.png",
+  "child" : [ ]
+}, {
+  "imageId" : 51,
+  "imagePath" : "temp-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 52,
+  "imagePath" : "temp-light.png",
+  "child" : [ ]
 } ]

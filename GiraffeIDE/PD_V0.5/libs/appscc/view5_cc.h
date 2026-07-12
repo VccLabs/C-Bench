@@ -9,5 +9,8 @@ static grf_ctrl_fun_t view_ctrls_fun_t[] =
 	{VIEW5_LABEL4_ID,label4_event},
 	{VIEW5_IMAGE1_ID,image1_event},
 	{VIEW5_IMAGE0_ID,image0_event},
-	{VIEW5_IMAGE2_ID,image2_event}
+	{VIEW5_IMAGE2_ID,image2_event},
+	{VIEW5_LABEL5_ID,label5_event},
+	{VIEW5_IMAGE3_ID,image3_event},
+	{VIEW5_LABEL6_ID,label6_event}
 };
