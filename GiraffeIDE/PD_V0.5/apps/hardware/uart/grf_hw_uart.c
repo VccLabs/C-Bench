@@ -371,9 +371,12 @@ void view1_toggle_output(void) /* label7 click: request opposite of real state *
     grf_reg_com_send(0x0022, 1); /* RP flips output, pushes 0x0016 back to repaint */
 }
 
-void view1_reset_press(u8 down) /* show/hide the reset press-tint overlay */
+void view1_reset_press(u8 down) /* show/hide the reset press-tint overlay + swap arrow */
 {
     grf_ctrl_set_hidden(GCL(GRF_VIEW1_ID, RST_TINT), down ? 0 : 1);
+    grf_img_set_src(GCL(GRF_VIEW1_ID, 21),                 /* image1 = reset arrow (V1_ARROW) */
+                    down ? (g_dark ? "arrow-pressed-light.png" : "arrow-pressed-dark.png")  /* pressed */
+                         : (g_dark ? "arrow-light.png"         : "arrow-dark.png"));         /* normal  */
 }
 void view1_reset_session(void) /* reset button -> tell RP to zero the trip */
 {

@@ -277,6 +277,9 @@ static void activeProfileInfo(uint16_t *type, uint16_t *mV)
 static uint16_t g_bmv[BATT_WIN];
 static uint8_t g_bst[BATT_WIN];
 static uint8_t g_bi = 0, g_bn = 0;
+static uint8_t g_bpresent = 0; // debounced presence actually reported to the panel
+static uint8_t g_bconfirm = 0; // consecutive "present" windows so far
+#define BATT_CONFIRM 40        // ~20 s steady @2Hz before presence latches (tunable)
 
 static bool batteryPresent(uint16_t cellmv, uint8_t chg)
 {
@@ -348,8 +351,6 @@ static void pushSession()
   writeReg(0x0018, s > 65535 ? 65535 : (uint16_t)s);
 }
 
-
-
 static void lifeWriteFile() // LittleFS wear-levels across sectors; power-loss safe
 {
   File f = LittleFS.open(LIFE_FILE, "w");
@@ -363,7 +364,6 @@ static void lifeWriteFile() // LittleFS wear-levels across sectors; power-loss s
   Serial.printf("lifeWriteFile: wrote %u B, %llu uWh\n", (unsigned)n, g_lifeE_uWh);
   g_lifeSaved_uWh = g_lifeE_uWh;
 }
-
 
 // Integrate measured power/current over real dt; accumulate only while output is on.
 static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA, bool good)
@@ -394,7 +394,8 @@ static void energyAccumulate(uint32_t now_ms, uint32_t mW, uint16_t mA, bool goo
   if (now_ms - g_lifeForceT >= 20000UL) // commit every 20 s if value changed
   {
     g_lifeForceT = now_ms;
-    if (g_lifeE_uWh != g_lifeSaved_uWh) lifeWriteFile();
+    if (g_lifeE_uWh != g_lifeSaved_uWh)
+      lifeWriteFile();
   }
 }
 
@@ -440,9 +441,10 @@ static void applyControl(uint16_t addr, uint16_t val)
     writeReg(0x0032, g_set.autoArm);
     writeReg(0x0039, g_set.theme);
     writeReg(0x0016, outputOn ? 1 : 0); /* real output state -> view1 toggle reflects arm on boot */
-    { /* re-push odometer so view4's entry-reset labels repaint */
+    {                                   /* re-push odometer so view4's entry-reset labels repaint */
       uint32_t wh = (uint32_t)(g_lifeE_uWh / 1000000ULL);
-      if (wh > 9999999UL) wh = 9999999UL;
+      if (wh > 9999999UL)
+        wh = 9999999UL;
       writeReg(0x003A, (uint16_t)(wh >> 16));
       writeReg(0x003B, (uint16_t)(wh & 0xFFFF));
     }
@@ -730,7 +732,20 @@ void loop()
     /* presence from dynamics: caps sawtooth + state flaps when no cell present */
     uint8_t chg = readChargeState();
     uint16_t vcellmv = battOk ? (uint16_t)(maxlipo.cellVoltage() * 1000.0f) : 0;
-    bool present = battOk && batteryPresent(vcellmv, chg);
+    bool raw = battOk && batteryPresent(vcellmv, chg);
+    if (raw)
+    {
+      if (g_bconfirm < BATT_CONFIRM)
+        g_bconfirm++;
+    }
+    else
+    {
+      g_bconfirm = 0;
+      g_bpresent = 0;
+    } /* any failing window -> drop now */
+    if (g_bconfirm >= BATT_CONFIRM)
+      g_bpresent = 1;
+    bool present = g_bpresent;
     writeReg(0x001E, present ? chg : 0); /* 0=none, 1=charging, 2=complete */
     if (present)
     {
