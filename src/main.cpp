@@ -108,6 +108,36 @@ static void armOCP(uint16_t ocpMA)
 }
 static volatile bool g_outAttach = false; // re-assert output after a (re)attach
 
+static volatile bool g_outAttach = false; // re-assert output after a (re)attach
+
+// Read AP33772S 2-byte STATUS (clear-on-read): [0]=nego events, [1]=protect events.
+// Called from INT and polled, so OCP is caught even if it never asserts INT.
+static void serviceStatus()
+{
+  Wire.beginTransmission(0x52);
+  Wire.write(0x01);
+  uint8_t st0 = 0, st1 = 0;
+  if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 2) == 2)
+  {
+    st0 = Wire.read();
+    st1 = Wire.read();
+  }
+  if (st1) Serial.printf("PDSTAT st0=%02X st1=%02X\n", st0, st1); // TEMP: confirm OCP bit
+  if (st0 & 0x07) // (re)negotiated
+  {
+    g_outAttach = true;
+    lastSig = 0xFFFFFFFF;
+  }
+  if (st1 & 0x02) // OCP (protectEvent bit1): chip only flags -> cut VOUT + latch off
+  {
+    outputOn = false;
+    g_ocpLatched = true;
+    usbpd.setOutput(0);
+    writeReg(0x0016, 0);
+    writeReg(0x001F, 1);
+  }
+}
+
 // Read source PDOs over I2C and push the real list to the HMI
 static void sendProfileList()
 {
@@ -792,29 +822,16 @@ void loop()
   if (g_pdInt)
   {
     g_pdInt = false;
-    Wire.beginTransmission(0x52);
-    Wire.write(0x01);
-    uint8_t st0 = 0, st1 = 0; // STATUS is 2 bytes: [0]=nego events, [1]=protect events
-    if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 2) == 2)
-    {
-      st0 = Wire.read();
-      st1 = Wire.read();
-    }
-    if (st0 & 0x07) // STARTED | READY | NEWPDO -> (re)negotiated
-    {
-      g_outAttach = true;   // re-assert output (default OFF) immediately
-      lastSig = 0xFFFFFFFF; // refresh the PDO list now
-    }
-    if (st1 & 0x02) // OCP (protectEvent bit1): chip only flags -> cut VOUT + latch off
-    {
-      outputOn = false;
-      g_ocpLatched = true;
-      usbpd.setOutput(0);  // AP33772S doesn't open VOUT on OCP itself; do it now
-      writeReg(0x0016, 0); // arm button (label7) back to green
-      writeReg(0x001F, 1); // raise OCP popups on all views
-    }
-    // other protect bits: st1 & 0x01 OVP, st1 & 0x04 OTP -> surface later
+    serviceStatus();
   }
+  // Poll STATUS for OCP (protection may not assert INT) + nego backstop
+  static uint32_t tStat = 0;
+  if (now - tStat >= 40)
+  {
+    tStat = now;
+    serviceStatus();
+  }
+
   // Fallback attach watch (INT backstop): slow poll for detach/missed edges
   static uint32_t tAtt = 0;
   if (now - tAtt >= 500)
