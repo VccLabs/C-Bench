@@ -194,8 +194,16 @@ lets the MCU both **bias** the STAT node and **read** it safely.
     VDD is powered, so neither voltage level nor the state enum can gate presence.
   - Presence gate (`batteryPresent()` in main.cpp): `BATT_WIN=10` samples (~5 s
     @ 2 Hz); present iff cell-mV span <=30 mV AND state flaps <2. A real cell is
-    ~DC + stable; no cell sawtooths/flaps. Latches ~5 s after connect. Don't drop
-    below 10 samples — shorter windows false-positive (miss the sawtooth).
+    ~DC + stable; no cell sawtooths/flaps. Don't drop below 10 samples — shorter
+    windows false-positive (miss the sawtooth).
+  - Second-order false positive (fixed): after ~5-10 min with no cell, the no-load
+    charger settles into its termination/recharge cycle and briefly parks +BATT at a
+    steady plateau (~4.1-4.2 V) with a stable STAT, which passes one raw window ->
+    momentary "96-99% Charged" that flips back. Fixed with ASYMMETRIC DEBOUNCE:
+    presence must hold for `BATT_CONFIRM=40` consecutive windows (~20 s @ 2 Hz) to
+    latch, and clears on the FIRST failing window. Plateau episodes (~seconds) never
+    reach 40; real cell latches in ~20 s. Lower BATT_CONFIRM for faster detect at the
+    cost of margin; raise it if a plateau ever sneaks through.
   - SoC: MAX17048 ModelGauge is UNUSABLE with CELL on +BATT (reported 100/11/15%,
     never converged). `quickStart()` removed entirely. SoC now computed from
     `cellVoltage()` via a piecewise Li-ion curve (`socFromVoltage()`); voltage read
@@ -421,7 +429,10 @@ Apple-style dark UI, 720×720. Pages are Giraffe **views**, navigated with
     `view3_apply_theme`) so control colors persist across navigation. Arc track
     (`TC_TRACK`) themed via `grf_arc_set_dis` part 0; green fg is constant.
     Charge-state pill `label0` (id 2) bg = `TC_SURF2`. Nav img `nav-battery.png` /
-    `-light`. Presence detection now reliable (see RESOLVED block above).
+    `-light`. Presence detection now reliable (see RESOLVED block above). Expect a
+    **~20 s delay** between connecting a real cell and it showing "Charging" — this
+    is the intended `BATT_CONFIRM` debounce (~20 s @ 2 Hz) that rejects the charger
+    termination-plateau false positive, not a fault.
 - **view4 — Settings:** boot output state (segmented Off / Last used) and auto-arm
   output (switch), wired to `0x0031`/`0x0032`. Controls are painted from a
   panel-side shadow on entry (`view4_apply_settings`), kept in sync by RP pushes.
