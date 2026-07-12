@@ -182,4 +182,20 @@
   "imageId" : 46,
   "imagePath" : "qr-website-light.png",
   "child" : [ ]
+}, {
+  "imageId" : 47,
+  "imagePath" : "arrow-pressed-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 48,
+  "imagePath" : "arrow-pressed-light.png",
+  "child" : [ ]
+}, {
+  "imageId" : 49,
+  "imagePath" : "ocp-dark.png",
+  "child" : [ ]
+}, {
+  "imageId" : 50,
+  "imagePath" : "ocp-light.png",
+  "child" : [ ]
 } ]

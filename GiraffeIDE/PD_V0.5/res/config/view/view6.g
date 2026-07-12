@@ -806,19 +806,21 @@
         "id" : 140,
         "ctrl_type" : 19,
         "pt" : {
-          "x" : 805,
+          "x" : 187,
           "y" : 95
         },
         "size" : {
-          "width" : 51,
-          "height" : 41
+          "width" : 346,
+          "height" : 278
         },
         "t_mode" : 1,
         "scrollbar_t" : { },
         "alpha" : 255,
         "pub" : true,
+        "click_area" : 400,
         "controlIDEnum" : "VIEW6_IMAGE2_ID"
       },
+      "init_img" : "ocp-dark.png",
       "rotate_pt" : { }
     }
   }, {

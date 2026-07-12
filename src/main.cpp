@@ -794,22 +794,26 @@ void loop()
     g_pdInt = false;
     Wire.beginTransmission(0x52);
     Wire.write(0x01);
-    uint8_t st = 0;
-    if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 1) == 1)
-      st = Wire.read();
-    if (st & 0x07) // STARTED | READY | NEWPDO -> (re)negotiated
+    uint8_t st0 = 0, st1 = 0; // STATUS is 2 bytes: [0]=nego events, [1]=protect events
+    if (Wire.endTransmission(false) == 0 && Wire.requestFrom(0x52, 2) == 2)
+    {
+      st0 = Wire.read();
+      st1 = Wire.read();
+    }
+    if (st0 & 0x07) // STARTED | READY | NEWPDO -> (re)negotiated
     {
       g_outAttach = true;   // re-assert output (default OFF) immediately
       lastSig = 0xFFFFFFFF; // refresh the PDO list now
     }
-    if (st & 0x20) // OCP: chip already opened VOUT -> latch off, force re-arm
+    if (st1 & 0x02) // OCP (protectEvent bit1): chip only flags -> cut VOUT + latch off
     {
       outputOn = false;
       g_ocpLatched = true;
+      usbpd.setOutput(0);  // AP33772S doesn't open VOUT on OCP itself; do it now
       writeReg(0x0016, 0); // arm button (label7) back to green
       writeReg(0x001F, 1); // raise OCP popups on all views
     }
-    // remaining fault bits st&0x58 (UVP/OVP/OTP) -> surfaced later
+    // other protect bits: st1 & 0x01 OVP, st1 & 0x04 OTP -> surface later
   }
   // Fallback attach watch (INT backstop): slow poll for detach/missed edges
   static uint32_t tAtt = 0;
