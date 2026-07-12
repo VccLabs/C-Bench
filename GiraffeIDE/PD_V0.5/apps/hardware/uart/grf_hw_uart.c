@@ -92,6 +92,23 @@ static void theme_save(void)
     if (f) { grf_fs_write(f, &g_dark, 1); grf_fs_close(f); }
 }
 
+#define TEMPUNIT_FILE "D:/tempunit.bin"
+void tempunit_load_boot(void) /* read persisted C/F unit before first paint */
+{
+    grf_fs_file_t *f = grf_fs_open(TEMPUNIT_FILE, GRF_FS_MODE_RD);
+    if (f)
+    {
+        u8 v = 0;
+        if (grf_fs_read(f, &v, 1) == 1 && v <= 1) g_tempF = v;
+        grf_fs_close(f);
+    }
+}
+static void tempunit_save(void)
+{
+    grf_fs_file_t *f = grf_fs_open(TEMPUNIT_FILE, GRF_FS_MODE_WR);
+    if (f) { grf_fs_write(f, &g_tempF, 1); grf_fs_close(f); }
+}
+
 /* ---- gift popup enable (panel-local, persisted) ---- */
 #define GIFTEN_FILE "D:/giften.bin"
 u8 g_giften = 1;                 /* 1 = show boot gift popup, 0 = suppressed */
@@ -882,7 +899,7 @@ static void temp_paint(void)
     }
 }
 
-void temp_toggle_unit(void) { g_tempF = !g_tempF; temp_paint(); } /* tap value label -> flip C/F everywhere */
+void temp_toggle_unit(void) { g_tempF = !g_tempF; temp_paint(); tempunit_save(); } /* flip C/F everywhere + persist */
 
 static void theme_apply(void) /* repaint all themed views from g_dark */
 {
