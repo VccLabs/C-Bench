@@ -435,6 +435,11 @@ static void theme_apply_view1(void)
         grf_img_set_src(GCL(GRF_VIEW1_ID, 32),
                         g_dark ? "boot-popup-light.png" : "boot-popup-dark.png"); /* image4 gift popup */
         THEME_TXT(GCL(GRF_VIEW1_ID, 33), TC_TXT); /* label24 gift message #fff dark / #000 light */
+        /* temp widget */
+            THEME_BG (GCL(GRF_VIEW1_ID, 37), TC_SURF);   /* bg label (holds value text) */
+            THEME_TXT(GCL(GRF_VIEW1_ID, 37), TC_GREEN);  /* value text color */
+            THEME_TXT(GCL(GRF_VIEW1_ID, 39), TC_TXT2);   /* "°C" fixed */
+            grf_img_set_src(GCL(GRF_VIEW1_ID, 38), g_dark ? "temp-dark.png" : "temp-light.png");
     }
 
 /* ── view2 (Profiles) themed control IDs ── */
@@ -505,6 +510,11 @@ static void theme_apply_view2(void)
         THEME_BG(GCL(GRF_VIEW2_ID, 82), TC_SURF);    /* container1 popup bg #1c1c1e/#fff */
         THEME_TXT(GCL(GRF_VIEW2_ID, 85), TC_TXT2);   /* label80 "Set Voltage" */
         THEME_TXT(GCL(GRF_VIEW2_ID, 86), TC_TXT2);   /* label81 "Set Current" */
+        /* temp widget */
+            THEME_BG (GCL(GRF_VIEW2_ID, 102), TC_SURF);
+            THEME_TXT(GCL(GRF_VIEW2_ID, 102), TC_GREEN);
+            THEME_TXT(GCL(GRF_VIEW2_ID, 104), TC_TXT2);
+            grf_img_set_src(GCL(GRF_VIEW2_ID, 103), g_dark ? "temp-dark.png" : "temp-light.png");
     }
 
 /* ── view3 (Battery) themed control IDs ── */
@@ -538,6 +548,11 @@ static void theme_apply_view3(void)
                         g_dark ? "theme-light.png" : "theme-dark.png");
         grf_img_set_src(GCL(GRF_VIEW3_ID, 16),
                         g_dark ? "logo-light.png" : "logo-dark.png");
+        /* temp widget */
+            THEME_BG (GCL(GRF_VIEW3_ID, 19), TC_SURF);
+            THEME_TXT(GCL(GRF_VIEW3_ID, 19), TC_GREEN);
+            THEME_TXT(GCL(GRF_VIEW3_ID, 21), TC_TXT2);
+            grf_img_set_src(GCL(GRF_VIEW3_ID, 20), g_dark ? "temp-dark.png" : "temp-light.png");
 }
 
 /* ── view4 (Settings) themed control IDs ── */
@@ -640,7 +655,12 @@ static void theme_apply_view4(void)
                     grf_img_set_src(GCL(GRF_VIEW4_ID, V4_ACC_BLACK[i]),
                                     g_dark ? "acc-black-light.png" : "acc-black-dark.png");
             }
-        }
+            /* temp widget */
+                THEME_BG (GCL(GRF_VIEW4_ID, 82), TC_SURF);
+                THEME_TXT(GCL(GRF_VIEW4_ID, 82), TC_GREEN);
+                THEME_TXT(GCL(GRF_VIEW4_ID, 84), TC_TXT2);
+                grf_img_set_src(GCL(GRF_VIEW4_ID, 83), g_dark ? "temp-dark.png" : "temp-light.png");
+}
 static void theme_apply_view5(void)
 {
     grf_view_set_bgcolor(GRF_VIEW5_ID, TCOL(TC_BG));                     /* screen bg */
@@ -654,6 +674,11 @@ static void theme_apply_view5(void)
     THEME_TXT(GCL(GRF_VIEW5_ID, 6), TC_BLUE);                           /* label3 "‹ Settings" */
     grf_img_set_src(GCL(GRF_VIEW5_ID, 9), g_dark ? "saved-light.png" : "saved-dark.png"); /* image1 popup */
     grf_img_set_src(GCL(GRF_VIEW5_ID, 8), g_dark ? "theme-light.png" : "theme-dark.png"); /* image0 toggle */
+    /* temp widget */
+        THEME_BG (GCL(GRF_VIEW5_ID, 11), TC_SURF);
+        THEME_TXT(GCL(GRF_VIEW5_ID, 11), TC_GREEN);
+        THEME_TXT(GCL(GRF_VIEW5_ID, 13), TC_TXT2);
+        grf_img_set_src(GCL(GRF_VIEW5_ID, 12), g_dark ? "temp-dark.png" : "temp-light.png");
 }
 
 /* ── view6 (Pin Map) themed control IDs ── */
@@ -730,6 +755,11 @@ static void theme_apply_view6(void)
             for (u8 id = 166; id <= 184; id++)
                 grf_ctrl_style_set_bg_color(GCL(GRF_VIEW6_ID, id),
                     g_dark ? GRF_COLOR_GET(0xDC, 0xDC, 0xE1) : GRF_COLOR_GET(0x12, 0x12, 0x12), 0);
+            /* temp widget */
+                THEME_BG (GCL(GRF_VIEW6_ID, 163), TC_SURF);
+                THEME_TXT(GCL(GRF_VIEW6_ID, 163), TC_GREEN);
+                THEME_TXT(GCL(GRF_VIEW6_ID, 165), TC_TXT2);
+                grf_img_set_src(GCL(GRF_VIEW6_ID, 164), g_dark ? "temp-dark.png" : "temp-light.png");
 
 }
 
@@ -803,6 +833,11 @@ static void theme_apply_view7(void)
         if (src) grf_img_set_src(GCL(GRF_VIEW7_ID, V7_QR), src);
     }
     /* label7/id11 green pip left fixed (accent, like cyan/orange elsewhere) */
+    /* temp widget */
+        THEME_BG (GCL(GRF_VIEW7_ID, 58), TC_SURF);
+        THEME_TXT(GCL(GRF_VIEW7_ID, 58), TC_GREEN);
+        THEME_TXT(GCL(GRF_VIEW7_ID, 60), TC_TXT2);
+        grf_img_set_src(GCL(GRF_VIEW7_ID, 59), g_dark ? "temp-dark.png" : "temp-light.png");
 }
 
 /* OCP popups: per-theme asset + visibility from g_ocp. Runs on every view entry
