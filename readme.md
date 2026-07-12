@@ -279,6 +279,8 @@ and apply logic depend on. (Do **not** rely on the `datalen>=4` branch in the
 | `0x001C` | Battery cell voltage (MAX17048); `0` = no battery         | mV            |
 | `0x001D` | Battery SoC (MAX17048), clamped 0–100; `0xFFFF` = no batt | %             |
 | `0x001E` | Charge state: 0 no battery/full, 1 charging (2 unused)    | enum          |
+| `0x001F` | OCP fault flag → raises the trip popup on all views       | 0/1           |
+| `0x0026` | Temperature (TMP102 @ 0x4B); `0xFFFF` = no sensor         | 0.1 °C        |
 | `0x003A` | Lifetime energy odometer — **high 16 bits** of Wh         | Wh            |
 | `0x003B` | Lifetime energy odometer — **low 16 bits** of Wh          | Wh            |
 
@@ -540,6 +542,36 @@ labels per view jumping to the other three pages via
 `grf_view_set_dis_view_anim(GRF_VIEWx_ID, GRF_SCR_LOAD_ANIM_NONE, …)`. Transitions
 are **instant** (no slide). Handlers bind by numeric Control ID in `viewX_cc.h`,
 which does **not** always match the IDE's label name — map by ID, not symbol.
+
+### Over-current protection (OCP)
+
+The AP33772S hardware OCP is armed on every profile apply — `setOCPTHR(limMA)` (50 mA/LSB)
+for PPS/AVS, the PDO `imax` for fixed — with `OCP_EN` + `OCP_MSK`. The chip only *flags*
+OCP (it doesn't open VOUT itself and doesn't reliably raise INT), so STATUS (`0x01`, bit 5)
+is **polled** in `serviceStatus()`. On a trip the firmware opens the output
+(`setOutput(0)`), latches off (`g_ocpLatched`), and pushes `0x0016=0` (arm button back to
+green) + `0x001F=1`. The latch clears only on a manual re-arm or a fresh apply.
+
+`serviceStatus()` handles **only** OCP — negotiation events are left to `sendProfileList()`
+edge-tracking and the 500 ms watch, because acting on every re-negotiation caused a
+spurious re-attach that reverted the rail on each profile select.
+
+HMI: one popup image per view (all bound to `ocp-light.png` / `ocp-dark.png`), raised
+together by `0x001F` and dismissed together on any tap; hidden by default and re-applied on
+entry via the `g_ocp` shadow, so a trip persists across navigation and theme changes.
+
+### Temperature (TMP102)
+
+The TMP102 (`0x4B`, no config — powers up in 12-bit continuous mode) is read each telemetry
+pass and pushed as tenths of a degree on reg `0x0026` (`0xFFFF` = no sensor). A top-bar
+widget on all 7 views shows value + thermometer + unit, colored by status (green <45 °C,
+orange 45–60 °C, red >60 °C — thresholds always in Celsius); the thermometer asset is
+theme-aware (`temp-light` / `temp-dark`).
+
+Tapping the value flips **°C ↔ °F** on every view at once (`temp_set_unit`), persisted to
+`D:/tempunit.bin`. Settings (view4) adds a Temperature section: `sw3` shows/hides the widget
+on all pages (persisted to `D:/tempshow.bin`, re-applied on entry) and a °C/°F segmented
+toggle mirroring the theme toggle's selected-chip behavior.
 
 ### Theme color table
 
@@ -804,7 +836,7 @@ Open-source hardware **and** software under the **MIT License**.
       current clamp ≤4999 mA, real PPS/AVS voltage_min floor, output re-assert.
 - [x] 4-page tab navigation (instant); view2 back button.
 - [x] Settings (view4): boot-output state + auto-arm, reflected on entry.
-- [x] Persist settings to flash; "Last used" restore of rail + voltage + output.
+- [x] Persist settings to flash; "Last used" restores rail + voltage only — **output is never armed on boot** (safety).
 - [x] Active-rail highlight after boot restore (reg 0x0017).
 - [x] Settings: persistent **brightness** slider (reg 0x0030, RP-backed, debounced).
 - [x] Monitor: output toggle as a colored **label** (green/red, reg 0x0022).
@@ -818,9 +850,6 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] **Dark/light theme** extended across view1 + view2 (roles, image swaps, cards).
 - [x] **Analog arc easing** (RP ramps toward measured V, reg 0x001B ~25 Hz on change).
 - [x] Extend theme to **view3 / view4** and any remaining view2 elements.
-- [~] **Dark/light theme — IN PROGRESS.** Proven on a TEST set (view1 `label16`/
-      `label17`/`label1`, ids 19/20/2) + toggle `label24` (id 28). **Next: extend to
-      all objects across all 4 views.** See the "Theme" notes in Firmware behavior.
 - [x] Lifetime-energy **odometer display** in Settings (7-digit, Control IDs 42–49).
 - [x] **Gift message**: view5 editor → `D:/gift.txt`; view1 boot popup (image4/label24).
 - [x] **Gift popup enable** (view4 sw1 → `D:/giften.bin`, panel-local, defaults ON).
@@ -836,7 +865,14 @@ Open-source hardware **and** software under the **MIT License**.
 - [x] **About page (view7)** — themed product/credits reference; theme-aware QR
       popup overlay (Crowd Supply / GitHub / Website); Back → Settings; reached
       from Settings row `label61`/id80.
-- [ ] **Battery presence detection — REDO from schematic.** Dynamics-only heuristics
-      off +BATT (short window / confirm debounce / disturbance quiet-latch) all
-      false-positive on the no-cell charger plateau. Needs a different approach.
+- [x] **Battery presence — resolved (charging-only model).** Heuristics off +BATT can't
+      tell a full cell from the no-cell charger plateau, so presence = sustained charging
+      (STAT `11`); full/none both read "no battery". See "Battery presence detection".
+- [x] **Over-current protection (OCP).** AP33772S hardware OCP armed at the set current
+      limit on every apply; STATUS bit5 polled (chip only flags) → firmware cuts VOUT,
+      latches off until re-arm, raises a themed trip popup on all 7 views (reg `0x001F`,
+      tap to dismiss). See "Over-current protection".
+- [x] **Temperature widget (TMP102 @ 0x4B).** Reading pushed as reg `0x0026` (0.1 °C);
+      shown on all 7 views with green/orange/red status color; tap to toggle °C/°F
+      (persisted); Settings `sw3` shows/hides the widget (persisted). See "Temperature".
 - [ ] Slide-up animation for the adjust panel (blocked: `grf_animation_set` no-op).
